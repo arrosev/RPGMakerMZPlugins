@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target":"es6",
+    
+  },
+
+  "include": [
+    "lunalite-pixi-mz.d.ts",
+    "js/*.js",
+    "js/plugins/*.js"
+  ]
+}
