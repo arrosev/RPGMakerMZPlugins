@@ -1,0 +1,2 @@
+# RPGMakerMZPlugins
+Personal test file
