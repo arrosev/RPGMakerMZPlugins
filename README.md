@@ -1,2 +1,2 @@
 # RPGMakerMZPlugins
-Personal test file
+RPGMaker MZ Plugins
