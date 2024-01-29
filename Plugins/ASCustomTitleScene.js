@@ -8,6 +8,7 @@
  * @help
  * pixi宣称是支持['mp4', 'm4v', 'webm', 'ogg', 'ogv', 'h264', 'avi', 'mov']，
  * 但是暂时只测试了mp4和webm是可以的
+ * 如有使用了会改变标题场景按钮个数的插件，请把此插件放在那个插件的上面
  * 
  * 
  * @param titleSet
@@ -67,8 +68,15 @@
  * @text 自定义标题命令窗口布局
  * @desc 自定义标题命令窗口布局设置
  * @parent titleCommandWindowSet
- * @default {"x":"0","y":"0","width":"0","height":"0"}
+ * @default {"x":"428","y":"364","width":"240","height":"156"}
  * @type struct<Rect>
+ * 
+ * @param titleCommandWindowPadding
+ * @text 自定义标题命令窗口内边距
+ * @desc 自定义标题命令窗口内边距设置
+ * @parent titleCommandWindowSet
+ * @type number
+ * @default 12
  * 
  * @param titleCommandWindowSkin
  * @text 自定义标题命令窗口皮肤
@@ -87,15 +95,47 @@
  * @option custom 
  * @default default
  * 
- * @param newGameCommandButton
- * @text 新游戏命令按钮样式
- * @desc 新游戏命令按钮样式设置
+ * @param drawTitleCommandBackground
+ * @text 绘制命令按钮默认背景
+ * @desc 是否绘制命令按钮默认背景
+ * @parent titleCommandListSet
+ * @default true
+ * @type boolean
+ * 
+ * @param titleCommandButtonSize
+ * @text 命令按钮尺寸
+ * @desc 命令按钮尺寸设置
+ * @parent titleCommandListSet
+ * @default {"width":"216","height":"44"}
+ * @type struct<Size>
+ * 
+ * @param titleCommandButtonRowSpacing
+ * @text 命令按钮行间距
+ * @desc 命令按钮行间距设置
+ * @parent titleCommandListSet
+ * @type number
+ * @default 4
+ * 
+ * @param newGameCommandButtonStyle
+ * @text 重新开始命令按钮
+ * @desc 重新开始命令按钮设置
  * @parent titleCommandListSet
  * @type struct<OldCommandListCell>
- * @default 
+ * @default {"commandName":"","commandSelectBG":"none","commandNoSelectBG":"none"}
  * 
+ * @param continueCommandButtonStyle
+ * @text 继续游戏命令按钮
+ * @desc 继续游戏命令按钮设置
+ * @parent titleCommandListSet
+ * @type struct<OldCommandListCell>
+ * @default {"commandName":"","commandSelectBG":"none","commandNoSelectBG":"none"}
  * 
- * 
+ * @param optionsCommandButtonStyle
+ * @text 选项命令按钮
+ * @desc 选项命令按钮设置
+ * @parent titleCommandListSet
+ * @type struct<OldCommandListCell>
+ * @default {"commandName":"","commandSelectBG":"none","commandNoSelectBG":"none"}
  * 
  */
 
@@ -145,11 +185,53 @@
  * 
  */
 
+/*~struct~Size:
+ * 
+ * @param width
+ * @text width
+ * @desc 宽
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param height
+ * @text height
+ * @desc 高
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ */
+
 /*~struct~OldCommandListCell:
  *
  * @param commandName
- * @text 命令名
- * @desc 命令名
+ * @text 命令名称
+ * @desc 命令名称
+ * @default 
+ * @type string
+ * 
+ * @param commandSelectBG
+ * @text 被选择时命令的背景图
+ * @desc 被选择时命令的背景图设置
+ * @type file
+ * @dir img/
+ * @default none
+ * 
+ * @param commandNoSelectBG
+ * @text 未被选择时命令的背景图
+ * @desc 未被选择时命令的背景图设置
+ * @type file
+ * @dir img/
+ * @default none
+ * 
+ */
+
+/*~struct~CommandListCell:
+ *
+ * @param commandName
+ * @text 命令名称
+ * @desc 命令名称
  * @default 
  * @type string
  * 
@@ -203,8 +285,23 @@
     const titleCommandWindowSet = parameters.titleCommandWindowSet || systemDefault;
     const titleCommandWindowRectJsonObject = JSON.parse(parameters.titleCommandWindowRect);
     const titleCommandWindowRect = new Rectangle(Number(titleCommandWindowRectJsonObject.x) || 0, Number(titleCommandWindowRectJsonObject.y) || 0, Number(titleCommandWindowRectJsonObject.width) || 0, Number(titleCommandWindowRectJsonObject.height) || 0);
-    console.log("titleCommandWindowRect: ", titleCommandWindowRect);
+    const titleCommandWindowPadding = Number(parameters.titleCommandWindowPadding);
     const titleCommandWindowSkin = parameters.titleCommandWindowSkin || defaultFilePath;
+
+
+    const titleCommandListSet = parameters.titleCommandListSet || systemDefault;
+    const drawTitleCommandBackground = parameters.drawTitleCommandBackground !== "false";
+    const titleCommandButtonSizeJsonObject = JSON.parse(parameters.titleCommandButtonSize);
+    const titleCommandButtonSize = {
+        width: Number(titleCommandButtonSizeJsonObject.width) || 0,
+        height: Number(titleCommandButtonSizeJsonObject.height) || 0,
+    };
+    const titleCommandButtonRowSpacing = Number(parameters.titleCommandButtonRowSpacing);
+    const newGameCommandButtonStyleJsonObject = JSON.parse(parameters.newGameCommandButtonStyle);
+    //console.log("newGameCommandButtonStyleJsonObject: ", newGameCommandButtonStyleJsonObject)
+    const continueCommandButtonStyleJsonObject = JSON.parse(parameters.continueCommandButtonStyle);
+    const optionsCommandButtonStyleJsonObject = JSON.parse(parameters.optionsCommandButtonStyle);
+    
     
     const _Create_Foreground = Scene_Title.prototype.createForeground;
     Scene_Title.prototype.createForeground = function() {
@@ -257,12 +354,108 @@
         _Create_Command_Window.apply(this, arguments);
 
         if (titleCommandWindowSet === userCustom) {
-            
+            this._commandWindow._padding = titleCommandWindowPadding;
             this._commandWindow.windowskin = titleCommandWindowSkin === defaultFilePath ? ImageManager.loadSystem("Window") : ImageManager.loadSystem(titleCommandWindowSkin);
-
         }
 
+        console.log("this._commandWindow: ", this._commandWindow)
+        console.log("this._commandWindow itemwidth: ", this._commandWindow.itemWidth())
+        console.log("this._commandWindow itemwidth: ", this._commandWindow.itemHeight())
     };
+
+
+
+    const _Window_Title_Command_Initialize = Window_TitleCommand.prototype.initialize;
+    Window_TitleCommand.prototype.initialize = function (rect) {
+        _Window_Title_Command_Initialize.apply(this, arguments);
+
+        // this.noSelectSprite = new Sprite(ImageManager.loadBitmap("img/", newGameCommandButtonStyleJsonObject.commandSelectBG));
+
+        // this.addChildToBack(this.noSelectSprite)
+
+        // if (titleCommandListSet === userCustom && drawTitleCommandBackground === false) {
+        //     this.contentsBack = null;
+        // }
+    };
+
+    const _Window_Title_Command_Item_Width = Window_TitleCommand.prototype.itemWidth;
+    Window_TitleCommand.prototype.itemWidth = function() {
+        let width = _Window_Title_Command_Item_Width.apply(this, arguments);
+        return titleCommandListSet === userCustom ? titleCommandButtonSize.width : width;
+    }
+
+    const _Window_Title_Command_Item_Height = Window_TitleCommand.prototype.itemHeight;
+    Window_TitleCommand.prototype.itemHeight = function() {
+        let height = _Window_Title_Command_Item_Height.apply(this, arguments);
+        return titleCommandListSet === userCustom ? titleCommandButtonSize.height : height;
+    }
+
+    const _Window_Title_Command_Button_Row_Spacing = Window_TitleCommand.prototype.rowSpacing;
+    Window_TitleCommand.prototype.rowSpacing = function() {
+        let rowSpacing = _Window_Title_Command_Button_Row_Spacing.apply(this, arguments);
+        return titleCommandListSet === userCustom ? titleCommandButtonRowSpacing : rowSpacing;
+    }
+
+    const _Window_Title_Command_Make_Command_List = Window_TitleCommand.prototype.makeCommandList;
+    Window_TitleCommand.prototype.makeCommandList = function() {
+
+        _Window_Title_Command_Make_Command_List.apply(this, arguments);
+
+        if(titleCommandListSet === userCustom) {
+            this.clearCommandList();
+            const continueEnabled = this.isContinueEnabled();
+            //把原本有的增加到command数组
+            this.addCommand(newGameCommandButtonStyleJsonObject.commandName, "newGame");
+            this.addCommand(continueCommandButtonStyleJsonObject.commandName, "continue", continueEnabled);
+            this.addCommand(optionsCommandButtonStyleJsonObject.commandName, "options");
+        }
+        
+        
+    };
+
+    const _Window_Title_Command_Draw_Item = Window_TitleCommand.prototype.drawItem;
+    Window_TitleCommand.prototype.drawItem = function(index) {
+        _Window_Title_Command_Draw_Item.apply(this, arguments);
+        console.log(this.contents)
+        console.log("contentsBack: ", this.contentsBack)
+        const bitmap = ImageManager.loadBitmap("img/", newGameCommandButtonStyleJsonObject.commandSelectBG)
+        const rect = this.itemLineRect(index);
+        console.log(rect)
+        bitmap.addLoadListener(() => {
+            //titleCommandButtonSize
+            this.contents.blt(bitmap, 0, 0, titleCommandButtonSize.width, titleCommandButtonSize.height, 0, rect.y, titleCommandButtonSize.width, titleCommandButtonSize.height)
+            // this.contents.blt(bitmap, 0, 0, titleCommandButtonSize.width, titleCommandButtonSize.height, 0, rect.y, titleCommandButtonSize.width, titleCommandButtonSize.height)
+            //this.contents.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
+            // this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, this.contents.width, this.contents.height)
+        })
+    }
+    
+    // Window_TitleCommand.prototype.colSpacing = function() {
+    //     return 0
+    // }
+
+    // Window_TitleCommand.prototype.rowSpacing = function() {
+    //     return 0
+    // }
+
+    
+    // const _Draw_Background_Rect = Window_TitleCommand.prototype.drawBackgroundRect;
+    // Window_TitleCommand.prototype.drawBackgroundRect = function(rect) {
+    //     _Draw_Background_Rect.apply(this, arguments);
+    //     console.log("rect: ", rect)
+    // }
+
+    // const _Initialize = Window_TitleCommand.prototype.initialize;
+    // Window_TitleCommand.prototype.initialize = function(rect) {
+    //     _Initialize.apply(this, arguments);
+    //     this.contentsBack = null;
+    // };
+
+    // const _Draw_Item_Background = Window_TitleCommand.prototype.drawItemBackground;
+    // Window_TitleCommand.prototype.drawItemBackground = function() {
+    //     // _Draw_Item_Background.apply(this, arguments);
+    //     // this.drawBackgroundRect(new Rectangle(0, 0, 0, 0));
+    // }
 
     // Scene_Title.prototype.mainCommandWidth = function() {
     //     return 180;
