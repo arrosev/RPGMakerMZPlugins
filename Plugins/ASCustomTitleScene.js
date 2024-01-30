@@ -102,6 +102,13 @@
  * @default true
  * @type boolean
  * 
+ * @param drawTitleCommandText
+ * @text 绘制命令按钮文本
+ * @desc 是否绘制命令按钮文本
+ * @parent titleCommandListSet
+ * @default true
+ * @type boolean
+ * 
  * @param titleCommandButtonSize
  * @text 命令按钮尺寸
  * @desc 命令按钮尺寸设置
@@ -291,6 +298,7 @@
 
     const titleCommandListSet = parameters.titleCommandListSet || systemDefault;
     const drawTitleCommandBackground = parameters.drawTitleCommandBackground !== "false";
+    const drawTitleCommandText = parameters.drawTitleCommandText !== "false";
     const titleCommandButtonSizeJsonObject = JSON.parse(parameters.titleCommandButtonSize);
     const titleCommandButtonSize = {
         width: Number(titleCommandButtonSizeJsonObject.width) || 0,
@@ -301,6 +309,9 @@
     //console.log("newGameCommandButtonStyleJsonObject: ", newGameCommandButtonStyleJsonObject)
     const continueCommandButtonStyleJsonObject = JSON.parse(parameters.continueCommandButtonStyle);
     const optionsCommandButtonStyleJsonObject = JSON.parse(parameters.optionsCommandButtonStyle);
+
+    const titleCommandButtonBGArray = [];
+    const selectBGSpriteArray = [];
     
     
     const _Create_Foreground = Scene_Title.prototype.createForeground;
@@ -398,7 +409,7 @@
 
     const _Window_Title_Command_Make_Command_List = Window_TitleCommand.prototype.makeCommandList;
     Window_TitleCommand.prototype.makeCommandList = function() {
-
+        console.log("------------------makeCommandList----------------------")
         _Window_Title_Command_Make_Command_List.apply(this, arguments);
 
         if(titleCommandListSet === userCustom) {
@@ -410,24 +421,30 @@
             this.addCommand(optionsCommandButtonStyleJsonObject.commandName, "options");
         }
         
+        titleCommandButtonBGArray.push({
+            noSelectBG: newGameCommandButtonStyleJsonObject.commandNoSelectBG,
+            selectBG: newGameCommandButtonStyleJsonObject.commandSelectBG
+        });
+
+        titleCommandButtonBGArray.push({
+            noSelectBG: continueCommandButtonStyleJsonObject.commandNoSelectBG,
+            selectBG: continueCommandButtonStyleJsonObject.commandSelectBG
+        });
+
+        titleCommandButtonBGArray.push({
+            noSelectBG: optionsCommandButtonStyleJsonObject.commandNoSelectBG,
+            selectBG: optionsCommandButtonStyleJsonObject.commandSelectBG
+        });
+
         
     };
 
     const _Window_Title_Command_Draw_Item = Window_TitleCommand.prototype.drawItem;
     Window_TitleCommand.prototype.drawItem = function(index) {
         _Window_Title_Command_Draw_Item.apply(this, arguments);
-        console.log(this.contents)
-        console.log("contentsBack: ", this.contentsBack)
-        const bitmap = ImageManager.loadBitmap("img/", newGameCommandButtonStyleJsonObject.commandSelectBG)
-        const rect = this.itemLineRect(index);
-        console.log(rect)
-        bitmap.addLoadListener(() => {
-            //titleCommandButtonSize
-            this.contents.blt(bitmap, 0, 0, titleCommandButtonSize.width, titleCommandButtonSize.height, 0, rect.y, titleCommandButtonSize.width, titleCommandButtonSize.height)
-            // this.contents.blt(bitmap, 0, 0, titleCommandButtonSize.width, titleCommandButtonSize.height, 0, rect.y, titleCommandButtonSize.width, titleCommandButtonSize.height)
-            //this.contents.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
-            // this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, this.contents.width, this.contents.height)
-        })
+        if (titleCommandListSet === userCustom && drawTitleCommandText === false) {
+            this.contents.clear();
+        }
     }
     
     // Window_TitleCommand.prototype.colSpacing = function() {
@@ -451,11 +468,123 @@
     //     this.contentsBack = null;
     // };
 
-    // const _Draw_Item_Background = Window_TitleCommand.prototype.drawItemBackground;
-    // Window_TitleCommand.prototype.drawItemBackground = function() {
-    //     // _Draw_Item_Background.apply(this, arguments);
-    //     // this.drawBackgroundRect(new Rectangle(0, 0, 0, 0));
-    // }
+    const _Draw_Item_Background = Window_TitleCommand.prototype.drawItemBackground;
+    Window_TitleCommand.prototype.drawItemBackground = function(index) {
+        _Draw_Item_Background.apply(this, arguments);
+
+        if (titleCommandListSet === userCustom && drawTitleCommandBackground === false) {
+            this.contentsBack.clear();
+            
+        }
+
+        
+        const rect = this.itemRect(index);
+        //this.contentsBack.clear()
+        console.log("index: ", index)
+        console.log("rect: ", rect)
+        console.log("titleCommandButtonBGArray: ", titleCommandButtonBGArray)
+        const bitmap = ImageManager.loadBitmap("img/", titleCommandButtonBGArray[index].noSelectBG)
+        bitmap.addLoadListener(() => {
+            //titleCommandButtonSize
+            this.contentsBack.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
+            // this.contents.blt(bitmap, 0, 0, titleCommandButtonSize.width, titleCommandButtonSize.height, 0, rect.y, titleCommandButtonSize.width, titleCommandButtonSize.height)
+            //this.contents.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
+            // this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, this.contents.width, this.contents.height)
+        })
+        // this.drawBackgroundRect(new Rectangle(0, 0, 0, 0));
+    }
+
+    const _Window_Title_Command_Select = Window_TitleCommand.prototype.select;
+    Window_TitleCommand.prototype.select = function(index) {
+        let last = this.index();
+        const lastRect = this.itemRect(last);
+        _Window_Title_Command_Select.apply(this, arguments);
+        let current = this.index();
+        
+        const currentRect = this.itemRect(current);
+        console.log("select -- titleCommandButtonBGArray: ", titleCommandButtonBGArray)
+
+        console.log("last: ", last)
+        console.log("titleCommandButtonBGArray[last]: ", titleCommandButtonBGArray[last])
+
+        if(titleCommandButtonBGArray.length !== 0) {
+
+            if(last === -1) {
+                const selectBitmap = ImageManager.loadBitmap("img/", titleCommandButtonBGArray[current].selectBG)
+                selectBitmap.addLoadListener(() => {
+                    //titleCommandButtonSize
+                    this.contentsBack.clearRect(0, currentRect.y, currentRect.width, currentRect.height);
+                    this.contentsBack.blt(selectBitmap, 0, 0, currentRect.width, currentRect.height, 0, currentRect.y, currentRect.width, currentRect.height)
+                    // this.contents.blt(bitmap, 0, 0, titleCommandButtonSize.width, titleCommandButtonSize.height, 0, rect.y, titleCommandButtonSize.width, titleCommandButtonSize.height)
+                    //this.contents.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
+                    // this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, this.contents.width, this.contents.height)
+                })
+            } else {
+                const bitmap = ImageManager.loadBitmap("img/", titleCommandButtonBGArray[last].noSelectBG)
+                const selectBitmap = ImageManager.loadBitmap("img/", titleCommandButtonBGArray[current].selectBG)
+
+                bitmap.addLoadListener(() => {
+                    //titleCommandButtonSize
+                    this.contentsBack.clearRect(0, lastRect.y, lastRect.width, lastRect.height);
+                    this.contentsBack.blt(bitmap, 0, 0, lastRect.width, lastRect.height, 0, lastRect.y, lastRect.width, lastRect.height)
+                    // this.contents.blt(bitmap, 0, 0, titleCommandButtonSize.width, titleCommandButtonSize.height, 0, rect.y, titleCommandButtonSize.width, titleCommandButtonSize.height)
+                    //this.contents.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
+                    // this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, this.contents.width, this.contents.height)
+                })
+
+                selectBitmap.addLoadListener(() => {
+                    //titleCommandButtonSize
+                    this.contentsBack.clearRect(0, currentRect.y, currentRect.width, currentRect.height);
+                    this.contentsBack.blt(selectBitmap, 0, 0, currentRect.width, currentRect.height, 0, currentRect.y, currentRect.width, currentRect.height)
+                    // this.contents.blt(bitmap, 0, 0, titleCommandButtonSize.width, titleCommandButtonSize.height, 0, rect.y, titleCommandButtonSize.width, titleCommandButtonSize.height)
+                    //this.contents.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
+                    // this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, this.contents.width, this.contents.height)
+                })
+            }
+            
+
+        }
+        
+        //this.contentsBack.clear()
+        // for (const key in titleCommandButtonBGArray) {
+
+        //     if(key === index) {
+
+        //     }
+
+        //     const bitmap = ImageManager.loadBitmap("img/", titleCommandButtonBGArray[key].noSelectBG)
+        // bitmap.addLoadListener(() => {
+        //     //titleCommandButtonSize
+        //     this.contentsBack.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
+        //     // this.contents.blt(bitmap, 0, 0, titleCommandButtonSize.width, titleCommandButtonSize.height, 0, rect.y, titleCommandButtonSize.width, titleCommandButtonSize.height)
+        //     //this.contents.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
+        //     // this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, this.contents.width, this.contents.height)
+        // })
+
+
+        // }
+
+        
+        // const bitmap = ImageManager.loadBitmap("img/", newGameCommandButtonStyleJsonObject.commandSelectBG)
+        // // const noSelectBitmap = ImageManager.loadBitmap("img/", newGameCommandButtonStyleJsonObject.commandNoSelectBG)
+        // // //this.contentsBack.clear();
+        // // noSelectBitmap.addLoadListener(() => {
+        // //     //titleCommandButtonSize
+        // //     this.contentsBack.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
+        // //     // this.contents.blt(bitmap, 0, 0, titleCommandButtonSize.width, titleCommandButtonSize.height, 0, rect.y, titleCommandButtonSize.width, titleCommandButtonSize.height)
+        // //     //this.contents.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
+        // //     // this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, this.contents.width, this.contents.height)
+        // // })
+        // bitmap.addLoadListener(() => {
+        //     //titleCommandButtonSize
+        //     this.contentsBack.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
+        //     // this.contents.blt(bitmap, 0, 0, titleCommandButtonSize.width, titleCommandButtonSize.height, 0, rect.y, titleCommandButtonSize.width, titleCommandButtonSize.height)
+        //     //this.contents.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
+        //     // this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, this.contents.width, this.contents.height)
+        // })
+
+        
+    }
 
     // Scene_Title.prototype.mainCommandWidth = function() {
     //     return 180;
