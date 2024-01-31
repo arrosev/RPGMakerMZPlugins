@@ -71,13 +71,6 @@
  * @default {"x":"428","y":"364","width":"240","height":"156"}
  * @type struct<Rect>
  * 
- * @param titleCommandWindowPadding
- * @text 自定义标题命令窗口内边距
- * @desc 自定义标题命令窗口内边距设置
- * @parent titleCommandWindowSet
- * @type number
- * @default 12
- * 
  * @param titleCommandWindowSkin
  * @text 自定义标题命令窗口皮肤
  * @desc 自定义标题命令窗口皮肤设置（仅支持png格式）
@@ -88,19 +81,12 @@
  * 
  * @param titleCommandListSet
  * @text 标题命令列表设置
- * @desc 选择标题命令列表设置方式
+ * @desc 选择标题命令列表设置方式(选custom会取消绘制命令按钮默认黑色矩形背景)
  * @parent titleCommandWindowSet
  * @type select
  * @option default
  * @option custom 
  * @default default
- * 
- * @param drawTitleCommandBackground
- * @text 绘制命令按钮默认背景
- * @desc 是否绘制命令按钮默认背景
- * @parent titleCommandListSet
- * @default true
- * @type boolean
  * 
  * @param drawTitleCommandText
  * @text 绘制命令按钮文本
@@ -108,20 +94,6 @@
  * @parent titleCommandListSet
  * @default true
  * @type boolean
- * 
- * @param titleCommandButtonSize
- * @text 命令按钮尺寸
- * @desc 命令按钮尺寸设置
- * @parent titleCommandListSet
- * @default {"width":"216","height":"44"}
- * @type struct<Size>
- * 
- * @param titleCommandButtonRowSpacing
- * @text 命令按钮行间距
- * @desc 命令按钮行间距设置
- * @parent titleCommandListSet
- * @type number
- * @default 4
  * 
  * @param newGameCommandButtonStyle
  * @text 重新开始命令按钮
@@ -232,6 +204,13 @@
  * @dir img/
  * @default none
  * 
+ * @param commandDisabledBG
+ * @text 未启用命令的背景图
+ * @desc 未启用命令的背景图设置
+ * @type file
+ * @dir img/
+ * @default none
+ * 
  */
 
 /*~struct~CommandListCell:
@@ -243,8 +222,8 @@
  * @type string
  * 
  * @param commandEnable
- * @text 能否点击
- * @desc 命令能否点击(选择true即命令可点击，或者输入一个开关号，以开关决定可否点击)
+ * @text 是否启用命令
+ * @desc 是否启用命令(选择true即启用命令，或者输入一个开关号，以开关决定是否启用)
  * @type combo
  * @option true
  * @default true
@@ -259,6 +238,13 @@
  * @param commandNoSelectBG
  * @text 未被选择时命令的背景图
  * @desc 未被选择时命令的背景图设置
+ * @type file
+ * @dir img/
+ * @default none
+ * 
+ * @param commandDisabledBG
+ * @text 未启用命令的背景图
+ * @desc 未启用命令的背景图设置
  * @type file
  * @dir img/
  * @default none
@@ -292,27 +278,25 @@
     const titleCommandWindowSet = parameters.titleCommandWindowSet || systemDefault;
     const titleCommandWindowRectJsonObject = JSON.parse(parameters.titleCommandWindowRect);
     const titleCommandWindowRect = new Rectangle(Number(titleCommandWindowRectJsonObject.x) || 0, Number(titleCommandWindowRectJsonObject.y) || 0, Number(titleCommandWindowRectJsonObject.width) || 0, Number(titleCommandWindowRectJsonObject.height) || 0);
-    const titleCommandWindowPadding = Number(parameters.titleCommandWindowPadding);
+    // const titleCommandWindowPadding = Number(parameters.titleCommandWindowPadding);
     const titleCommandWindowSkin = parameters.titleCommandWindowSkin || defaultFilePath;
 
 
     const titleCommandListSet = parameters.titleCommandListSet || systemDefault;
-    const drawTitleCommandBackground = parameters.drawTitleCommandBackground !== "false";
+    //const drawTitleCommandBackground = parameters.drawTitleCommandBackground !== "false";
     const drawTitleCommandText = parameters.drawTitleCommandText !== "false";
-    const titleCommandButtonSizeJsonObject = JSON.parse(parameters.titleCommandButtonSize);
-    const titleCommandButtonSize = {
-        width: Number(titleCommandButtonSizeJsonObject.width) || 0,
-        height: Number(titleCommandButtonSizeJsonObject.height) || 0,
-    };
-    const titleCommandButtonRowSpacing = Number(parameters.titleCommandButtonRowSpacing);
+    //const titleCommandButtonSizeJsonObject = JSON.parse(parameters.titleCommandButtonSize);
+    // const titleCommandButtonSize = {
+    //     width: Number(titleCommandButtonSizeJsonObject.width) || 0,
+    //     height: Number(titleCommandButtonSizeJsonObject.height) || 0,
+    // };
+    //const titleCommandButtonRowSpacing = Number(parameters.titleCommandButtonRowSpacing);
     const newGameCommandButtonStyleJsonObject = JSON.parse(parameters.newGameCommandButtonStyle);
     //console.log("newGameCommandButtonStyleJsonObject: ", newGameCommandButtonStyleJsonObject)
     const continueCommandButtonStyleJsonObject = JSON.parse(parameters.continueCommandButtonStyle);
     const optionsCommandButtonStyleJsonObject = JSON.parse(parameters.optionsCommandButtonStyle);
 
-    const titleCommandButtonBGArray = [];
-    const selectBGSpriteArray = [];
-    
+    let titleCommandButtonBGArray = [];
     
     const _Create_Foreground = Scene_Title.prototype.createForeground;
     Scene_Title.prototype.createForeground = function() {
@@ -334,7 +318,8 @@
     const _Create_Background = Scene_Title.prototype.createBackground;
     Scene_Title.prototype.createBackground = function() {
         _Create_Background.apply(this, arguments);
-       
+        PIXI.utils.clearTextureCache();
+        console.log("-------------------------------Scene_Title.prototype.createBackground--------------------------")
         //img/titles1/loopTitle.mp4
         if(backgroundSet === userCustom && customMoviesBackgroundPath !== defaultFilePath) {
 
@@ -365,47 +350,47 @@
         _Create_Command_Window.apply(this, arguments);
 
         if (titleCommandWindowSet === userCustom) {
-            this._commandWindow._padding = titleCommandWindowPadding;
+            //this._commandWindow._padding = titleCommandWindowPadding;
             this._commandWindow.windowskin = titleCommandWindowSkin === defaultFilePath ? ImageManager.loadSystem("Window") : ImageManager.loadSystem(titleCommandWindowSkin);
         }
 
-        console.log("this._commandWindow: ", this._commandWindow)
-        console.log("this._commandWindow itemwidth: ", this._commandWindow.itemWidth())
-        console.log("this._commandWindow itemwidth: ", this._commandWindow.itemHeight())
+        // console.log("this._commandWindow: ", this._commandWindow)
+        // console.log("this._commandWindow itemwidth: ", this._commandWindow.itemWidth())
+        // console.log("this._commandWindow itemwidth: ", this._commandWindow.itemHeight())
     };
 
 
 
-    const _Window_Title_Command_Initialize = Window_TitleCommand.prototype.initialize;
-    Window_TitleCommand.prototype.initialize = function (rect) {
-        _Window_Title_Command_Initialize.apply(this, arguments);
+    // const _Window_Title_Command_Initialize = Window_TitleCommand.prototype.initialize;
+    // Window_TitleCommand.prototype.initialize = function (rect) {
+    //     _Window_Title_Command_Initialize.apply(this, arguments);
 
-        // this.noSelectSprite = new Sprite(ImageManager.loadBitmap("img/", newGameCommandButtonStyleJsonObject.commandSelectBG));
+    //     // this.noSelectSprite = new Sprite(ImageManager.loadBitmap("img/", newGameCommandButtonStyleJsonObject.commandSelectBG));
 
-        // this.addChildToBack(this.noSelectSprite)
+    //     // this.addChildToBack(this.noSelectSprite)
 
-        // if (titleCommandListSet === userCustom && drawTitleCommandBackground === false) {
-        //     this.contentsBack = null;
-        // }
-    };
+    //     // if (titleCommandListSet === userCustom && drawTitleCommandBackground === false) {
+    //     //     this.contentsBack = null;
+    //     // }
+    // };
 
-    const _Window_Title_Command_Item_Width = Window_TitleCommand.prototype.itemWidth;
-    Window_TitleCommand.prototype.itemWidth = function() {
-        let width = _Window_Title_Command_Item_Width.apply(this, arguments);
-        return titleCommandListSet === userCustom ? titleCommandButtonSize.width : width;
-    }
+    // const _Window_Title_Command_Item_Width = Window_TitleCommand.prototype.itemWidth;
+    // Window_TitleCommand.prototype.itemWidth = function() {
+    //     let width = _Window_Title_Command_Item_Width.apply(this, arguments);
+    //     return titleCommandListSet === userCustom ? titleCommandButtonSize.width : width;
+    // }
 
-    const _Window_Title_Command_Item_Height = Window_TitleCommand.prototype.itemHeight;
-    Window_TitleCommand.prototype.itemHeight = function() {
-        let height = _Window_Title_Command_Item_Height.apply(this, arguments);
-        return titleCommandListSet === userCustom ? titleCommandButtonSize.height : height;
-    }
+    // const _Window_Title_Command_Item_Height = Window_TitleCommand.prototype.itemHeight;
+    // Window_TitleCommand.prototype.itemHeight = function() {
+    //     let height = _Window_Title_Command_Item_Height.apply(this, arguments);
+    //     return titleCommandListSet === userCustom ? titleCommandButtonSize.height : height;
+    // }
 
-    const _Window_Title_Command_Button_Row_Spacing = Window_TitleCommand.prototype.rowSpacing;
-    Window_TitleCommand.prototype.rowSpacing = function() {
-        let rowSpacing = _Window_Title_Command_Button_Row_Spacing.apply(this, arguments);
-        return titleCommandListSet === userCustom ? titleCommandButtonRowSpacing : rowSpacing;
-    }
+    // const _Window_Title_Command_Button_Row_Spacing = Window_TitleCommand.prototype.rowSpacing;
+    // Window_TitleCommand.prototype.rowSpacing = function() {
+    //     let rowSpacing = _Window_Title_Command_Button_Row_Spacing.apply(this, arguments);
+    //     return titleCommandListSet === userCustom ? titleCommandButtonRowSpacing : rowSpacing;
+    // }
 
     const _Window_Title_Command_Make_Command_List = Window_TitleCommand.prototype.makeCommandList;
     Window_TitleCommand.prototype.makeCommandList = function() {
@@ -413,28 +398,33 @@
         _Window_Title_Command_Make_Command_List.apply(this, arguments);
 
         if(titleCommandListSet === userCustom) {
+            titleCommandButtonBGArray = [];
             this.clearCommandList();
             const continueEnabled = this.isContinueEnabled();
             //把原本有的增加到command数组
             this.addCommand(newGameCommandButtonStyleJsonObject.commandName, "newGame");
             this.addCommand(continueCommandButtonStyleJsonObject.commandName, "continue", continueEnabled);
             this.addCommand(optionsCommandButtonStyleJsonObject.commandName, "options");
+
+            titleCommandButtonBGArray.push({
+                noSelectBG: newGameCommandButtonStyleJsonObject.commandNoSelectBG,
+                selectBG: newGameCommandButtonStyleJsonObject.commandSelectBG,
+                disabledBG: newGameCommandButtonStyleJsonObject.commandDisabledBG
+            });
+    
+            titleCommandButtonBGArray.push({
+                noSelectBG: continueCommandButtonStyleJsonObject.commandNoSelectBG,
+                selectBG: continueCommandButtonStyleJsonObject.commandSelectBG,
+                disabledBG: continueCommandButtonStyleJsonObject.commandDisabledBG
+            });
+    
+            titleCommandButtonBGArray.push({
+                noSelectBG: optionsCommandButtonStyleJsonObject.commandNoSelectBG,
+                selectBG: optionsCommandButtonStyleJsonObject.commandSelectBG,
+                disabledBG: optionsCommandButtonStyleJsonObject.commandDisabledBG
+            });
+
         }
-        
-        titleCommandButtonBGArray.push({
-            noSelectBG: newGameCommandButtonStyleJsonObject.commandNoSelectBG,
-            selectBG: newGameCommandButtonStyleJsonObject.commandSelectBG
-        });
-
-        titleCommandButtonBGArray.push({
-            noSelectBG: continueCommandButtonStyleJsonObject.commandNoSelectBG,
-            selectBG: continueCommandButtonStyleJsonObject.commandSelectBG
-        });
-
-        titleCommandButtonBGArray.push({
-            noSelectBG: optionsCommandButtonStyleJsonObject.commandNoSelectBG,
-            selectBG: optionsCommandButtonStyleJsonObject.commandSelectBG
-        });
 
         
     };
@@ -472,26 +462,28 @@
     Window_TitleCommand.prototype.drawItemBackground = function(index) {
         _Draw_Item_Background.apply(this, arguments);
 
-        if (titleCommandListSet === userCustom && drawTitleCommandBackground === false) {
-            this.contentsBack.clear();
-            
-        }
+        if (titleCommandListSet === userCustom) {
+            const rect = this.itemRect(index);
+            console.log("index: ", index)
+            console.log("drawItemBackground -------------- rect: ", rect)
+            console.log("titleCommandButtonBGArray: ", titleCommandButtonBGArray)
+            this.contentsBack.clearRect(rect.x - 1, rect.y - 1, rect.width + 2, rect.height + 2);
+            console.log("this._list[index].enabled: ", this._list[index].enabled)
 
+            redrawItemBackground(this._list[index].enabled === false ? titleCommandButtonBGArray[index].disabledBG : titleCommandButtonBGArray[index].noSelectBG, rect, this.contentsBack);
+
+        }
         
-        const rect = this.itemRect(index);
-        //this.contentsBack.clear()
-        console.log("index: ", index)
-        console.log("rect: ", rect)
-        console.log("titleCommandButtonBGArray: ", titleCommandButtonBGArray)
-        const bitmap = ImageManager.loadBitmap("img/", titleCommandButtonBGArray[index].noSelectBG)
-        bitmap.addLoadListener(() => {
-            //titleCommandButtonSize
-            this.contentsBack.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
-            // this.contents.blt(bitmap, 0, 0, titleCommandButtonSize.width, titleCommandButtonSize.height, 0, rect.y, titleCommandButtonSize.width, titleCommandButtonSize.height)
-            //this.contents.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
-            // this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, this.contents.width, this.contents.height)
-        })
-        // this.drawBackgroundRect(new Rectangle(0, 0, 0, 0));
+    }
+
+    const redrawItemBackground = function(imagePath, drawRect, contentsBack) {
+        if(imagePath !== defaultFilePath) {
+            const bitmap = ImageManager.loadBitmap("img/", imagePath);
+            bitmap.addLoadListener(() => {
+                contentsBack.clearRect(drawRect.x, drawRect.y, drawRect.width, drawRect.height);
+                contentsBack.blt(bitmap, 0, 0, drawRect.width, drawRect.height, drawRect.x, drawRect.y, drawRect.width, drawRect.height);
+            });
+        }
     }
 
     const _Window_Title_Command_Select = Window_TitleCommand.prototype.select;
@@ -500,89 +492,19 @@
         const lastRect = this.itemRect(last);
         _Window_Title_Command_Select.apply(this, arguments);
         let current = this.index();
-        
         const currentRect = this.itemRect(current);
-        console.log("select -- titleCommandButtonBGArray: ", titleCommandButtonBGArray)
-
         console.log("last: ", last)
-        console.log("titleCommandButtonBGArray[last]: ", titleCommandButtonBGArray[last])
-
+        console.log("current: ", current)
         if(titleCommandButtonBGArray.length !== 0) {
-
             if(last === -1) {
-                const selectBitmap = ImageManager.loadBitmap("img/", titleCommandButtonBGArray[current].selectBG)
-                selectBitmap.addLoadListener(() => {
-                    //titleCommandButtonSize
-                    this.contentsBack.clearRect(0, currentRect.y, currentRect.width, currentRect.height);
-                    this.contentsBack.blt(selectBitmap, 0, 0, currentRect.width, currentRect.height, 0, currentRect.y, currentRect.width, currentRect.height)
-                    // this.contents.blt(bitmap, 0, 0, titleCommandButtonSize.width, titleCommandButtonSize.height, 0, rect.y, titleCommandButtonSize.width, titleCommandButtonSize.height)
-                    //this.contents.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
-                    // this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, this.contents.width, this.contents.height)
-                })
+                if(current !== -1) {
+                    redrawItemBackground(this._list[current].enabled === false ? titleCommandButtonBGArray[current].disabledBG : titleCommandButtonBGArray[current].selectBG, currentRect, this.contentsBack);
+                }
             } else {
-                const bitmap = ImageManager.loadBitmap("img/", titleCommandButtonBGArray[last].noSelectBG)
-                const selectBitmap = ImageManager.loadBitmap("img/", titleCommandButtonBGArray[current].selectBG)
-
-                bitmap.addLoadListener(() => {
-                    //titleCommandButtonSize
-                    this.contentsBack.clearRect(0, lastRect.y, lastRect.width, lastRect.height);
-                    this.contentsBack.blt(bitmap, 0, 0, lastRect.width, lastRect.height, 0, lastRect.y, lastRect.width, lastRect.height)
-                    // this.contents.blt(bitmap, 0, 0, titleCommandButtonSize.width, titleCommandButtonSize.height, 0, rect.y, titleCommandButtonSize.width, titleCommandButtonSize.height)
-                    //this.contents.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
-                    // this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, this.contents.width, this.contents.height)
-                })
-
-                selectBitmap.addLoadListener(() => {
-                    //titleCommandButtonSize
-                    this.contentsBack.clearRect(0, currentRect.y, currentRect.width, currentRect.height);
-                    this.contentsBack.blt(selectBitmap, 0, 0, currentRect.width, currentRect.height, 0, currentRect.y, currentRect.width, currentRect.height)
-                    // this.contents.blt(bitmap, 0, 0, titleCommandButtonSize.width, titleCommandButtonSize.height, 0, rect.y, titleCommandButtonSize.width, titleCommandButtonSize.height)
-                    //this.contents.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
-                    // this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, this.contents.width, this.contents.height)
-                })
+                redrawItemBackground(this._list[last].enabled === false ? titleCommandButtonBGArray[last].disabledBG : titleCommandButtonBGArray[last].noSelectBG, lastRect, this.contentsBack);
+                redrawItemBackground(this._list[current].enabled === false ? titleCommandButtonBGArray[current].disabledBG : titleCommandButtonBGArray[current].selectBG, currentRect, this.contentsBack);
             }
-            
-
         }
-        
-        //this.contentsBack.clear()
-        // for (const key in titleCommandButtonBGArray) {
-
-        //     if(key === index) {
-
-        //     }
-
-        //     const bitmap = ImageManager.loadBitmap("img/", titleCommandButtonBGArray[key].noSelectBG)
-        // bitmap.addLoadListener(() => {
-        //     //titleCommandButtonSize
-        //     this.contentsBack.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
-        //     // this.contents.blt(bitmap, 0, 0, titleCommandButtonSize.width, titleCommandButtonSize.height, 0, rect.y, titleCommandButtonSize.width, titleCommandButtonSize.height)
-        //     //this.contents.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
-        //     // this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, this.contents.width, this.contents.height)
-        // })
-
-
-        // }
-
-        
-        // const bitmap = ImageManager.loadBitmap("img/", newGameCommandButtonStyleJsonObject.commandSelectBG)
-        // // const noSelectBitmap = ImageManager.loadBitmap("img/", newGameCommandButtonStyleJsonObject.commandNoSelectBG)
-        // // //this.contentsBack.clear();
-        // // noSelectBitmap.addLoadListener(() => {
-        // //     //titleCommandButtonSize
-        // //     this.contentsBack.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
-        // //     // this.contents.blt(bitmap, 0, 0, titleCommandButtonSize.width, titleCommandButtonSize.height, 0, rect.y, titleCommandButtonSize.width, titleCommandButtonSize.height)
-        // //     //this.contents.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
-        // //     // this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, this.contents.width, this.contents.height)
-        // // })
-        // bitmap.addLoadListener(() => {
-        //     //titleCommandButtonSize
-        //     this.contentsBack.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
-        //     // this.contents.blt(bitmap, 0, 0, titleCommandButtonSize.width, titleCommandButtonSize.height, 0, rect.y, titleCommandButtonSize.width, titleCommandButtonSize.height)
-        //     //this.contents.blt(bitmap, 0, 0, rect.width, rect.height, 0, rect.y, rect.width, rect.height)
-        //     // this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, this.contents.width, this.contents.height)
-        // })
-
         
     }
 
