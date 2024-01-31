@@ -116,6 +116,13 @@
  * @type struct<OldCommandListCell>
  * @default {"commandName":"","commandSelectBG":"none","commandNoSelectBG":"none"}
  * 
+ * @param extraCommandList
+ * @text 额外标题命令选项列表
+ * @desc 添加额外标题命令选项
+ * @parent titleCommandListSet
+ * @type struct<CommandListCell>[]
+ * @default []
+ * 
  */
 
 /*~struct~Point:
@@ -190,16 +197,16 @@
  * @default 
  * @type string
  * 
- * @param commandSelectBG
- * @text 被选择时命令的背景图
- * @desc 被选择时命令的背景图设置
+ * @param commandNoSelectBG
+ * @text 未被选择时命令的背景图
+ * @desc 未被选择时命令的背景图设置
  * @type file
  * @dir img/
  * @default none
  * 
- * @param commandNoSelectBG
- * @text 未被选择时命令的背景图
- * @desc 未被选择时命令的背景图设置
+ * @param commandSelectBG
+ * @text 被选择时命令的背景图
+ * @desc 被选择时命令的背景图设置
  * @type file
  * @dir img/
  * @default none
@@ -212,14 +219,26 @@
  * @default none
  * 
  */
-
+//symbol
 /*~struct~CommandListCell:
  *
  * @param commandName
  * @text 命令名称
  * @desc 命令名称
- * @default 
  * @type string
+ * @default 
+ * 
+ * @param commandSymbol
+ * @text 命令符号
+ * @desc 命令符号(不可重复，newGame，continue，options已被占用)
+ * @type string
+ * @default 
+ * 
+ * @param commandCommonEvent	
+ * @text 命令公共事件
+ * @desc 按下命令后执行的公共事件
+ * @type common_event
+ * @default 0
  * 
  * @param commandEnable
  * @text 是否启用命令
@@ -228,16 +247,16 @@
  * @option true
  * @default true
  * 
- * @param commandSelectBG
- * @text 被选择时命令的背景图
- * @desc 被选择时命令的背景图设置
+ * @param commandNoSelectBG
+ * @text 未被选择时命令的背景图
+ * @desc 未被选择时命令的背景图设置
  * @type file
  * @dir img/
  * @default none
  * 
- * @param commandNoSelectBG
- * @text 未被选择时命令的背景图
- * @desc 未被选择时命令的背景图设置
+ * @param commandSelectBG
+ * @text 被选择时命令的背景图
+ * @desc 被选择时命令的背景图设置
  * @type file
  * @dir img/
  * @default none
@@ -278,24 +297,26 @@
     const titleCommandWindowSet = parameters.titleCommandWindowSet || systemDefault;
     const titleCommandWindowRectJsonObject = JSON.parse(parameters.titleCommandWindowRect);
     const titleCommandWindowRect = new Rectangle(Number(titleCommandWindowRectJsonObject.x) || 0, Number(titleCommandWindowRectJsonObject.y) || 0, Number(titleCommandWindowRectJsonObject.width) || 0, Number(titleCommandWindowRectJsonObject.height) || 0);
-    // const titleCommandWindowPadding = Number(parameters.titleCommandWindowPadding);
     const titleCommandWindowSkin = parameters.titleCommandWindowSkin || defaultFilePath;
 
 
     const titleCommandListSet = parameters.titleCommandListSet || systemDefault;
-    //const drawTitleCommandBackground = parameters.drawTitleCommandBackground !== "false";
     const drawTitleCommandText = parameters.drawTitleCommandText !== "false";
-    //const titleCommandButtonSizeJsonObject = JSON.parse(parameters.titleCommandButtonSize);
-    // const titleCommandButtonSize = {
-    //     width: Number(titleCommandButtonSizeJsonObject.width) || 0,
-    //     height: Number(titleCommandButtonSizeJsonObject.height) || 0,
-    // };
-    //const titleCommandButtonRowSpacing = Number(parameters.titleCommandButtonRowSpacing);
     const newGameCommandButtonStyleJsonObject = JSON.parse(parameters.newGameCommandButtonStyle);
-    //console.log("newGameCommandButtonStyleJsonObject: ", newGameCommandButtonStyleJsonObject)
     const continueCommandButtonStyleJsonObject = JSON.parse(parameters.continueCommandButtonStyle);
     const optionsCommandButtonStyleJsonObject = JSON.parse(parameters.optionsCommandButtonStyle);
 
+    // const parseStructArray = function(arr) {
+    //     const parseStruct = function(struct) {
+    //         return JSON.parse(struct);
+    //     };
+    //     return arr.map(parseStruct);
+    // };
+    //undefine问题
+    const extraCommandListJsonObject = JSON.parse(parameters.extraCommandList);
+    //console.log("extraCommandListJsonObject: ", extraCommandListJsonObject);
+    //const extraCommandListJsonObject = parseStructArray(JSON.parse(parameters.extraCommandList));
+    
     let titleCommandButtonBGArray = [];
     
     const _Create_Foreground = Scene_Title.prototype.createForeground;
@@ -358,8 +379,6 @@
         // console.log("this._commandWindow itemwidth: ", this._commandWindow.itemWidth())
         // console.log("this._commandWindow itemwidth: ", this._commandWindow.itemHeight())
     };
-
-
 
     // const _Window_Title_Command_Initialize = Window_TitleCommand.prototype.initialize;
     // Window_TitleCommand.prototype.initialize = function (rect) {
@@ -424,8 +443,21 @@
                 disabledBG: optionsCommandButtonStyleJsonObject.commandDisabledBG
             });
 
+            // console.log("extraCommandListJsonObject: ", extraCommandListJsonObject)
+            for(const command of extraCommandListJsonObject) {
+                console.log("command: ", command)
+                const commandJsonObject = JSON.parse(command)
+                this.addCommand(command.commandName, command.commandSymbol);
+                titleCommandButtonBGArray.push({
+                    noSelectBG: commandJsonObject.commandNoSelectBG,
+                    selectBG: commandJsonObject.commandSelectBG,
+                    disabledBG: commandJsonObject.commandDisabledBG
+                });
+            }
+
         }
 
+        console.log("titleCommandButtonBGArray: ", titleCommandButtonBGArray)
         
     };
 
