@@ -71,6 +71,20 @@
  * @default {"x":"428","y":"364","width":"240","height":"156"}
  * @type struct<Rect>
  * 
+ * @param titleCommandWindowPoint
+ * @text 自定义标题命令窗口坐标
+ * @desc 自定义标题命令窗口左上角坐标设置
+ * @parent titleCommandWindowSet
+ * @default {"x":"428","y":"364"}
+ * @type struct<Point>
+ * 
+ * @param titleCommandWindowPadding
+ * @text 自定义标题命令窗口内边距
+ * @desc 自定义标题命令窗口内边距设置
+ * @parent titleCommandWindowSet
+ * @type number
+ * @default 12
+ * 
  * @param titleCommandWindowSkin
  * @text 自定义标题命令窗口皮肤
  * @desc 自定义标题命令窗口皮肤设置（仅支持png格式）
@@ -94,6 +108,27 @@
  * @parent titleCommandListSet
  * @default true
  * @type boolean
+ * 
+ * @param titleCommandButtonSize
+ * @text 命令按钮尺寸
+ * @desc 命令按钮尺寸设置
+ * @parent titleCommandListSet
+ * @default {"width":"208","height":"40"}
+ * @type struct<Size>
+ * 
+ * @param titleCommandButtonRowSpacing
+ * @text 命令按钮行间距
+ * @desc 命令按钮行间距设置
+ * @parent titleCommandListSet
+ * @type number
+ * @default 4
+ * 
+ * @param titleCommandButtonColSpacing
+ * @text 命令按钮列间距
+ * @desc 命令按钮列间距设置
+ * @parent titleCommandListSet
+ * @type number
+ * @default 8
  * 
  * @param newGameCommandButtonStyle
  * @text 重新开始命令按钮
@@ -297,11 +332,21 @@
     const titleCommandWindowSet = parameters.titleCommandWindowSet || systemDefault;
     const titleCommandWindowRectJsonObject = JSON.parse(parameters.titleCommandWindowRect);
     const titleCommandWindowRect = new Rectangle(Number(titleCommandWindowRectJsonObject.x) || 0, Number(titleCommandWindowRectJsonObject.y) || 0, Number(titleCommandWindowRectJsonObject.width) || 0, Number(titleCommandWindowRectJsonObject.height) || 0);
+    const titleCommandWindowPointJsonObject = JSON.parse(parameters.titleCommandWindowPoint); 
+    const titleCommandWindowPoint = new Point(Number(titleCommandWindowPointJsonObject.x) || 0, Number(titleCommandWindowPointJsonObject.y) || 0);
+    const titleCommandWindowPadding = Number(parameters.titleCommandWindowPadding);
     const titleCommandWindowSkin = parameters.titleCommandWindowSkin || defaultFilePath;
 
 
     const titleCommandListSet = parameters.titleCommandListSet || systemDefault;
     const drawTitleCommandText = parameters.drawTitleCommandText !== "false";
+    const titleCommandButtonSizeJsonObject = JSON.parse(parameters.titleCommandButtonSize);
+    const titleCommandButtonSize = {
+        width: Number(titleCommandButtonSizeJsonObject.width) || 0,
+        height: Number(titleCommandButtonSizeJsonObject.height) || 0,
+    };
+    const titleCommandButtonRowSpacing = Number(parameters.titleCommandButtonRowSpacing);
+    const titleCommandButtonColSpacing = Number(parameters.titleCommandButtonColSpacing);
     const newGameCommandButtonStyleJsonObject = JSON.parse(parameters.newGameCommandButtonStyle);
     const continueCommandButtonStyleJsonObject = JSON.parse(parameters.continueCommandButtonStyle);
     const optionsCommandButtonStyleJsonObject = JSON.parse(parameters.optionsCommandButtonStyle);
@@ -360,20 +405,22 @@
     };
 
 
-    const _Command_Window_Rect = Scene_Title.prototype.commandWindowRect;
-    Scene_Title.prototype.commandWindowRect = function() {
-        let rect = _Command_Window_Rect.apply(this, arguments);
-        return titleCommandWindowSet === userCustom ? titleCommandWindowRect : rect;
-    };
+    // const _Command_Window_Rect = Scene_Title.prototype.commandWindowRect;
+    // Scene_Title.prototype.commandWindowRect = function() {
+    //     let rect = _Command_Window_Rect.apply(this, arguments);
+    //     return titleCommandWindowSet === userCustom ? titleCommandWindowRect : rect;
+    // };
 
     const _Create_Command_Window = Scene_Title.prototype.createCommandWindow;
     Scene_Title.prototype.createCommandWindow = function() {
         _Create_Command_Window.apply(this, arguments);
 
         if (titleCommandWindowSet === userCustom) {
-            //this._commandWindow._padding = titleCommandWindowPadding;
+            this._commandWindow._padding = titleCommandWindowPadding;
             this._commandWindow.windowskin = titleCommandWindowSkin === defaultFilePath ? ImageManager.loadSystem("Window") : ImageManager.loadSystem(titleCommandWindowSkin);
+            //this._commandWindow.move(titleCommandWindowPoint.x, titleCommandWindowPoint.y, titleCommandButtonSize.width + 2 * titleCommandWindowPadding + titleCommandButtonColSpacing, titleCommandButtonSize.height * titleCommandButtonBGArray.length  + 2 * titleCommandWindowPadding + titleCommandButtonRowSpacing * titleCommandButtonBGArray.length);
         }
+
 
         // console.log("this._commandWindow: ", this._commandWindow)
         // console.log("this._commandWindow itemwidth: ", this._commandWindow.itemWidth())
@@ -455,6 +502,10 @@
                 });
             }
 
+            this.move(titleCommandWindowPoint.x, titleCommandWindowPoint.y, titleCommandButtonSize.width + 2 * titleCommandWindowPadding + titleCommandButtonColSpacing, titleCommandButtonSize.height * titleCommandButtonBGArray.length  + 2 * titleCommandWindowPadding + titleCommandButtonRowSpacing * titleCommandButtonBGArray.length);
+            console.log("this height: ", this.height)
+            this.contentsBack.resize(titleCommandButtonSize.width + 2 * titleCommandWindowPadding + titleCommandButtonColSpacing, titleCommandButtonSize.height * titleCommandButtonBGArray.length  + 2 * titleCommandWindowPadding + titleCommandButtonRowSpacing * titleCommandButtonBGArray.length)
+            console.log("this.contentsBack rect: ", this.contentsBack.rect)
         }
 
         console.log("titleCommandButtonBGArray: ", titleCommandButtonBGArray)
@@ -509,6 +560,7 @@
     }
 
     const redrawItemBackground = function(imagePath, drawRect, contentsBack) {
+        //console.log("contentsBack: ", contentsBack)
         if(imagePath !== defaultFilePath) {
             const bitmap = ImageManager.loadBitmap("img/", imagePath);
             bitmap.addLoadListener(() => {
