@@ -440,23 +440,29 @@
     //     // }
     // };
 
-    // const _Window_Title_Command_Item_Width = Window_TitleCommand.prototype.itemWidth;
-    // Window_TitleCommand.prototype.itemWidth = function() {
-    //     let width = _Window_Title_Command_Item_Width.apply(this, arguments);
-    //     return titleCommandListSet === userCustom ? titleCommandButtonSize.width : width;
-    // }
+    const _Window_Title_Command_Item_Width = Window_TitleCommand.prototype.itemWidth;
+    Window_TitleCommand.prototype.itemWidth = function() {
+        let width = _Window_Title_Command_Item_Width.apply(this, arguments);
+        return titleCommandListSet === userCustom ? titleCommandButtonSize.width + this.colSpacing() : width;
+    }
 
-    // const _Window_Title_Command_Item_Height = Window_TitleCommand.prototype.itemHeight;
-    // Window_TitleCommand.prototype.itemHeight = function() {
-    //     let height = _Window_Title_Command_Item_Height.apply(this, arguments);
-    //     return titleCommandListSet === userCustom ? titleCommandButtonSize.height : height;
-    // }
+    const _Window_Title_Command_Item_Height = Window_TitleCommand.prototype.itemHeight;
+    Window_TitleCommand.prototype.itemHeight = function() {
+        let height = _Window_Title_Command_Item_Height.apply(this, arguments);
+        return titleCommandListSet === userCustom ? titleCommandButtonSize.height + this.rowSpacing() : height;
+    }
 
-    // const _Window_Title_Command_Button_Row_Spacing = Window_TitleCommand.prototype.rowSpacing;
-    // Window_TitleCommand.prototype.rowSpacing = function() {
-    //     let rowSpacing = _Window_Title_Command_Button_Row_Spacing.apply(this, arguments);
-    //     return titleCommandListSet === userCustom ? titleCommandButtonRowSpacing : rowSpacing;
-    // }
+    const _Window_Title_Command_ColSpacing = Window_TitleCommand.prototype.colSpacing;
+    Window_TitleCommand.prototype.colSpacing = function() {
+        let colSpacing = _Window_Title_Command_ColSpacing.apply(this, arguments);
+        return titleCommandListSet === userCustom ? titleCommandButtonColSpacing : colSpacing;
+    }
+
+    const _Window_Title_Command_RowSpacing = Window_TitleCommand.prototype.rowSpacing;
+    Window_TitleCommand.prototype.rowSpacing = function() {
+        let rowSpacing = _Window_Title_Command_RowSpacing.apply(this, arguments);
+        return titleCommandListSet === userCustom ? titleCommandButtonRowSpacing : rowSpacing;
+    }
 
     const _Window_Title_Command_Make_Command_List = Window_TitleCommand.prototype.makeCommandList;
     Window_TitleCommand.prototype.makeCommandList = function() {
@@ -520,15 +526,6 @@
         }
     }
     
-    // Window_TitleCommand.prototype.colSpacing = function() {
-    //     return 0
-    // }
-
-    // Window_TitleCommand.prototype.rowSpacing = function() {
-    //     return 0
-    // }
-
-    
     // const _Draw_Background_Rect = Window_TitleCommand.prototype.drawBackgroundRect;
     // Window_TitleCommand.prototype.drawBackgroundRect = function(rect) {
     //     _Draw_Background_Rect.apply(this, arguments);
@@ -560,7 +557,6 @@
     }
 
     const redrawItemBackground = function(imagePath, drawRect, contentsBack) {
-        //console.log("contentsBack: ", contentsBack)
         if(imagePath !== defaultFilePath) {
             const bitmap = ImageManager.loadBitmap("img/", imagePath);
             bitmap.addLoadListener(() => {
@@ -577,19 +573,20 @@
         _Window_Title_Command_Select.apply(this, arguments);
         let current = this.index();
         const currentRect = this.itemRect(current);
-        console.log("last: ", last)
-        console.log("current: ", current)
-        if(titleCommandButtonBGArray.length !== 0) {
-            if(last === -1) {
-                if(current !== -1) {
+        if(last !== current) {
+            console.log("last: ", last)
+            console.log("current: ", current)
+            if (titleCommandButtonBGArray.length !== 0) {
+                if (last === -1) {
+                    if (current !== -1) {
+                        redrawItemBackground(this._list[current].enabled === false ? titleCommandButtonBGArray[current].disabledBG : titleCommandButtonBGArray[current].selectBG, currentRect, this.contentsBack);
+                    }
+                } else {
+                    redrawItemBackground(this._list[last].enabled === false ? titleCommandButtonBGArray[last].disabledBG : titleCommandButtonBGArray[last].noSelectBG, lastRect, this.contentsBack);
                     redrawItemBackground(this._list[current].enabled === false ? titleCommandButtonBGArray[current].disabledBG : titleCommandButtonBGArray[current].selectBG, currentRect, this.contentsBack);
                 }
-            } else {
-                redrawItemBackground(this._list[last].enabled === false ? titleCommandButtonBGArray[last].disabledBG : titleCommandButtonBGArray[last].noSelectBG, lastRect, this.contentsBack);
-                redrawItemBackground(this._list[current].enabled === false ? titleCommandButtonBGArray[current].disabledBG : titleCommandButtonBGArray[current].selectBG, currentRect, this.contentsBack);
             }
         }
-        
     }
 
     // Scene_Title.prototype.mainCommandWidth = function() {
