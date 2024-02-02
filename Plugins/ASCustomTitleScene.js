@@ -262,11 +262,11 @@
  * @type string
  * @default  
  * 
- * @param commandCommonEvent	
- * @text 命令公共事件
- * @desc 按下命令后执行的公共事件
- * @type common_event
- * @default 0
+ * @param commandAction	
+ * @text 命令方法
+ * @desc 按下命令后执行的代码
+ * @type note
+ * @default 
  * 
  * @param commandEnable
  * @text 是否启用命令
@@ -398,11 +398,12 @@
     //     return titleCommandWindowSet === userCustom ? titleCommandWindowRect : rect;
     // };
 
-    const _Scene_Title_Initialize = Scene_Title.prototype.initialize;
-    Scene_Title.prototype.initialize = function() {
-        _Scene_Title_Initialize.apply(this, arguments);
-        this._interpreter = new Game_Interpreter();
-    };
+    // const _Scene_Title_Initialize = Scene_Title.prototype.initialize;
+    // Scene_Title.prototype.initialize = function() {
+    //     _Scene_Title_Initialize.apply(this, arguments);
+    //     //this.commonEventsRunner = new Game_Map();
+    //     this._interpreter = new Game_Interpreter();
+    // };
 
     // const _Scene_Title_Update = Scene_Title.prototype.update;
     // Scene_Title.prototype.update = function() {
@@ -416,15 +417,9 @@
     //     }
     // }
 
-    Scene_Title.prototype.commandEventBind = function(commandEventNumber) {
-        //this._commandWindow.close()
-        console.log(commandEventNumber)
-        //$gameTemp.setupChild($dataCommonEvents[commandEventNumber].list, commandEventNumber)
-        //$gameTemp.reserveCommonEvent(commandEventNumber)
-        //$gameMap._interpreter.setup($dataCommonEvents[commandEventNumber].list)
-        this._interpreter.setup($dataCommonEvents[commandEventNumber].list);
-        let result = this._interpreter.executeCommand()
-        console.log("result: ", result)
+    Scene_Title.prototype.commandActionBind = function(commandAction) {
+        eval(JSON.parse(commandAction));
+        this._commandWindow.activate();
     }
 
     const _Create_Command_Window = Scene_Title.prototype.createCommandWindow;
@@ -439,9 +434,8 @@
             for (const index in extraCommandListJsonObject) {
                 const commandJsonObject = JSON.parse(extraCommandListJsonObject[index]);
                 const commandSymbol = commandSymbolHead + index.toString();
-                if (commandJsonObject.commandCommonEvent !== "0") {
-                    const commandCommonEventNum = Number(commandJsonObject.commandCommonEvent)
-                    this._commandWindow.setHandler(commandSymbol, this.commandEventBind.bind(this, commandCommonEventNum));
+                if (commandJsonObject.commandAction) {
+                    this._commandWindow.setHandler(commandSymbol, this.commandActionBind.bind(this, commandJsonObject.commandAction));
                 }
             };
         }
