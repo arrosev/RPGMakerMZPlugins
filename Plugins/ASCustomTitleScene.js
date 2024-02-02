@@ -123,6 +123,21 @@
  * @type number
  * @default 8
  * 
+ * @param titleCommandButtonCursorSprite
+ * @text 命令按钮光标精灵
+ * @desc 命令按钮光标精灵设置
+ * @parent titleCommandListSet
+ * @type file[]
+ * @dir img/
+ * @default []
+ * 
+ * @param titleCommandButtonCursorSpriteRect
+ * @text 命令按钮光标布局
+ * @desc 命令按钮光标布局设置
+ * @parent titleCommandListSet
+ * @type struct<Rect>
+ * @default {"x":"0","y":"0","width":"0","height":"0"}
+ * 
  * @param newGameCommandButtonStyle
  * @text 重新开始命令按钮
  * @desc 重新开始命令按钮设置
@@ -340,12 +355,17 @@
     };
     const titleCommandButtonRowSpacing = Number(parameters.titleCommandButtonRowSpacing);
     const titleCommandButtonColSpacing = Number(parameters.titleCommandButtonColSpacing);
+    const titleCommandButtonCursorSpriteJsonObject = JSON.parse(parameters.titleCommandButtonCursorSprite !== undefined ? parameters.titleCommandButtonCursorSprite : "[]");
+    // const titleCommandButtonCursorSpriteTextureArray = [];
+    
+    const titleCommandButtonCursorSpriteRectJsonObject = JSON.parse(parameters.titleCommandButtonCursorSpriteRect);
+    const titleCommandButtonCursorSpriteRect = new Rectangle(Number(titleCommandButtonCursorSpriteRectJsonObject.x) || 0, Number(titleCommandButtonCursorSpriteRectJsonObject.y) || 0, Number(titleCommandButtonCursorSpriteRectJsonObject.width) || 0, Number(titleCommandButtonCursorSpriteRectJsonObject.height) || 0);
     const newGameCommandButtonStyleJsonObject = JSON.parse(parameters.newGameCommandButtonStyle);
     const continueCommandButtonStyleJsonObject = JSON.parse(parameters.continueCommandButtonStyle);
     const optionsCommandButtonStyleJsonObject = JSON.parse(parameters.optionsCommandButtonStyle);
 
     //undefine问题
-    const extraCommandListJsonObject = JSON.parse(parameters.extraCommandList);
+    const extraCommandListJsonObject = JSON.parse(parameters.extraCommandList !== undefined ? parameters.extraCommandList : "[]");
     //console.log("extraCommandListJsonObject: ", extraCommandListJsonObject);
     //const extraCommandListJsonObject = parseStructArray(JSON.parse(parameters.extraCommandList));
     
@@ -388,6 +408,28 @@
             videoSprite.height = Graphics.height;
             this.addChild(videoSprite);
         }
+
+        const titleCommandButtonCursorSpriteTextureArray = [];
+        for (const image of titleCommandButtonCursorSpriteJsonObject) {
+            console.log("image: ", "img/" + image + ".png")
+            let texture = PIXI.Texture.from("img/" + image + ".png");
+            titleCommandButtonCursorSpriteTextureArray.push(texture);
+        }
+
+        // let animatedSprite = new PIXI.AnimatedSprite(titleCommandButtonCursorSpriteTextureArray, true);
+        let animatedSprite = new PIXI.AnimatedSprite(titleCommandButtonCursorSpriteTextureArray);
+        animatedSprite.animationSpeed = 1;
+        animatedSprite.loop = true;
+        animatedSprite.x = titleCommandButtonCursorSpriteRect.x;
+        animatedSprite.y = titleCommandButtonCursorSpriteRect.y;
+        animatedSprite.width = titleCommandButtonCursorSpriteRect.width;
+        animatedSprite.height = titleCommandButtonCursorSpriteRect.height;
+        animatedSprite.onComplete = () => {
+            
+        };
+        animatedSprite.gotoAndPlay(0);
+        console.log("animatedSprite: ", animatedSprite)
+        this.addChild(animatedSprite);
 
     };
 
@@ -600,29 +642,83 @@
 
     const _Window_Title_Command_Select = Window_TitleCommand.prototype.select;
     Window_TitleCommand.prototype.select = function(index) {
+
         let last = this.index();
         const lastRect = this.itemRect(last);
         _Window_Title_Command_Select.apply(this, arguments);
         let current = this.index();
         const currentRect = this.itemRect(current);
-        if (last !== current) {
-            console.log("last: ", last)
-            console.log("current: ", current)
-            if (titleCommandButtonBGArray.length !== 0) {
-                if (last === -1) {
-                    if (current !== -1) {
+
+        if (titleCommandListSet === userCustom) {
+            if (last !== current) {
+                console.log("last: ", last)
+                console.log("current: ", current)
+                if (titleCommandButtonBGArray.length !== 0) {
+                    if (last === -1) {
+                        if (current !== -1) {
+                            redrawItemBackground(this._list[current].enabled === false ? titleCommandButtonBGArray[current].disabledBG : titleCommandButtonBGArray[current].selectBG, currentRect, this.contentsBack);
+                        }
+                    } else {
+                        redrawItemBackground(this._list[last].enabled === false ? titleCommandButtonBGArray[last].disabledBG : titleCommandButtonBGArray[last].noSelectBG, lastRect, this.contentsBack);
                         redrawItemBackground(this._list[current].enabled === false ? titleCommandButtonBGArray[current].disabledBG : titleCommandButtonBGArray[current].selectBG, currentRect, this.contentsBack);
                     }
-                } else {
-                    redrawItemBackground(this._list[last].enabled === false ? titleCommandButtonBGArray[last].disabledBG : titleCommandButtonBGArray[last].noSelectBG, lastRect, this.contentsBack);
-                    redrawItemBackground(this._list[current].enabled === false ? titleCommandButtonBGArray[current].disabledBG : titleCommandButtonBGArray[current].selectBG, currentRect, this.contentsBack);
                 }
             }
         }
+        
     }
 
-    // Scene_Title.prototype.mainCommandWidth = function() {
-    //     return 180;
-    // }
+    const _Window_Title_Command_Create_Cursor_Sprite = Window_TitleCommand.prototype._createCursorSprite;
+    Window_TitleCommand.prototype._createCursorSprite = function() {
+        _Window_Title_Command_Create_Cursor_Sprite.apply(this, arguments);
+        
+        if (titleCommandListSet === userCustom) {
+            if (titleCommandButtonCursorSpriteJsonObject.length === 1) {
+                this._cursorSprite = new Sprite();
+                this._cursorSprite.addChild(new Sprite());
+                this._cursorSprite.children[0].bitmap = ImageManager.loadBitmap("img/", titleCommandButtonCursorSpriteJsonObject[0]);
+                this._cursorSprite.children[0].setFrame(titleCommandButtonCursorSpriteRect.x, titleCommandButtonCursorSpriteRect.y, titleCommandButtonCursorSpriteRect.width, titleCommandButtonCursorSpriteRect.height);
+                this._clientArea.addChild(this._cursorSprite)
+            } else {
+                // this._cursorSprite = new Sprite();
+                
+                // const titleCommandButtonCursorSpriteTextureArray = [];
+                // for (const image of titleCommandButtonCursorSpriteJsonObject) {
+                //     console.log("image: ", "img/" + image + ".png")
+                //     let texture = PIXI.Texture.from("img/" + image + ".png");
+                //     titleCommandButtonCursorSpriteTextureArray.push(texture);
+                // }
+
+                // // let animatedSprite = new PIXI.AnimatedSprite(titleCommandButtonCursorSpriteTextureArray, true);
+                // let animatedSprite = new PIXI.AnimatedSprite(titleCommandButtonCursorSpriteTextureArray);
+                // animatedSprite.animationSpeed = 1;
+                // animatedSprite.loop = true;
+                // animatedSprite.x = titleCommandButtonCursorSpriteRect.x;
+                // animatedSprite.y = titleCommandButtonCursorSpriteRect.y;
+                // animatedSprite.width = titleCommandButtonCursorSpriteRect.width;
+                // animatedSprite.height = titleCommandButtonCursorSpriteRect.height;
+                // animatedSprite.onComplete = () => {
+                //     console.log("播放完成");
+                // }; //完成的回调函数
+                // animatedSprite.gotoAndStop(1); // 第几帧开始播放
+                // console.log("animatedSprite: ", animatedSprite)
+                // this._cursorSprite.addChild(animatedSprite);
+                // //this._cursorSprite.setFrame(titleCommandButtonCursorSpriteRect.x, titleCommandButtonCursorSpriteRect.y, titleCommandButtonCursorSpriteRect.width, titleCommandButtonCursorSpriteRect.height);
+                // this._clientArea.addChild(this._cursorSprite);
+               
+            }
+        }
+       
+    }
+
+    Window_TitleCommand.prototype._updateCursor = function() {
+        this._cursorSprite.visible = this.isOpen() && this.cursorVisible;
+        this._cursorSprite.x = this._cursorRect.x;
+        this._cursorSprite.y = this._cursorRect.y;
+    }
+
+    Window_TitleCommand.prototype._refreshCursor = function() {
+
+    }
 
 })();
