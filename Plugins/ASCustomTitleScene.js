@@ -328,9 +328,6 @@
     const commandSymbolHead = "commandSymbol";
 
     const titleSet = parameters.titleSet || systemDefault;
-    //console.log("titleSet: ", titleSet);
-
-    //console.log("parameters.customPictureTitlePoint: ", parameters.customPictureTitlePoint)
     const customPictureTitlePointJsonObject = JSON.parse(parameters.customPictureTitlePoint);
     const customPictureTitlePoint = new Point(Number(customPictureTitlePointJsonObject.x) || 0, Number(customPictureTitlePointJsonObject.y) || 0);
     const customPictureTitlePath = parameters.customPictureTitlePath || defaultFilePath;
@@ -364,10 +361,7 @@
     const continueCommandButtonStyleJsonObject = JSON.parse(parameters.continueCommandButtonStyle);
     const optionsCommandButtonStyleJsonObject = JSON.parse(parameters.optionsCommandButtonStyle);
 
-    //undefine问题
     const extraCommandListJsonObject = JSON.parse(parameters.extraCommandList !== undefined ? parameters.extraCommandList : "[]");
-    //console.log("extraCommandListJsonObject: ", extraCommandListJsonObject);
-    //const extraCommandListJsonObject = parseStructArray(JSON.parse(parameters.extraCommandList));
     
     let titleCommandButtonBGArray = [];
     
@@ -408,28 +402,6 @@
             videoSprite.height = Graphics.height;
             this.addChild(videoSprite);
         }
-
-        const titleCommandButtonCursorSpriteTextureArray = [];
-        for (const image of titleCommandButtonCursorSpriteJsonObject) {
-            console.log("image: ", "img/" + image + ".png")
-            let texture = PIXI.Texture.from("img/" + image + ".png");
-            titleCommandButtonCursorSpriteTextureArray.push(texture);
-        }
-
-        // let animatedSprite = new PIXI.AnimatedSprite(titleCommandButtonCursorSpriteTextureArray, true);
-        let animatedSprite = new PIXI.AnimatedSprite(titleCommandButtonCursorSpriteTextureArray);
-        animatedSprite.animationSpeed = 1;
-        animatedSprite.loop = true;
-        animatedSprite.x = titleCommandButtonCursorSpriteRect.x;
-        animatedSprite.y = titleCommandButtonCursorSpriteRect.y;
-        animatedSprite.width = titleCommandButtonCursorSpriteRect.width;
-        animatedSprite.height = titleCommandButtonCursorSpriteRect.height;
-        animatedSprite.onComplete = () => {
-            
-        };
-        animatedSprite.gotoAndPlay(0);
-        console.log("animatedSprite: ", animatedSprite)
-        this.addChild(animatedSprite);
 
     };
 
@@ -599,18 +571,6 @@
             this.contents.clear();
         }
     }
-    
-    // const _Draw_Background_Rect = Window_TitleCommand.prototype.drawBackgroundRect;
-    // Window_TitleCommand.prototype.drawBackgroundRect = function(rect) {
-    //     _Draw_Background_Rect.apply(this, arguments);
-    //     console.log("rect: ", rect)
-    // }
-
-    // const _Initialize = Window_TitleCommand.prototype.initialize;
-    // Window_TitleCommand.prototype.initialize = function(rect) {
-    //     _Initialize.apply(this, arguments);
-    //     this.contentsBack = null;
-    // };
 
     const _Draw_Item_Background = Window_TitleCommand.prototype.drawItemBackground;
     Window_TitleCommand.prototype.drawItemBackground = function(index) {
@@ -672,7 +632,7 @@
     Window_TitleCommand.prototype._createCursorSprite = function() {
         _Window_Title_Command_Create_Cursor_Sprite.apply(this, arguments);
         
-        if (titleCommandListSet === userCustom) {
+        if (titleCommandListSet === userCustom && titleCommandButtonCursorSpriteJsonObject.length !== 0) {
             if (titleCommandButtonCursorSpriteJsonObject.length === 1) {
                 this._cursorSprite = new Sprite();
                 this._cursorSprite.addChild(new Sprite());
@@ -680,45 +640,67 @@
                 this._cursorSprite.children[0].setFrame(titleCommandButtonCursorSpriteRect.x, titleCommandButtonCursorSpriteRect.y, titleCommandButtonCursorSpriteRect.width, titleCommandButtonCursorSpriteRect.height);
                 this._clientArea.addChild(this._cursorSprite)
             } else {
-                // this._cursorSprite = new Sprite();
-                
-                // const titleCommandButtonCursorSpriteTextureArray = [];
-                // for (const image of titleCommandButtonCursorSpriteJsonObject) {
-                //     console.log("image: ", "img/" + image + ".png")
-                //     let texture = PIXI.Texture.from("img/" + image + ".png");
-                //     titleCommandButtonCursorSpriteTextureArray.push(texture);
-                // }
+                this._cursorSprite = new Sprite();
 
-                // // let animatedSprite = new PIXI.AnimatedSprite(titleCommandButtonCursorSpriteTextureArray, true);
-                // let animatedSprite = new PIXI.AnimatedSprite(titleCommandButtonCursorSpriteTextureArray);
-                // animatedSprite.animationSpeed = 1;
-                // animatedSprite.loop = true;
-                // animatedSprite.x = titleCommandButtonCursorSpriteRect.x;
-                // animatedSprite.y = titleCommandButtonCursorSpriteRect.y;
-                // animatedSprite.width = titleCommandButtonCursorSpriteRect.width;
-                // animatedSprite.height = titleCommandButtonCursorSpriteRect.height;
-                // animatedSprite.onComplete = () => {
-                //     console.log("播放完成");
-                // }; //完成的回调函数
-                // animatedSprite.gotoAndStop(1); // 第几帧开始播放
-                // console.log("animatedSprite: ", animatedSprite)
-                // this._cursorSprite.addChild(animatedSprite);
-                // //this._cursorSprite.setFrame(titleCommandButtonCursorSpriteRect.x, titleCommandButtonCursorSpriteRect.y, titleCommandButtonCursorSpriteRect.width, titleCommandButtonCursorSpriteRect.height);
-                // this._clientArea.addChild(this._cursorSprite);
+                const titleCommandButtonCursorSpritePathArray = [];
+                for (const image of titleCommandButtonCursorSpriteJsonObject) {
+                    console.log("image: ", "img/" + image + ".png")
+                    titleCommandButtonCursorSpritePathArray.push("img/" + image + ".png")
+                }
+                const animatedSprite = new PIXI.AnimatedSprite.fromImages(titleCommandButtonCursorSpritePathArray);
+                animatedSprite.animationSpeed = 0.2;
+                animatedSprite.loop = true;
+                animatedSprite.x = titleCommandButtonCursorSpriteRect.x;
+                animatedSprite.y = titleCommandButtonCursorSpriteRect.y;
+                animatedSprite.width = titleCommandButtonCursorSpriteRect.width;
+                animatedSprite.height = titleCommandButtonCursorSpriteRect.height;
+                animatedSprite.onFrameChange = function() {
+                    if (this.x !== titleCommandButtonCursorSpriteRect.x || this.y !== titleCommandButtonCursorSpriteRect.y || this.width !== titleCommandButtonCursorSpriteRect.width || this.height !== titleCommandButtonCursorSpriteRect.height) {
+                        this.x = titleCommandButtonCursorSpriteRect.x;
+                        this.y = titleCommandButtonCursorSpriteRect.y;
+                        this.width = titleCommandButtonCursorSpriteRect.width;
+                        this.height = titleCommandButtonCursorSpriteRect.height;
+                    }
+                }
+                animatedSprite.gotoAndPlay(0);
+                
+                const animatedSpriteContainer = new PIXI.Container();
+                animatedSpriteContainer.x = titleCommandButtonCursorSpriteRect.x;
+                animatedSpriteContainer.y = titleCommandButtonCursorSpriteRect.y;
+                animatedSpriteContainer.width = titleCommandButtonCursorSpriteRect.width;
+                animatedSpriteContainer.height = titleCommandButtonCursorSpriteRect.height;
+                animatedSpriteContainer.addChild(animatedSprite);
+                
+                this._cursorSprite.addChild(animatedSpriteContainer);
+                this._cursorSprite.x = titleCommandButtonCursorSpriteRect.x;
+                this._cursorSprite.y = titleCommandButtonCursorSpriteRect.y;
+                this._cursorSprite.width = titleCommandButtonCursorSpriteRect.width;
+                this._cursorSprite.height = titleCommandButtonCursorSpriteRect.height;
+                this._clientArea.addChild(this._cursorSprite);
                
             }
         }
        
     }
 
+    const _Window_Title_Command_Update_Cursor = Window_TitleCommand.prototype._updateCursor;
     Window_TitleCommand.prototype._updateCursor = function() {
-        this._cursorSprite.visible = this.isOpen() && this.cursorVisible;
-        this._cursorSprite.x = this._cursorRect.x;
-        this._cursorSprite.y = this._cursorRect.y;
+        if(titleCommandListSet === userCustom && titleCommandButtonCursorSpriteJsonObject.length !== 0) {
+            this._cursorSprite.visible = this.isOpen() && this.cursorVisible;
+            this._cursorSprite.x = this._cursorRect.x;
+            this._cursorSprite.y = this._cursorRect.y;
+        } else {
+            _Window_Title_Command_Update_Cursor.apply(this, arguments);
+        }
     }
 
+    const _Window_Title_Command_Refresh_Cursor = Window_TitleCommand.prototype._refreshCursor;
     Window_TitleCommand.prototype._refreshCursor = function() {
+        if(titleCommandListSet === userCustom && titleCommandButtonCursorSpriteJsonObject.length !== 0) {
 
+        } else {
+            _Window_Title_Command_Refresh_Cursor.apply(this, arguments);
+        }
     }
 
 })();
