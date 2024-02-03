@@ -3,12 +3,36 @@
  * @plugindesc 【V1.0.0】 自定义标题场景
  * @author Arrose
  * 
- * @url https://github.com/arrosev/RPGMakerMZPlugins
+ * @url https://github.com/arrosev/RPGMakerMZPlugins 
  * 
  * @help
- * pixi宣称是支持['mp4', 'm4v', 'webm', 'ogg', 'ogv', 'h264', 'avi', 'mov']，
- * 但是暂时只测试了mp4和webm是可以的
- * 如有使用了会改变标题场景按钮个数的插件，请把此插件放在那个插件的上面
+ * 
+ * 这个插件主要用于自定义标题界面
+ * 
+ * 
+ * 【V1.0.0】
+ *     1. 使用视频作为标题场景的背景
+ *     2. 使用图片集制作动画作为标题
+ *     3. 使用图片集制作动画作为标题命令窗口的光标
+ *     4. 自定义标题命令窗口的WindowSkin
+ *     5. 以图片作为命令窗口按钮的未选择状态背景，被选择状态背景，和未启用状态背景
+ *     6. 创建额外的新按钮添加到标题命令窗口，并绑定点击按钮后执行的脚本
+ *     7. 自定义标题场景各窗口及按钮等的大小和位置
+ *     
+ * 
+ * 注意
+ *     1. 使用的视频，pixi宣称是支持：['mp4', 'm4v', 'webm', 'ogg', 'ogv', 'h264', 'avi', 'mov']，
+ *        但是暂时只测试了mp4和webm是可以的
+ *     2. 如果在打包发布游戏时，勾选了排除未使用文件，请务必确保你使用的
+ *        视频文件在项目路径的movies文件夹里，不要放其他文件夹（特别是img），
+ *        也不要放在movies文件夹的子文件夹（这是MZ排除未使用文件的限制）
+ *     3. 视频路径不是直接从文件夹选的，而是直接输入了一个路径，传入插件时是
+ *        作为一个字符串（这是MZ插件选择文件的限制，只能选图像和音频）
+ *     4. 理论上无法与会改变标题场景按钮个数的插件混用，但是只要你不开那些插件
+ *        的把按钮添加到标题命令窗口，且把此插件放在那些插件下面，你可以自己
+ *        创建那些插件创建的按钮，并在按钮中绑定那些插件点击按钮后使用的脚本
+ *     5. 碰到使用问题，如插件兼容性或者bug等问题，请b站私信我：
+ *        https://space.bilibili.com/37886049，我看到绝对会回！除非我忙！
  * 
  * 
  * @param titleSet
@@ -19,20 +43,34 @@
  * @option custom 
  * @default default
  * 
- * @param customPictureTitlePoint
- * @text 自定义图像标题坐标
- * @desc 自定义图像标题左上角坐标设置
+ * @param customPictureTitleSprite
+ * @text 自定义图像标题精灵
+ * @desc 自定义图像标题精灵设置
  * @parent titleSet
- * @type struct<Point>
- * @default {"x":"0","y":"0"}
- * 
- * @param customPictureTitlePath
- * @text 自定义图像标题路径
- * @desc 自定义图像标题路径设置（仅支持png格式）
- * @parent titleSet
- * @type file
+ * @type file[]
  * @dir img/
- * @default none
+ * @default []
+ * 
+ * @param customPictureTitleSpriteAnimationSpeed
+ * @text 自定义图像标题动画速度
+ * @desc 自定义图像标题动画速度设置
+ * @parent titleSet
+ * @type number
+ * @default 1
+ * 
+ * @param customPictureTitleSpriteLoop
+ * @text 自定义图像标题动画循环
+ * @desc 是否循环播放自定义图像标题动画
+ * @parent titleSet
+ * @type boolean
+ * @default true
+ * 
+ * @param customPictureTitleSpriteRect
+ * @text 自定义图像标题布局
+ * @desc 自定义图像标题布局设置
+ * @parent titleSet
+ * @type struct<Rect>
+ * @default {"x":"0","y":"0","width":"0","height":"0"}
  * 
  * @param backgroundSet
  * @text 背景设置
@@ -80,7 +118,7 @@
  * 
  * @param titleCommandWindowSkin
  * @text 自定义标题命令窗口皮肤
- * @desc 自定义标题命令窗口皮肤设置（仅支持png格式）
+ * @desc 自定义标题命令窗口皮肤设置
  * @parent titleCommandWindowSet
  * @type file
  * @dir img/system/
@@ -130,6 +168,20 @@
  * @type file[]
  * @dir img/
  * @default []
+ * 
+ * @param titleCommandButtonCursorSpriteAnimationSpeed
+ * @text 命令按钮光标动画速度
+ * @desc 命令按钮光标动画速度设置
+ * @parent titleCommandListSet
+ * @type number
+ * @default 1
+ * 
+ * @param titleCommandButtonCursorSpriteLoop
+ * @text 命令按钮光标动画循环
+ * @desc 是否循环播放命令按钮光标动画
+ * @parent titleCommandListSet
+ * @type boolean
+ * @default true
  * 
  * @param titleCommandButtonCursorSpriteRect
  * @text 命令按钮光标布局
@@ -328,9 +380,12 @@
     const commandSymbolHead = "commandSymbol";
 
     const titleSet = parameters.titleSet || systemDefault;
-    const customPictureTitlePointJsonObject = JSON.parse(parameters.customPictureTitlePoint);
-    const customPictureTitlePoint = new Point(Number(customPictureTitlePointJsonObject.x) || 0, Number(customPictureTitlePointJsonObject.y) || 0);
-    const customPictureTitlePath = parameters.customPictureTitlePath || defaultFilePath;
+    const customPictureTitleSpriteJsonObject = JSON.parse(parameters.customPictureTitleSprite !== undefined ? parameters.customPictureTitleSprite : "[]");
+    const customPictureTitleSpriteAnimationSpeed = Number(parameters.customPictureTitleSpriteAnimationSpeed);
+    const customPictureTitleSpriteLoop = parameters.customPictureTitleSpriteLoop !== "false";
+    
+    const customPictureTitleSpriteRectJsonObject = JSON.parse(parameters.customPictureTitleSpriteRect);
+    const customPictureTitleSpriteRect = new Rectangle(Number(customPictureTitleSpriteRectJsonObject.x) || 0, Number(customPictureTitleSpriteRectJsonObject.y) || 0, Number(customPictureTitleSpriteRectJsonObject.width) || 0, Number(customPictureTitleSpriteRectJsonObject.height) || 0);
 
     const backgroundSet = parameters.backgroundSet || systemDefault;
     const customMoviesBackgroundLoop = parameters.customMoviesBackgroundLoop !== "false";
@@ -353,7 +408,8 @@
     const titleCommandButtonRowSpacing = Number(parameters.titleCommandButtonRowSpacing);
     const titleCommandButtonColSpacing = Number(parameters.titleCommandButtonColSpacing);
     const titleCommandButtonCursorSpriteJsonObject = JSON.parse(parameters.titleCommandButtonCursorSprite !== undefined ? parameters.titleCommandButtonCursorSprite : "[]");
-    // const titleCommandButtonCursorSpriteTextureArray = [];
+    const titleCommandButtonCursorSpriteAnimationSpeed = Number(parameters.titleCommandButtonCursorSpriteAnimationSpeed);
+    const titleCommandButtonCursorSpriteLoop = parameters.titleCommandButtonCursorSpriteLoop !== "false";
     
     const titleCommandButtonCursorSpriteRectJsonObject = JSON.parse(parameters.titleCommandButtonCursorSpriteRect);
     const titleCommandButtonCursorSpriteRect = new Rectangle(Number(titleCommandButtonCursorSpriteRectJsonObject.x) || 0, Number(titleCommandButtonCursorSpriteRectJsonObject.y) || 0, Number(titleCommandButtonCursorSpriteRectJsonObject.width) || 0, Number(titleCommandButtonCursorSpriteRectJsonObject.height) || 0);
@@ -365,28 +421,59 @@
     
     let titleCommandButtonBGArray = [];
     
+    //动画标题部分
     const _Create_Foreground = Scene_Title.prototype.createForeground;
     Scene_Title.prototype.createForeground = function() {
         _Create_Foreground.apply(this, arguments);
 
-        if (titleSet === userCustom && customPictureTitlePath !== defaultFilePath) {
+        if (titleSet === userCustom && customPictureTitleSpriteJsonObject.length !== 0) {
 
             this.removeChild(this._gameTitleSprite);
 
-            this.pictureTitleSprite = new Sprite(ImageManager.loadBitmap("img/", customPictureTitlePath));
-            this.pictureTitleSprite.move(customPictureTitlePoint.x, customPictureTitlePoint.y);
-            //this.pictureTitleSprite.move(customPictureTitleRect.x, customPictureTitleRect.y, customPictureTitleRect.width, customPictureTitleRect.height);
-            this.addChild(this.pictureTitleSprite);
+            if (customPictureTitleSpriteJsonObject.length === 1) {
+                this.pictureTitleSprite = new Sprite(ImageManager.loadBitmap("img/", customPictureTitleSpriteJsonObject[0]));
+                this.pictureTitleSprite.width = customPictureTitleSpriteRect.width;
+                this.pictureTitleSprite.height = customPictureTitleSpriteRect.height;
+                this.pictureTitleSprite.move(customPictureTitleSpriteRect.x, customPictureTitleSpriteRect.y);
+                this.addChild(this.pictureTitleSprite);
+            } else {
+                const customPictureTitleSpritePathArray = [];
+                for (const image of customPictureTitleSpriteJsonObject) {
+                    customPictureTitleSpritePathArray.push("img/" + image + ".png")
+                }
+                const animatedSprite = new PIXI.AnimatedSprite.fromImages(customPictureTitleSpritePathArray);
+                animatedSprite.animationSpeed = customPictureTitleSpriteAnimationSpeed / 10.0;
+                animatedSprite.loop = customPictureTitleSpriteLoop;
+                animatedSprite.x = customPictureTitleSpriteRect.x;
+                animatedSprite.y = customPictureTitleSpriteRect.y;
+                animatedSprite.width = customPictureTitleSpriteRect.width;
+                animatedSprite.height = customPictureTitleSpriteRect.height;
+                animatedSprite.onFrameChange = function() {
+                    if (this.x !== customPictureTitleSpriteRect.x || this.y !== customPictureTitleSpriteRect.y || this.width !== customPictureTitleSpriteRect.width || this.height !== customPictureTitleSpriteRect.height) {
+                        this.x = customPictureTitleSpriteRect.x;
+                        this.y = customPictureTitleSpriteRect.y;
+                        this.width = customPictureTitleSpriteRect.width;
+                        this.height = customPictureTitleSpriteRect.height;
+                    }
+                }
+                animatedSprite.gotoAndPlay(0);
+                
+                const animatedSpriteContainer = new PIXI.Container();
+                animatedSpriteContainer.addChild(animatedSprite);
+                
+                this.addChild(animatedSpriteContainer);
+            }
 
         }
 
     };
 
+    //标题视频背景部分
     const _Create_Background = Scene_Title.prototype.createBackground;
     Scene_Title.prototype.createBackground = function() {
         _Create_Background.apply(this, arguments);
         PIXI.utils.clearTextureCache();
-        console.log("-------------------------------Scene_Title.prototype.createBackground--------------------------")
+        //console.log("-------------------------------Scene_Title.prototype.createBackground--------------------------")
         //img/titles1/loopTitle.mp4
         if (backgroundSet === userCustom && customMoviesBackgroundPath !== defaultFilePath) {
 
@@ -405,32 +492,7 @@
 
     };
 
-
-    // const _Command_Window_Rect = Scene_Title.prototype.commandWindowRect;
-    // Scene_Title.prototype.commandWindowRect = function() {
-    //     let rect = _Command_Window_Rect.apply(this, arguments);
-    //     return titleCommandWindowSet === userCustom ? titleCommandWindowRect : rect;
-    // };
-
-    // const _Scene_Title_Initialize = Scene_Title.prototype.initialize;
-    // Scene_Title.prototype.initialize = function() {
-    //     _Scene_Title_Initialize.apply(this, arguments);
-    //     //this.commonEventsRunner = new Game_Map();
-    //     this._interpreter = new Game_Interpreter();
-    // };
-
-    // const _Scene_Title_Update = Scene_Title.prototype.update;
-    // Scene_Title.prototype.update = function() {
-    //     _Scene_Title_Update.apply(this, arguments);
-    //     if (this._interpreter) {
-    //         if (!this._interpreter.isRunning()) {
-    //             console.log("_Scene_Title_Update")
-    //             this._interpreter.setup($dataCommonEvents[1].list)
-    //         }
-    //         this._interpreter.update();
-    //     }
-    // }
-
+    //标题命令框按钮绑定部分
     Scene_Title.prototype.commandActionBind = function(commandAction) {
         eval(JSON.parse(commandAction));
         this._commandWindow.activate();
@@ -454,24 +516,9 @@
             };
         }
 
-        // console.log("this._commandWindow: ", this._commandWindow)
-        // console.log("this._commandWindow itemwidth: ", this._commandWindow.itemWidth())
-        // console.log("this._commandWindow itemwidth: ", this._commandWindow.itemHeight())
     };
 
-    // const _Window_Title_Command_Initialize = Window_TitleCommand.prototype.initialize;
-    // Window_TitleCommand.prototype.initialize = function (rect) {
-    //     _Window_Title_Command_Initialize.apply(this, arguments);
-
-    //     // this.noSelectSprite = new Sprite(ImageManager.loadBitmap("img/", newGameCommandButtonStyleJsonObject.commandSelectBG));
-
-    //     // this.addChildToBack(this.noSelectSprite)
-
-    //     // if (titleCommandListSet === userCustom && drawTitleCommandBackground === false) {
-    //     //     this.contentsBack = null;
-    //     // }
-    // };
-
+    //标题命令框部分
     const _Window_Title_Command_Item_Width = Window_TitleCommand.prototype.itemWidth;
     Window_TitleCommand.prototype.itemWidth = function() {
         let width = _Window_Title_Command_Item_Width.apply(this, arguments);
@@ -498,7 +545,7 @@
 
     const _Window_Title_Command_Make_Command_List = Window_TitleCommand.prototype.makeCommandList;
     Window_TitleCommand.prototype.makeCommandList = function() {
-        console.log("------------------makeCommandList----------------------")
+        //console.log("------------------makeCommandList----------------------")
         _Window_Title_Command_Make_Command_List.apply(this, arguments);
 
         if (titleCommandListSet === userCustom) {
@@ -537,7 +584,7 @@
             
             for (const index in extraCommandListJsonObject) {
                 const commandJsonObject = JSON.parse(extraCommandListJsonObject[index]);
-                console.log("commandJsonObject: ", commandJsonObject)
+                //console.log("commandJsonObject: ", commandJsonObject)
                 const commandName = commandJsonObject.commandName;
                 const commandSymbol = commandSymbolHead + index.toString();
                 let commandEnable = false;
@@ -556,9 +603,7 @@
             }
 
             this.move(titleCommandWindowPoint.x, titleCommandWindowPoint.y, titleCommandButtonSize.width + 2 * titleCommandWindowPadding + titleCommandButtonColSpacing, titleCommandButtonSize.height * titleCommandButtonBGArray.length + 2 * titleCommandWindowPadding + titleCommandButtonRowSpacing * titleCommandButtonBGArray.length);
-            console.log("this height: ", this.height)
-            this.contentsBack.resize(titleCommandButtonSize.width + 2 * titleCommandWindowPadding + titleCommandButtonColSpacing, titleCommandButtonSize.height * titleCommandButtonBGArray.length + 2 * titleCommandWindowPadding + titleCommandButtonRowSpacing * titleCommandButtonBGArray.length)
-            console.log("this.contentsBack rect: ", this.contentsBack.rect)
+            this.contentsBack.resize(titleCommandButtonSize.width + 2 * titleCommandWindowPadding + titleCommandButtonColSpacing, titleCommandButtonSize.height * titleCommandButtonBGArray.length + 2 * titleCommandWindowPadding + titleCommandButtonRowSpacing * titleCommandButtonBGArray.length);
 
         }
         
@@ -578,11 +623,11 @@
 
         if (titleCommandListSet === userCustom) {
             const rect = this.itemRect(index);
-            console.log("index: ", index)
-            console.log("drawItemBackground -------------- rect: ", rect)
-            console.log("titleCommandButtonBGArray: ", titleCommandButtonBGArray)
+            // console.log("index: ", index)
+            // console.log("drawItemBackground -------------- rect: ", rect)
+            // console.log("titleCommandButtonBGArray: ", titleCommandButtonBGArray)
             this.contentsBack.clearRect(rect.x - 1, rect.y - 1, rect.width + 2, rect.height + 2);
-            console.log("this._list[index].enabled: ", this._list[index].enabled)
+            // console.log("this._list[index].enabled: ", this._list[index].enabled)
 
             redrawItemBackground(this._list[index].enabled === false ? titleCommandButtonBGArray[index].disabledBG : titleCommandButtonBGArray[index].noSelectBG, rect, this.contentsBack);
 
@@ -611,8 +656,8 @@
 
         if (titleCommandListSet === userCustom) {
             if (last !== current) {
-                console.log("last: ", last)
-                console.log("current: ", current)
+                // console.log("last: ", last)
+                // console.log("current: ", current)
                 if (titleCommandButtonBGArray.length !== 0) {
                     if (last === -1) {
                         if (current !== -1) {
@@ -628,6 +673,7 @@
         
     }
 
+    //标题命令框光标部分
     const _Window_Title_Command_Create_Cursor_Sprite = Window_TitleCommand.prototype._createCursorSprite;
     Window_TitleCommand.prototype._createCursorSprite = function() {
         _Window_Title_Command_Create_Cursor_Sprite.apply(this, arguments);
@@ -644,12 +690,12 @@
 
                 const titleCommandButtonCursorSpritePathArray = [];
                 for (const image of titleCommandButtonCursorSpriteJsonObject) {
-                    console.log("image: ", "img/" + image + ".png")
+                    //console.log("image: ", "img/" + image + ".png")
                     titleCommandButtonCursorSpritePathArray.push("img/" + image + ".png")
                 }
                 const animatedSprite = new PIXI.AnimatedSprite.fromImages(titleCommandButtonCursorSpritePathArray);
-                animatedSprite.animationSpeed = 0.2;
-                animatedSprite.loop = true;
+                animatedSprite.animationSpeed = titleCommandButtonCursorSpriteAnimationSpeed / 10.0;
+                animatedSprite.loop = titleCommandButtonCursorSpriteLoop;
                 animatedSprite.x = titleCommandButtonCursorSpriteRect.x;
                 animatedSprite.y = titleCommandButtonCursorSpriteRect.y;
                 animatedSprite.width = titleCommandButtonCursorSpriteRect.width;
@@ -665,17 +711,9 @@
                 animatedSprite.gotoAndPlay(0);
                 
                 const animatedSpriteContainer = new PIXI.Container();
-                animatedSpriteContainer.x = titleCommandButtonCursorSpriteRect.x;
-                animatedSpriteContainer.y = titleCommandButtonCursorSpriteRect.y;
-                animatedSpriteContainer.width = titleCommandButtonCursorSpriteRect.width;
-                animatedSpriteContainer.height = titleCommandButtonCursorSpriteRect.height;
                 animatedSpriteContainer.addChild(animatedSprite);
                 
                 this._cursorSprite.addChild(animatedSpriteContainer);
-                this._cursorSprite.x = titleCommandButtonCursorSpriteRect.x;
-                this._cursorSprite.y = titleCommandButtonCursorSpriteRect.y;
-                this._cursorSprite.width = titleCommandButtonCursorSpriteRect.width;
-                this._cursorSprite.height = titleCommandButtonCursorSpriteRect.height;
                 this._clientArea.addChild(this._cursorSprite);
                
             }
