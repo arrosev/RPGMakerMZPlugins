@@ -1,6 +1,6 @@
 /*:
  * @target MZ
- * @plugindesc 【V1.0.0】自定义物品选择窗口
+ * @plugindesc 【V1.0.1】自定义物品选择窗口
  * @author Arrose
  * 
  * @url https://github.com/arrosev/RPGMakerMZPlugins
@@ -11,6 +11,8 @@
  * 
  *  【V1.0.0】
  *     1. 自定义物品选择窗口样式
+ *  【V1.0.1】
+ *     1. 修复没有物品可以选择时报错的bug
  * 
  *    注意：
  *     1. 物品需要在插件参数->物品扩展参数中设置缩略图和详细图，
@@ -424,10 +426,6 @@ const ASItemSelectionWindowNameSpace = (() => {
             }
             this.createItemSelectionCommandWindow();
             this.createItemSelectionSceneWindowTitleImage();
-            const id = Number(this._itemSelectionCommandWindow.commandSymbol(0)) || 0;
-            if(id) {
-                this._itemDetailInfoWindow.drawItemDetailImage(id);
-            }
         }
 
         createItemSelectionSceneWindowTitleImage() {
@@ -458,6 +456,12 @@ const ASItemSelectionWindowNameSpace = (() => {
             this._itemSelectionCommandWindow.proxy = this;
             this._itemSelectionCommandWindow._padding = itemSelectionCommandWindowPadding;
             this.addChild(this._itemSelectionCommandWindow);
+            if(this._itemSelectionCommandWindow._list.length !== 0) {
+                const id = Number(this._itemSelectionCommandWindow.commandSymbol(0)) || 0;
+                if (id) {
+                    this._itemDetailInfoWindow.drawItemDetailImage(id);
+                }
+            }
         }
 
         createBackground() {
