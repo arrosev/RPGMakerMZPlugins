@@ -1,6 +1,6 @@
 /*:
  * @target MZ
- * @plugindesc 【V1.0.1】自定义物品选择窗口
+ * @plugindesc 【V1.0.2】自定义物品选择窗口
  * @author Arrose
  * 
  * @url https://github.com/arrosev/RPGMakerMZPlugins
@@ -11,8 +11,12 @@
  * 
  *  【V1.0.0】
  *     1. 自定义物品选择窗口样式
+ * 
  *  【V1.0.1】
  *     1. 修复没有物品可以选择时报错的bug
+ * 
+ *  【V1.0.2】
+ *     1. 添加对其他修改了返回按钮的插件的兼容
  * 
  *    注意：
  *     1. 物品需要在插件参数->物品扩展参数中设置缩略图和详细图，
@@ -421,10 +425,11 @@ const ASItemSelectionWindowNameSpace = (() => {
         create() {
             Scene_MenuBase.prototype.create.call(this);
             this.createItemDetailInfoWindow();
-            if(isShowCancelButton) {
-                this._cancelButton.setClickHandler(this.clickOnCancelButton.bind(this));
-            }
             this.createItemSelectionCommandWindow();
+            if(isShowCancelButton) {
+                this._itemSelectionCommandWindow.setHandler("cancel", this.popScene.bind(this));
+                //this._cancelButton.setClickHandler(this.clickOnCancelButton.bind(this));
+            }
             this.createItemSelectionSceneWindowTitleImage();
         }
 
