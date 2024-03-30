@@ -1,6 +1,6 @@
 /*:
  * @target MZ
- * @plugindesc 【V1.0.0】拼图小游戏
+ * @plugindesc 【V1.0.1】拼图小游戏
  * @author Arrose
  * 
  * @url https://github.com/arrosev/RPGMakerMZPlugins
@@ -11,6 +11,9 @@
  * 
  *  【V1.0.0】
  *     1. 实现拼图小游戏
+ * 
+ *  【V1.0.1】
+ *     1. 添加对其他修改了返回按钮的插件的兼容
  * 
  *    注意：
  *     1. 拼图成功之后会回到地图，执行的公共事件只会在回到地图页面后执行
@@ -319,11 +322,12 @@ const ASJigsawGameNameSpace = (() => {
 
         create() {
             Scene_MenuBase.prototype.create.call(this);
-            if(isShowCancelButton) {
-                this._cancelButton.setClickHandler(this.clickOnCancelButton.bind(this));
-            }
             this.createPreviewWindow();
             this.createJigsawGameCommandWindow();
+            if(isShowCancelButton) {
+                this._jigsawGameCommandWindow.setHandler("cancel", this.popScene.bind(this));
+                //this._cancelButton.setClickHandler(this.clickOnCancelButton.bind(this));
+            }
         }
 
         createPreviewWindow() {
