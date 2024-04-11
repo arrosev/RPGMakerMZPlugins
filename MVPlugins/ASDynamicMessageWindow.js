@@ -1,6 +1,6 @@
 /*:
  * @target MV
- * @plugindesc 【V1.0.0】 以屏幕左上角为原点，动态修改地图对话框位置和大小
+ * @plugindesc 【V1.0.1】 以屏幕左上角为原点，动态修改地图对话框位置和大小
  * @author Arrose https://github.com/arrosev/RPGMakerMZPlugins
  * 
  * @url https://github.com/arrosev/RPGMakerMZPlugins
@@ -14,6 +14,9 @@
  *    1. 通过插件参数可以全局为所有对话框设置位置和大小
  *    2. 通过插件命令可以单独为局部某一个对话框设置位置和大小，会覆盖全局设置，
  *       但是只作用于插件命令后紧跟的一条对话框
+ * 
+ * 【V1.0.1】
+ *    1. 修复和行数插件兼容问题（现在不会随着行数插件最大行数来调整对话框高度，现在默认是使用4行的高度）
  * 
  * @param globalModifications
  * @text 对话框全局修改
@@ -96,6 +99,9 @@
         nowRect.width = this.width;
         nowRect.height = this.height;
 
+        // console.log(Graphics.boxWidth)
+        // console.log(this.fittingHeight(4))
+
         if (partialModifications === true) {
             if (!isSameRect(nowRect, partialRect)) {
                 this.move(partialRect.x, partialRect.y, partialRect.width, partialRect.height);
@@ -107,7 +113,7 @@
                     this.move(globalRect.x, globalRect.y, globalRect.width, globalRect.height);
                 }
             } else {
-                let originRect = new Rectangle((Graphics.boxWidth - this.windowWidth()) / 2, 0, this.windowWidth(), this.windowHeight());
+                let originRect = new Rectangle((Graphics.boxWidth - this.windowWidth()) / 2, 0, this.windowWidth(), this.fittingHeight(4));
                 this.move(originRect.x, (this._positionType * (Graphics.boxHeight - originRect.height)) / 2, originRect.width, originRect.height);
             }
         }
