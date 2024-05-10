@@ -44,21 +44,30 @@
  * @off Hide
  * @default true
  * 
+ * @param sceneBackGround
+ * @text Scene BackGround
+ * @desc Scene BackGround
+ * @parent mainMenuSceneSet
+ * @type select
+ * @option none
+ * @option image
+ * @option video
+ * @default none
+ * 
  * @param sceneBackGroundImage
  * @text Scene BackGround Image
  * @desc Scene BackGround Image
- * @parent mainMenuSceneSet
+ * @parent sceneBackGround
  * @type file
  * @dir img/titles1
  * @default
  * 
- * @param sceneBackGroundMusic
- * @text Scene BackGround Music
- * @desc Scene BackGround Music
- * @parent mainMenuSceneSet
- * @type file
- * @dir audio/bgm
- * @default
+ * @param sceneBackGroundVideo
+ * @text Scene BackGround Video
+ * @desc No video file extension required, both mp4 and webm files are needed(Video format used by MZ), the video will loop 
+ * @parent sceneBackGround
+ * @type string
+ * @default 
  * 
  * @param commandWindowSet
  * @text Command Window Set
@@ -83,15 +92,30 @@
  * 
  */
 
+// * @param sceneBackGroundMusic
+// * @text Scene BackGround Music
+// * @desc Scene BackGround Music
+// * @parent mainMenuSceneSet
+// * @type file
+// * @dir audio/bgm
+// * @default
+
 const ASCustomMainMenuSceneNameSpace = (() => {
     "use strict";
 
     const pluginName = "ASCustomMainMenuScene";
     const parameters = PluginManager.parameters(pluginName);
+
+    //const sceneBackGroundSelectNone = "none";
+    const sceneBackGroundSelectImage = "image";
+    const sceneBackGroundSelectVideo = "video";
     
     const sceneCancelButtonVisible = parameters.sceneCancelButtonVisible !== "false";
+
+    const sceneBackGround = parameters.sceneBackGround;
     const sceneBackGroundImage = parameters.sceneBackGroundImage;
-    const sceneBackGroundMusic = parameters.sceneBackGroundMusic;
+    const sceneBackGroundVideo = parameters.sceneBackGroundVideo;
+    //const sceneBackGroundMusic = parameters.sceneBackGroundMusic;
 
 
     //Scene
@@ -105,12 +129,25 @@ const ASCustomMainMenuSceneNameSpace = (() => {
 
     const _Scene_Menu_Create_Background = Scene_Menu.prototype.createBackground;
     Scene_Menu.prototype.createBackground = function() {
-        if (sceneBackGroundImage) {
-            const bitmap = ImageManager.loadTitle1(sceneBackGroundImage);
-            this._backgroundSprite = new Sprite(bitmap);
-            this.addChild(this._backgroundSprite);
-        } else {
-            _Scene_Menu_Create_Background.apply(this, arguments);
+        _Scene_Menu_Create_Background.apply(this, arguments);
+        if (sceneBackGroundImage && sceneBackGround === sceneBackGroundSelectImage) {
+            this._backgroundSprite.bitmap = ImageManager.loadTitle1(sceneBackGroundImage);
+            this._backgroundSprite.filters = [];
+            this.setBackgroundOpacity(255);
+        }
+        if (sceneBackGroundVideo && sceneBackGround === sceneBackGroundSelectVideo) {
+            this.removeChild(this._backgroundSprite);
+            PIXI.utils.clearTextureCache();
+            const fileExtension = Utils.canPlayWebm() ? ".webm" : ".mp4";
+            const videoPath = sceneBackGroundVideo + fileExtension;
+            const bg = PIXI.Texture.from(videoPath);
+            const video = bg.baseTexture.resource.source;
+            video.loop = true;
+            video.preload = 'auto';
+            const videoSprite = new PIXI.Sprite(bg);
+            videoSprite.width = Graphics.width;
+            videoSprite.height = Graphics.height;
+            this.addChild(videoSprite);
         }
     };
 
