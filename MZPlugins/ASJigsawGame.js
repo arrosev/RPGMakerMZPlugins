@@ -1,6 +1,6 @@
 /*:
  * @target MZ
- * @plugindesc 【V1.0.2 Debug】拼图小游戏
+ * @plugindesc 【V1.0.2】拼图小游戏
  * @author Arrose
  * 
  * @url https://github.com/arrosev/RPGMakerMZPlugins
