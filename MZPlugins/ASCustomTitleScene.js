@@ -1,6 +1,6 @@
 /*:
  * @target MZ
- * @plugindesc 【V1.0.0】 自定义标题场景
+ * @plugindesc 【V1.0.1】 自定义标题场景
  * @author Arrose
  * 
  * @url https://github.com/arrosev/RPGMakerMZPlugins 
@@ -18,6 +18,9 @@
  *     5. 以图片作为命令窗口按钮的未选择状态背景，被选择状态背景，和未启用状态背景
  *     6. 创建额外的新按钮添加到标题命令窗口，并绑定点击按钮后执行的脚本
  *     7. 自定义标题场景各窗口及按钮等的大小和位置
+ * 
+ * 【V1.0.1】
+ *     1. 修复其他插件对Array进行扩充后使用const in遍历数组导致的兼容问题
  *     
  * 
  * 注意
@@ -507,7 +510,14 @@
             this._commandWindow._padding = titleCommandWindowPadding;
             this._commandWindow.windowskin = titleCommandWindowSkin === defaultFilePath ? ImageManager.loadSystem("Window") : ImageManager.loadSystem(titleCommandWindowSkin);
 
-            for (const index in extraCommandListJsonObject) {
+            // for (const index in extraCommandListJsonObject) {
+            //     const commandJsonObject = JSON.parse(extraCommandListJsonObject[index]);
+            //     const commandSymbol = commandSymbolHead + index.toString();
+            //     if (commandJsonObject.commandAction) {
+            //         this._commandWindow.setHandler(commandSymbol, this.commandActionBind.bind(this, commandJsonObject.commandAction));
+            //     }
+            // };
+            for (let index = 0; index < extraCommandListJsonObject.length; index ++) {
                 const commandJsonObject = JSON.parse(extraCommandListJsonObject[index]);
                 const commandSymbol = commandSymbolHead + index.toString();
                 if (commandJsonObject.commandAction) {
@@ -582,9 +592,26 @@
                 });
             }
             
-            for (const index in extraCommandListJsonObject) {
+            // for (const index in extraCommandListJsonObject) {
+            //     const commandJsonObject = JSON.parse(extraCommandListJsonObject[index]);
+            //     const commandName = commandJsonObject.commandName;
+            //     const commandSymbol = commandSymbolHead + index.toString();
+            //     let commandEnable = false;
+            //     if (commandJsonObject.commandEnable === "true") {
+            //         commandEnable = true;
+            //     } else {
+            //         const switcheNumber = Number(commandJsonObject.commandEnable) || 0;
+            //         commandEnable = switcheNumber === 0 ? false : $gameSwitches.value(switcheNumber);
+            //     }
+            //     this.addCommand(commandName, commandSymbol, commandEnable);
+            //     titleCommandButtonBGArray.push({
+            //         noSelectBG: commandJsonObject.commandNoSelectBG,
+            //         selectBG: commandJsonObject.commandSelectBG,
+            //         disabledBG: commandJsonObject.commandDisabledBG
+            //     });     
+            // }
+            for (let index = 0; index < extraCommandListJsonObject.length; index ++) {
                 const commandJsonObject = JSON.parse(extraCommandListJsonObject[index]);
-                //console.log("commandJsonObject: ", commandJsonObject)
                 const commandName = commandJsonObject.commandName;
                 const commandSymbol = commandSymbolHead + index.toString();
                 let commandEnable = false;
