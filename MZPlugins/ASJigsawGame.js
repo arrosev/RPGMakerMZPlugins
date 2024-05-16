@@ -1,6 +1,6 @@
 /*:
  * @target MZ
- * @plugindesc 【V1.0.1】拼图小游戏
+ * @plugindesc 【V1.0.2 Debug】拼图小游戏
  * @author Arrose
  * 
  * @url https://github.com/arrosev/RPGMakerMZPlugins
@@ -15,6 +15,10 @@
  *  【V1.0.1】
  *     1. 添加对其他修改了返回按钮的插件的兼容
  * 
+ *  【V1.0.2】
+ *     1. 修复其他插件对Array进行扩充后使用const in遍历数组导致的兼容问题
+ *     2. 添加了对背景图片的设置
+ * 
  *    注意：
  *     1. 拼图成功之后会回到地图，执行的公共事件只会在回到地图页面后执行
  *     2. 拼图游戏窗口的大小取决于拼图游戏窗口单图块尺寸，
@@ -25,6 +29,14 @@
  * @command openJigsawGame
  * @text Open Jigsaw Game
  * @desc 打开拼图游戏
+ * 
+ * @arg sceneBackGroundImage
+ * @text 背景图片
+ * @desc 背景图片设置
+ * @parent openJigsawGame
+ * @type file
+ * @dir img/titles1
+ * @default
  * 
  * @arg previewWindow
  * @text 预览窗口
@@ -258,6 +270,8 @@ const ASJigsawGameNameSpace = (() => {
     const pluginName = "ASJigsawGame";
     //const parameters = PluginManager.parameters(pluginName);
 
+    let sceneBackGroundImage = undefined;
+
     let previewWindowSkin = "Window";
     let previewWindowRect = new Rectangle(0, 0, 0, 0);
     let previewWindowPadding = 12;
@@ -282,6 +296,8 @@ const ASJigsawGameNameSpace = (() => {
     PluginManager.registerCommand(pluginName, "openJigsawGame", args => {
 
         currentlySelectedIndex = -1;
+
+        sceneBackGroundImage = args.sceneBackGroundImage;
 
         previewWindowSkin = args.previewWindowSkin;
         const previewWindowRectObject = JSON.parse(args.previewWindowRect);
@@ -329,6 +345,20 @@ const ASJigsawGameNameSpace = (() => {
                 //this._cancelButton.setClickHandler(this.clickOnCancelButton.bind(this));
             }
         }
+
+        createBackground() {
+            this._backgroundFilter = new PIXI.filters.BlurFilter();
+            this._backgroundSprite = new Sprite();
+            this._backgroundSprite.bitmap = SceneManager.backgroundBitmap();
+            this._backgroundSprite.filters = [this._backgroundFilter];
+            this.addChild(this._backgroundSprite);
+            this.setBackgroundOpacity(192);
+            if (sceneBackGroundImage) {
+                this._backgroundSprite.bitmap = ImageManager.loadTitle1(sceneBackGroundImage);
+                this._backgroundSprite.filters = [];
+                this.setBackgroundOpacity(255);
+            }
+        };
 
         createPreviewWindow() {
             if (isShowPreviewWindow === true) {
@@ -378,7 +408,10 @@ const ASJigsawGameNameSpace = (() => {
         }
 
         makeCommandList() {
-            for (const index in jigsawGameImageCellList) {
+            // for (const index in jigsawGameImageCellList) {
+            //     this.addCommand(jigsawGameImageCellList[index].image, `${index}`);
+            // }
+            for (let index = 0; index < jigsawGameImageCellList.length; index ++) {
                 this.addCommand(jigsawGameImageCellList[index].image, `${index}`);
             }
             for (const command of this._list) {
@@ -407,7 +440,15 @@ const ASJigsawGameNameSpace = (() => {
                     currentlySelectedIndex = -1;
                     //判断是否拼图成功
                     let succeed = true;
-                    for (const index in jigsawGameImageCellList) {
+                    // for (const index in jigsawGameImageCellList) {
+                    //     const currentIndex = Number(index) + 1;
+                    //     const correctIndex = Number(jigsawGameImageCellList[index].index);
+                    //     if(currentIndex !== correctIndex) {
+                    //         succeed = false;
+                    //         break;
+                    //     }
+                    // }
+                    for (let index = 0; index < jigsawGameImageCellList.length; index ++) {
                         const currentIndex = Number(index) + 1;
                         const correctIndex = Number(jigsawGameImageCellList[index].index);
                         if(currentIndex !== correctIndex) {
