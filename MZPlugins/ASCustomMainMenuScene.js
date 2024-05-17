@@ -36,7 +36,7 @@
  * @default
  * 
  * @param sceneCancelButtonVisible
- * @text Scene Cancel Button Visible
+ * @text Cancel Button Visible
  * @desc Scene Cancel Button Visible
  * @parent mainMenuSceneSet
  * @type boolean
@@ -76,6 +76,35 @@
  * @type string
  * @default
  * 
+ * @param commandWindowWindowSkin
+ * @text Window Skin
+ * @desc Command Window WindowSkin
+ * @parent commandWindowSet
+ * @type file
+ * @dir img/system/
+ * @default Window
+ * 
+ * @param commandWindowFrame
+ * @text Frame
+ * @desc Command Window Frame
+ * @parent commandWindowSet
+ * @type struct<Rect>
+ * @default {"x":"568","y":"52","width":"240","height":"496"}
+ * 
+ * @param commandWindowText
+ * @text Text
+ * @desc Command Window Text
+ * @parent commandWindowSet
+ * @type string
+ * @default
+ * 
+ * @param commandWindowTextColor
+ * @text Color
+ * @desc Command Window Text Color
+ * @parent commandWindowText
+ * @type struct<Color>
+ * @default
+ * 
  * @param goldWindowSet
  * @text Gold Window Set
  * @desc Gold Window Set
@@ -83,12 +112,96 @@
  * @type string
  * @default
  * 
+ * @param goldWindowVisible
+ * @text Visible
+ * @desc Gold Window Visible
+ * @parent goldWindowSet
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
  * @param statusWindowSet
  * @text Status Window Set
  * @desc Status Window Set
  * @parent mainMenuSceneSet
  * @type string
  * @default
+ * 
+ * @param statusWindowVisible
+ * @text Visible
+ * @desc Status Window Visible
+ * @parent statusWindowSet
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ */
+
+/*~struct~Color:
+ * 
+ * @param r
+ * @text R
+ * @desc R
+ * @type number
+ * @min 0
+ * @max 255
+ * @default 255
+ * 
+ * @param g
+ * @text G
+ * @desc G
+ * @type number
+ * @min 0
+ * @max 255
+ * @default 255
+ * 
+ * @param b
+ * @text B
+ * @desc B
+ * @type number
+ * @min 0
+ * @max 255
+ * @default 255
+ * 
+ * @param a
+ * @text A
+ * @desc A
+ * @type number
+ * @min 0
+ * @max 1
+ * @default 1
+ * 
+ */
+
+/*~struct~Rect:
+ * 
+ * @param x
+ * @text X
+ * @desc X
+ * @type number
+ * @default 0
+ * 
+ * @param y
+ * @text Y
+ * @desc Y
+ * @type number
+ * @default 0
+ * 
+ * @param width
+ * @text Width
+ * @desc Width
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param height
+ * @text Height
+ * @desc Height
+ * @type number
+ * @min 0
+ * @default 0
  * 
  */
 
@@ -118,6 +231,16 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     //const sceneBackGroundMusic = parameters.sceneBackGroundMusic;
 
 
+    const commandWindowWindowSkin = parameters.commandWindowWindowSkin;
+    const commandWindowFrameJsonObject = JSON.parse(parameters.commandWindowFrame);
+    const commandWindowFrame = new Rectangle(Number(commandWindowFrameJsonObject.x) || 0, Number(commandWindowFrameJsonObject.y) || 0, Number(commandWindowFrameJsonObject.width) || 0, Number(commandWindowFrameJsonObject.height) || 0);
+
+
+    const goldWindowVisible = parameters.goldWindowVisible !== "false";
+
+
+    const statusWindowVisible = parameters.statusWindowVisible !== "false";
+
     //Scene
 
     const _Scene_Menu_Needs_Cancel_Button = Scene_Menu.prototype.needsCancelButton;
@@ -136,7 +259,7 @@ const ASCustomMainMenuSceneNameSpace = (() => {
             this.setBackgroundOpacity(255);
         }
         if (sceneBackGroundVideo && sceneBackGround === sceneBackGroundSelectVideo) {
-            this.removeChild(this._backgroundSprite);
+            //this.removeChild(this._backgroundSprite);
             PIXI.utils.clearTextureCache();
             const fileExtension = Utils.canPlayWebm() ? ".webm" : ".mp4";
             const videoPath = sceneBackGroundVideo + fileExtension;
@@ -178,16 +301,28 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     Scene_Menu.prototype.createCommandWindow = function() {
         _Scene_Menu_Create_Command_Window.apply(this, arguments);
         //this._commandWindow.visible = false;
+        this._commandWindow.windowskin = ImageManager.loadSystem(commandWindowWindowSkin);
+    };
+
+    const _Scene_Menu_Command_Window_Rect = Scene_Menu.prototype.commandWindowRect;
+    Scene_Menu.prototype.commandWindowRect = function() {
+        let frame = _Scene_Menu_Command_Window_Rect.apply(this, arguments);
+        frame = commandWindowFrame;
+        return frame;
     };
 
     //GoldWindow
     const _Scene_Menu_Create_Gold_Window = Scene_Menu.prototype.createGoldWindow;
     Scene_Menu.prototype.createGoldWindow = function() {
         _Scene_Menu_Create_Gold_Window.apply(this, arguments);
-        
+        this._goldWindow.visible = goldWindowVisible;
     };
 
     //StatusWindow
-    
+    const _Scene_Menu_Create_Status_Window = Scene_Menu.prototype.createStatusWindow;
+    Scene_Menu.prototype.createStatusWindow = function() {
+        _Scene_Menu_Create_Status_Window.apply(this, arguments);
+        this._statusWindow.visible = statusWindowVisible;
+    };
 
 })();
