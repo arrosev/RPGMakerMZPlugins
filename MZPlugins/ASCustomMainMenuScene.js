@@ -98,12 +98,36 @@
  * @type string
  * @default
  * 
+ * @param commandWindowFontSize
+ * @text Font Size
+ * @desc Command Window Font Size
+ * @parent commandWindowText
+ * @type number
+ * @default 26
+ * 
+ * @param commandWindowTextAlign
+ * @text Text Align
+ * @desc Command Window Text Align
+ * @parent commandWindowText
+ * @type select
+ * @option center
+ * @option left
+ * @option right
+ * @default center
+ * 
  * @param commandWindowTextColor
- * @text Color
+ * @text Text Color
  * @desc Command Window Text Color
  * @parent commandWindowText
  * @type struct<Color>
- * @default
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param commandWindowOutlineColor
+ * @text Outline Color
+ * @desc Command Window Outline Color
+ * @parent commandWindowText
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
  * 
  * @param goldWindowSet
  * @text Gold Window Set
@@ -219,7 +243,7 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const pluginName = "ASCustomMainMenuScene";
     const parameters = PluginManager.parameters(pluginName);
 
-    //const sceneBackGroundSelectNone = "none";
+    const sceneBackGroundSelectNone = "none";
     const sceneBackGroundSelectImage = "image";
     const sceneBackGroundSelectVideo = "video";
     
@@ -230,12 +254,14 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const sceneBackGroundVideo = parameters.sceneBackGroundVideo;
     //const sceneBackGroundMusic = parameters.sceneBackGroundMusic;
 
-
     const commandWindowWindowSkin = parameters.commandWindowWindowSkin;
     const commandWindowFrameJsonObject = JSON.parse(parameters.commandWindowFrame);
     const commandWindowFrame = new Rectangle(Number(commandWindowFrameJsonObject.x) || 0, Number(commandWindowFrameJsonObject.y) || 0, Number(commandWindowFrameJsonObject.width) || 0, Number(commandWindowFrameJsonObject.height) || 0);
-
-
+    const commandWindowFontSize = Number(parameters.commandWindowFontSize) || 26;
+    const commandWindowTextAlign = parameters.commandWindowTextAlign;
+    const commandWindowTextColorJsonObject = JSON.parse(parameters.commandWindowTextColor);
+    const commandWindowOutlineColorJsonObject = JSON.parse(parameters.commandWindowOutlineColor);
+    
     const goldWindowVisible = parameters.goldWindowVisible !== "false";
 
 
@@ -253,25 +279,27 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const _Scene_Menu_Create_Background = Scene_Menu.prototype.createBackground;
     Scene_Menu.prototype.createBackground = function() {
         _Scene_Menu_Create_Background.apply(this, arguments);
-        if (sceneBackGroundImage && sceneBackGround === sceneBackGroundSelectImage) {
-            this._backgroundSprite.bitmap = ImageManager.loadTitle1(sceneBackGroundImage);
-            this._backgroundSprite.filters = [];
-            this.setBackgroundOpacity(255);
-        }
-        if (sceneBackGroundVideo && sceneBackGround === sceneBackGroundSelectVideo) {
-            //this.removeChild(this._backgroundSprite);
-            PIXI.utils.clearTextureCache();
-            const fileExtension = Utils.canPlayWebm() ? ".webm" : ".mp4";
-            const videoPath = sceneBackGroundVideo + fileExtension;
-            const bg = PIXI.Texture.from(videoPath);
-            const video = bg.baseTexture.resource.source;
-            video.loop = true;
-            video.preload = 'auto';
-            const videoSprite = new PIXI.Sprite(bg);
-            videoSprite.width = Graphics.width;
-            videoSprite.height = Graphics.height;
-            this.addChild(videoSprite);
-        }
+        if (sceneBackGround !== sceneBackGroundSelectNone) {
+            if (sceneBackGroundImage && sceneBackGround === sceneBackGroundSelectImage) {
+                this._backgroundSprite.bitmap = ImageManager.loadTitle1(sceneBackGroundImage);
+                this._backgroundSprite.filters = [];
+                this.setBackgroundOpacity(255);
+            }
+            if (sceneBackGroundVideo && sceneBackGround === sceneBackGroundSelectVideo) {
+                //this.removeChild(this._backgroundSprite);
+                PIXI.utils.clearTextureCache();
+                const fileExtension = Utils.canPlayWebm() ? ".webm" : ".mp4";
+                const videoPath = sceneBackGroundVideo + fileExtension;
+                const bg = PIXI.Texture.from(videoPath);
+                const video = bg.baseTexture.resource.source;
+                video.loop = true;
+                video.preload = 'auto';
+                const videoSprite = new PIXI.Sprite(bg);
+                videoSprite.width = Graphics.width;
+                videoSprite.height = Graphics.height;
+                this.addChild(videoSprite);
+            }
+        } 
     };
 
     // const _Scene_Menu_Start = Scene_Menu.prototype.start;
@@ -310,6 +338,36 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         frame = commandWindowFrame;
         return frame;
     };
+
+    const _Window_Menu_Command_Reset_Text_Color = Window_MenuCommand.prototype.resetTextColor;
+    Window_MenuCommand.prototype.resetTextColor = function() {
+        _Window_Menu_Command_Reset_Text_Color.apply(this, arguments);
+        const textColorR = Number(commandWindowTextColorJsonObject.r);
+        const textColorG = Number(commandWindowTextColorJsonObject.g);
+        const textColorB = Number(commandWindowTextColorJsonObject.b);
+        const textColorA = Number(commandWindowTextColorJsonObject.a);
+        this.changeTextColor(`rgba(${textColorR}, ${textColorG}, ${textColorB}, ${textColorA})`);
+        const OutlineColorR = Number(commandWindowOutlineColorJsonObject.r); 
+        const OutlineColorG = Number(commandWindowOutlineColorJsonObject.g); 
+        const OutlineColorB = Number(commandWindowOutlineColorJsonObject.b); 
+        const OutlineColorA = Number(commandWindowOutlineColorJsonObject.a); 
+        this.changeOutlineColor(`rgba(${OutlineColorR}, ${OutlineColorG}, ${OutlineColorB}, ${OutlineColorA})`);
+    };
+
+    const _Window_Menu_Command_Item_Text_Align = Window_MenuCommand.prototype.itemTextAlign;
+    Window_MenuCommand.prototype.itemTextAlign = function() {
+        let textAlign = _Window_Menu_Command_Item_Text_Align.apply(this, arguments);
+        textAlign = commandWindowTextAlign;
+        return textAlign;
+    };
+
+    const _Window_Menu_Command_Draw_Item = Window_MenuCommand.prototype.drawItem;
+    Window_MenuCommand.prototype.drawItem = function(index) {
+        this.contents.fontSize = commandWindowFontSize;
+        _Window_Menu_Command_Draw_Item.apply(this, arguments);
+    };
+
+    
 
     //GoldWindow
     const _Scene_Menu_Create_Gold_Window = Scene_Menu.prototype.createGoldWindow;
