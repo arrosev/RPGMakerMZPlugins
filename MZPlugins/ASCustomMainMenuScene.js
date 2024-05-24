@@ -91,6 +91,27 @@
  * @type struct<Rect>
  * @default {"x":"568","y":"52","width":"240","height":"496"}
  * 
+ * @param commandWindowPadding
+ * @text Padding
+ * @desc Command Window Padding
+ * @parent commandWindowSet
+ * @type number
+ * @default 12
+ * 
+ * @param commandWindowRowSpacing
+ * @text Row Spacing
+ * @desc Command Window Row Spacing
+ * @parent commandWindowSet
+ * @type number
+ * @default 4
+ * 
+ * @param commandWindowColSpacing
+ * @text Col Spacing
+ * @desc Command Window Col Spacing
+ * @parent commandWindowSet
+ * @type number
+ * @default 8
+ * 
  * @param commandWindowText
  * @text Text
  * @desc Command Window Text
@@ -257,6 +278,11 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const commandWindowWindowSkin = parameters.commandWindowWindowSkin;
     const commandWindowFrameJsonObject = JSON.parse(parameters.commandWindowFrame);
     const commandWindowFrame = new Rectangle(Number(commandWindowFrameJsonObject.x) || 0, Number(commandWindowFrameJsonObject.y) || 0, Number(commandWindowFrameJsonObject.width) || 0, Number(commandWindowFrameJsonObject.height) || 0);
+    
+    const commandWindowPadding = Number(parameters.commandWindowPadding);
+    const commandWindowRowSpacing = Number(parameters.commandWindowRowSpacing) || 4;
+    const commandWindowColSpacing = Number(parameters.commandWindowColSpacing) || 8;
+
     const commandWindowFontSize = Number(parameters.commandWindowFontSize) || 26;
     const commandWindowTextAlign = parameters.commandWindowTextAlign;
     const commandWindowTextColorJsonObject = JSON.parse(parameters.commandWindowTextColor);
@@ -330,6 +356,7 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         _Scene_Menu_Create_Command_Window.apply(this, arguments);
         //this._commandWindow.visible = false;
         this._commandWindow.windowskin = ImageManager.loadSystem(commandWindowWindowSkin);
+        this._commandWindow._padding = commandWindowPadding;
     };
 
     const _Scene_Menu_Command_Window_Rect = Scene_Menu.prototype.commandWindowRect;
@@ -338,6 +365,20 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         frame = commandWindowFrame;
         return frame;
     };
+
+    const _Window_Menu_Command_RowSpacing = Window_MenuCommand.prototype.rowSpacing;
+    Window_MenuCommand.prototype.rowSpacing = function() {
+        let rowSpacing = _Window_Menu_Command_RowSpacing.apply(this, arguments);
+        rowSpacing = commandWindowRowSpacing;
+        return rowSpacing;
+    }
+
+    const _Window_Menu_Command_ColSpacing = Window_MenuCommand.prototype.colSpacing;
+    Window_MenuCommand.prototype.colSpacing = function() {
+        let colSpacing = _Window_Menu_Command_ColSpacing.apply(this, arguments);
+        colSpacing = commandWindowColSpacing;
+        return colSpacing;
+    }
 
     const _Window_Menu_Command_Reset_Text_Color = Window_MenuCommand.prototype.resetTextColor;
     Window_MenuCommand.prototype.resetTextColor = function() {
