@@ -140,21 +140,21 @@
  * @desc Command Window Item Background Color1
  * @parent commandWindowItemBackgroundColor
  * @type struct<Color>
- * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * @default {"r":"32","g":"32","b":"32","a":"0.5"}
  * 
  * @param commandWindowItemBGColor2
  * @text Item BG Color2
  * @desc Command Window Item Background Color2
  * @parent commandWindowItemBackgroundColor
  * @type struct<Color>
- * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * @default {"r":"0","g":"0","b":"0","a":"0.5"}
  * 
  * @param commandWindowItemBGBorderColor
- * @text Item BG Borde Color
- * @desc Command Window Item Background Borde Color
+ * @text Item BG Border Color
+ * @desc Command Window Item Background Border Color
  * @parent commandWindowItemBackgroundColor
  * @type struct<Color>
- * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * @default {"r":"32","g":"32","b":"32","a":"0.5"}
  * 
  * @param commandWindowItemText
  * @text Item Text
@@ -256,8 +256,8 @@
  * 
  * @param a
  * @text A
- * @desc A
- * @type number
+ * @desc A Range of values (0-1)
+ * @type string
  * @min 0
  * @max 1
  * @default 1
@@ -324,12 +324,14 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const commandWindowFrame = new Rectangle(Number(commandWindowFrameJsonObject.x) || 0, Number(commandWindowFrameJsonObject.y) || 0, Number(commandWindowFrameJsonObject.width) || 0, Number(commandWindowFrameJsonObject.height) || 0);
     
     const commandWindowItemHeight = Number(parameters.commandWindowItemHeight) || 40;
-
     const commandWindowPadding = Number(parameters.commandWindowPadding) || 12;
     const commandWindowRowSpacing = Number(parameters.commandWindowRowSpacing) || 4;
     const commandWindowColSpacing = Number(parameters.commandWindowColSpacing) || 8;
-
     const commandWindowMaxCols = Number(parameters.commandWindowMaxCols) || 1;
+
+    const commandWindowItemBGColor1JsonObject = JSON.parse(parameters.commandWindowItemBGColor1);
+    const commandWindowItemBGColor2JsonObject = JSON.parse(parameters.commandWindowItemBGColor2);
+    const commandWindowItemBGBorderColorJsonObject = JSON.parse(parameters.commandWindowItemBGBorderColor);
 
     const commandWindowItemFontSize = Number(parameters.commandWindowItemFontSize) || 26;
     const commandWindowItemTextAlign = parameters.commandWindowItemTextAlign;
@@ -470,15 +472,31 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         _Window_Menu_Command_Draw_Item.apply(this, arguments);
     };
 
+    const _Window_Menu_Command_Draw_Background_Rect = Window_MenuCommand.prototype.drawBackgroundRect;
     Window_MenuCommand.prototype.drawBackgroundRect = function(rect) {
-        const c1 = ColorManager.itemBackColor1();
-        const c2 = ColorManager.itemBackColor2();
+        _Window_Menu_Command_Draw_Background_Rect.apply(this, arguments);
+        this.contentsBack.clearRect(rect.x, rect.y, rect.width, rect.height);
+        const itemBackColor1R = Number(commandWindowItemBGColor1JsonObject.r);
+        const itemBackColor1G = Number(commandWindowItemBGColor1JsonObject.g);
+        const itemBackColor1B = Number(commandWindowItemBGColor1JsonObject.b);
+        const itemBackColor1A = Number(commandWindowItemBGColor1JsonObject.a);
+        const c1 = `rgba(${itemBackColor1R}, ${itemBackColor1G}, ${itemBackColor1B}, ${itemBackColor1A})`;
+        const itemBackColor2R = Number(commandWindowItemBGColor2JsonObject.r);
+        const itemBackColor2G = Number(commandWindowItemBGColor2JsonObject.g);
+        const itemBackColor2B = Number(commandWindowItemBGColor2JsonObject.b);
+        const itemBackColor2A = Number(commandWindowItemBGColor2JsonObject.a);
+        const c2 = `rgba(${itemBackColor2R}, ${itemBackColor2G}, ${itemBackColor2B}, ${itemBackColor2A})`;
+        const itemBGBorderColor2R = Number(commandWindowItemBGBorderColorJsonObject.r);
+        const itemBGBorderColor2G = Number(commandWindowItemBGBorderColorJsonObject.g);
+        const itemBGBorderColor2B = Number(commandWindowItemBGBorderColorJsonObject.b);
+        const itemBGBorderColor2A = Number(commandWindowItemBGBorderColorJsonObject.a);
+        const c3 = `rgba(${itemBGBorderColor2R}, ${itemBGBorderColor2G}, ${itemBGBorderColor2B}, ${itemBGBorderColor2A})`;
         const x = rect.x;
         const y = rect.y;
         const w = rect.width;
         const h = rect.height;
         this.contentsBack.gradientFillRect(x, y, w, h, c1, c2, true);
-        this.contentsBack.strokeRect(x, y, w, h, c1);
+        this.contentsBack.strokeRect(x, y, w, h, c3);
     };
     
 
