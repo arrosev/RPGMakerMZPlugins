@@ -128,41 +128,69 @@
  * @min 1
  * @default 1
  * 
- * @param commandWindowText
- * @text Text
- * @desc Command Window Text
+ * @param commandWindowItemBackgroundColor
+ * @text Item Background Color
+ * @desc Command Window Item Background Color
  * @parent commandWindowSet
  * @type string
  * @default
  * 
- * @param commandWindowFontSize
- * @text Font Size
- * @desc Command Window Font Size
- * @parent commandWindowText
+ * @param commandWindowItemBGColor1
+ * @text Item BG Color1
+ * @desc Command Window Item Background Color1
+ * @parent commandWindowItemBackgroundColor
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param commandWindowItemBGColor2
+ * @text Item BG Color2
+ * @desc Command Window Item Background Color2
+ * @parent commandWindowItemBackgroundColor
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param commandWindowItemBGBorderColor
+ * @text Item BG Borde Color
+ * @desc Command Window Item Background Borde Color
+ * @parent commandWindowItemBackgroundColor
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param commandWindowItemText
+ * @text Item Text
+ * @desc Command Window Item Text
+ * @parent commandWindowSet
+ * @type string
+ * @default
+ * 
+ * @param commandWindowItemFontSize
+ * @text Item Font Size
+ * @desc Command Window Item Font Size
+ * @parent commandWindowItemText
  * @type number
  * @default 26
  * 
- * @param commandWindowTextAlign
- * @text Text Align
- * @desc Command Window Text Align
- * @parent commandWindowText
+ * @param commandWindowItemTextAlign
+ * @text Item Text Align
+ * @desc Command Window Item Text Align
+ * @parent commandWindowItemText
  * @type select
  * @option center
  * @option left
  * @option right
  * @default center
  * 
- * @param commandWindowTextColor
- * @text Text Color
- * @desc Command Window Text Color
- * @parent commandWindowText
+ * @param commandWindowItemTextColor
+ * @text Item Text Color
+ * @desc Command Window Item Text Color
+ * @parent commandWindowItemText
  * @type struct<Color>
  * @default {"r":"255","g":"255","b":"255","a":"1"}
  * 
- * @param commandWindowOutlineColor
- * @text Outline Color
- * @desc Command Window Outline Color
- * @parent commandWindowText
+ * @param commandWindowItemTextOutlineColor
+ * @text Item Text Outline Color
+ * @desc Command Window Item Text Outline Color
+ * @parent commandWindowItemText
  * @type struct<Color>
  * @default {"r":"0","g":"0","b":"0","a":"1"}
  * 
@@ -303,10 +331,10 @@ const ASCustomMainMenuSceneNameSpace = (() => {
 
     const commandWindowMaxCols = Number(parameters.commandWindowMaxCols) || 1;
 
-    const commandWindowFontSize = Number(parameters.commandWindowFontSize) || 26;
-    const commandWindowTextAlign = parameters.commandWindowTextAlign;
-    const commandWindowTextColorJsonObject = JSON.parse(parameters.commandWindowTextColor);
-    const commandWindowOutlineColorJsonObject = JSON.parse(parameters.commandWindowOutlineColor);
+    const commandWindowItemFontSize = Number(parameters.commandWindowItemFontSize) || 26;
+    const commandWindowItemTextAlign = parameters.commandWindowItemTextAlign;
+    const commandWindowItemTextColorJsonObject = JSON.parse(parameters.commandWindowItemTextColor);
+    const commandWindowItemTextOutlineColorJsonObject = JSON.parse(parameters.commandWindowItemTextOutlineColor);
     
     const goldWindowVisible = parameters.goldWindowVisible !== "false";
 
@@ -417,31 +445,41 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const _Window_Menu_Command_Reset_Text_Color = Window_MenuCommand.prototype.resetTextColor;
     Window_MenuCommand.prototype.resetTextColor = function() {
         _Window_Menu_Command_Reset_Text_Color.apply(this, arguments);
-        const textColorR = Number(commandWindowTextColorJsonObject.r);
-        const textColorG = Number(commandWindowTextColorJsonObject.g);
-        const textColorB = Number(commandWindowTextColorJsonObject.b);
-        const textColorA = Number(commandWindowTextColorJsonObject.a);
+        const textColorR = Number(commandWindowItemTextColorJsonObject.r);
+        const textColorG = Number(commandWindowItemTextColorJsonObject.g);
+        const textColorB = Number(commandWindowItemTextColorJsonObject.b);
+        const textColorA = Number(commandWindowItemTextColorJsonObject.a);
         this.changeTextColor(`rgba(${textColorR}, ${textColorG}, ${textColorB}, ${textColorA})`);
-        const OutlineColorR = Number(commandWindowOutlineColorJsonObject.r); 
-        const OutlineColorG = Number(commandWindowOutlineColorJsonObject.g); 
-        const OutlineColorB = Number(commandWindowOutlineColorJsonObject.b); 
-        const OutlineColorA = Number(commandWindowOutlineColorJsonObject.a); 
+        const OutlineColorR = Number(commandWindowItemTextOutlineColorJsonObject.r); 
+        const OutlineColorG = Number(commandWindowItemTextOutlineColorJsonObject.g); 
+        const OutlineColorB = Number(commandWindowItemTextOutlineColorJsonObject.b); 
+        const OutlineColorA = Number(commandWindowItemTextOutlineColorJsonObject.a); 
         this.changeOutlineColor(`rgba(${OutlineColorR}, ${OutlineColorG}, ${OutlineColorB}, ${OutlineColorA})`);
     };
 
     const _Window_Menu_Command_Item_Text_Align = Window_MenuCommand.prototype.itemTextAlign;
     Window_MenuCommand.prototype.itemTextAlign = function() {
         let textAlign = _Window_Menu_Command_Item_Text_Align.apply(this, arguments);
-        textAlign = commandWindowTextAlign;
+        textAlign = commandWindowItemTextAlign;
         return textAlign;
     };
 
     const _Window_Menu_Command_Draw_Item = Window_MenuCommand.prototype.drawItem;
     Window_MenuCommand.prototype.drawItem = function(index) {
-        this.contents.fontSize = commandWindowFontSize;
+        this.contents.fontSize = commandWindowItemFontSize;
         _Window_Menu_Command_Draw_Item.apply(this, arguments);
     };
 
+    Window_MenuCommand.prototype.drawBackgroundRect = function(rect) {
+        const c1 = ColorManager.itemBackColor1();
+        const c2 = ColorManager.itemBackColor2();
+        const x = rect.x;
+        const y = rect.y;
+        const w = rect.width;
+        const h = rect.height;
+        this.contentsBack.gradientFillRect(x, y, w, h, c1, c2, true);
+        this.contentsBack.strokeRect(x, y, w, h, c1);
+    };
     
 
     //GoldWindow
