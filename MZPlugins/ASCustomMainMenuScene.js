@@ -128,6 +128,38 @@
  * @min 1
  * @default 1
  * 
+ * @param commandWindowCursor
+ * @text Cursor
+ * @desc Command Window Cursor
+ * @parent commandWindowSet
+ * @type select
+ * @option none
+ * @option images
+ * @default none
+ * 
+ * @param commandWindowCursorImages
+ * @text Cursor Images
+ * @desc Command Window Cursor Images
+ * @parent commandWindowCursor
+ * @type file[]
+ * @dir img/
+ * @default []
+ * 
+ * @param commandWindowCursorOffset
+ * @text Cursor Offset
+ * @desc Command Window Cursor Offset
+ * @parent commandWindowCursor
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
+ * 
+ * @param commandWindowCursorAnimationSpeed
+ * @text Cursor Animation Speed
+ * @desc Command Window Cursor Animation Speed
+ * @parent commandWindowCursor
+ * @type number
+ * @min 1
+ * @default 1
+ * 
  * @param commandWindowItemBackgroundColor
  * @text Item Background Color
  * @desc Command Window Item Background Color
@@ -264,6 +296,22 @@
  * 
  */
 
+/*~struct~Point:
+ * 
+ * @param x
+ * @text X
+ * @desc X
+ * @type number
+ * @default 0
+ * 
+ * @param y
+ * @text Y
+ * @desc Y
+ * @type number
+ * @default 0
+ * 
+ */
+
 /*~struct~Rect:
  * 
  * @param x
@@ -311,6 +359,9 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const sceneBackGroundSelectNone = "none";
     const sceneBackGroundSelectImage = "image";
     const sceneBackGroundSelectVideo = "video";
+
+    const commandWindowCursorSelectNone = "none";
+    const commandWindowCursorSelectImage = "images";
     
     const sceneCancelButtonVisible = parameters.sceneCancelButtonVisible !== "false";
 
@@ -328,6 +379,12 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const commandWindowRowSpacing = Number(parameters.commandWindowRowSpacing) || 4;
     const commandWindowColSpacing = Number(parameters.commandWindowColSpacing) || 8;
     const commandWindowMaxCols = Number(parameters.commandWindowMaxCols) || 1;
+
+    const commandWindowCursor = parameters.commandWindowCursor;
+    const commandWindowCursorImagesJsonObject = JSON.parse(parameters.commandWindowCursorImages !== undefined ? parameters.commandWindowCursorImages : "[]");
+    const commandWindowCursorOffsetJsonObject = JSON.parse(parameters.commandWindowCursorOffset); 
+    const commandWindowCursorOffset = new Point(Number(commandWindowCursorOffsetJsonObject.x) || 0, Number(commandWindowCursorOffsetJsonObject.y) || 0);
+    const commandWindowCursorAnimationSpeed = Number(parameters.commandWindowCursorAnimationSpeed);
 
     const commandWindowItemBGColor1JsonObject = JSON.parse(parameters.commandWindowItemBGColor1);
     const commandWindowItemBGColor2JsonObject = JSON.parse(parameters.commandWindowItemBGColor2);
@@ -442,7 +499,86 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         let maxCols = _Window_Menu_Command_MaxCols.apply(this, arguments);
         maxCols = commandWindowMaxCols;
         return maxCols;
-    };    
+    };
+    
+    const _Window_Menu_Command_Create_Cursor_Sprite = Window_MenuCommand.prototype._createCursorSprite;
+    Window_MenuCommand.prototype._createCursorSprite = function() {
+        _Window_Menu_Command_Create_Cursor_Sprite.apply(this, arguments);
+        if (commandWindowCursor === commandWindowCursorSelectImage && commandWindowCursorImagesJsonObject.length !== 0) {
+            if (commandWindowCursorImagesJsonObject.length === 1) {
+                this._cursorSprite = new Sprite();
+                this._cursorSprite.addChild(new Sprite());
+                this._cursorSprite.children[0].bitmap = ImageManager.loadBitmap("img/", commandWindowCursorImagesJsonObject[0]);
+                this._cursorSprite.children[0].move(commandWindowCursorOffset.x, commandWindowCursorOffset.y); // 居中微调
+                this._clientArea.addChild(this._cursorSprite);
+            } else {
+                this._cursorSprite = new Sprite();
+
+                const commandWindowCursorImagesPathArray = [];
+                for (const image of commandWindowCursorImagesJsonObject) {
+                    commandWindowCursorImagesPathArray.push("img/" + image + ".png")
+                }
+                const animatedSprite = new PIXI.AnimatedSprite.fromImages(commandWindowCursorImagesPathArray);
+
+                animatedSprite.animationSpeed = commandWindowCursorAnimationSpeed / 10.0;
+                animatedSprite.x = commandWindowCursorOffset.x;
+                animatedSprite.y = commandWindowCursorOffset.y;
+            
+                animatedSprite.gotoAndPlay(0);
+                
+                const animatedSpriteContainer = new PIXI.Container();
+                animatedSpriteContainer.addChild(animatedSprite);
+                
+                this._cursorSprite.addChild(animatedSpriteContainer);
+                this._clientArea.addChild(this._cursorSprite);
+            }
+        }
+    }
+
+    const _Window_Menu_Command_Update_Cursor = Window_MenuCommand.prototype._updateCursor;
+    Window_MenuCommand.prototype._updateCursor = function() {
+        if (commandWindowCursor === commandWindowCursorSelectImage && commandWindowCursorImagesJsonObject.length !== 0) {
+            this._cursorSprite.visible = this.isOpen() && this.cursorVisible;
+            this._cursorSprite.x = this._cursorRect.x;
+            this._cursorSprite.y = this._cursorRect.y;
+        } else {
+            _Window_Menu_Command_Update_Cursor.apply(this, arguments);
+        }
+    }
+
+    const _Window_Menu_Command_Refresh_Cursor = Window_MenuCommand.prototype._refreshCursor;
+    Window_MenuCommand.prototype._refreshCursor = function() {
+        if (commandWindowCursor === commandWindowCursorSelectNone || commandWindowCursorImagesJsonObject.length === 0) {
+            _Window_Menu_Command_Refresh_Cursor.apply(this, arguments);
+        }
+    }
+
+    const _Window_Menu_Command_Draw_Background_Rect = Window_MenuCommand.prototype.drawBackgroundRect;
+    Window_MenuCommand.prototype.drawBackgroundRect = function(rect) {
+        _Window_Menu_Command_Draw_Background_Rect.apply(this, arguments);
+        this.contentsBack.clearRect(rect.x, rect.y, rect.width, rect.height);
+        const itemBackColor1R = Number(commandWindowItemBGColor1JsonObject.r);
+        const itemBackColor1G = Number(commandWindowItemBGColor1JsonObject.g);
+        const itemBackColor1B = Number(commandWindowItemBGColor1JsonObject.b);
+        const itemBackColor1A = Number(commandWindowItemBGColor1JsonObject.a);
+        const c1 = `rgba(${itemBackColor1R}, ${itemBackColor1G}, ${itemBackColor1B}, ${itemBackColor1A})`;
+        const itemBackColor2R = Number(commandWindowItemBGColor2JsonObject.r);
+        const itemBackColor2G = Number(commandWindowItemBGColor2JsonObject.g);
+        const itemBackColor2B = Number(commandWindowItemBGColor2JsonObject.b);
+        const itemBackColor2A = Number(commandWindowItemBGColor2JsonObject.a);
+        const c2 = `rgba(${itemBackColor2R}, ${itemBackColor2G}, ${itemBackColor2B}, ${itemBackColor2A})`;
+        const itemBGBorderColor2R = Number(commandWindowItemBGBorderColorJsonObject.r);
+        const itemBGBorderColor2G = Number(commandWindowItemBGBorderColorJsonObject.g);
+        const itemBGBorderColor2B = Number(commandWindowItemBGBorderColorJsonObject.b);
+        const itemBGBorderColor2A = Number(commandWindowItemBGBorderColorJsonObject.a);
+        const c3 = `rgba(${itemBGBorderColor2R}, ${itemBGBorderColor2G}, ${itemBGBorderColor2B}, ${itemBGBorderColor2A})`;
+        const x = rect.x;
+        const y = rect.y;
+        const w = rect.width;
+        const h = rect.height;
+        this.contentsBack.gradientFillRect(x, y, w, h, c1, c2, true);
+        this.contentsBack.strokeRect(x, y, w, h, c3);
+    };
 
     const _Window_Menu_Command_Reset_Text_Color = Window_MenuCommand.prototype.resetTextColor;
     Window_MenuCommand.prototype.resetTextColor = function() {
@@ -470,33 +606,6 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     Window_MenuCommand.prototype.drawItem = function(index) {
         this.contents.fontSize = commandWindowItemFontSize;
         _Window_Menu_Command_Draw_Item.apply(this, arguments);
-    };
-
-    const _Window_Menu_Command_Draw_Background_Rect = Window_MenuCommand.prototype.drawBackgroundRect;
-    Window_MenuCommand.prototype.drawBackgroundRect = function(rect) {
-        _Window_Menu_Command_Draw_Background_Rect.apply(this, arguments);
-        this.contentsBack.clearRect(rect.x, rect.y, rect.width, rect.height);
-        const itemBackColor1R = Number(commandWindowItemBGColor1JsonObject.r);
-        const itemBackColor1G = Number(commandWindowItemBGColor1JsonObject.g);
-        const itemBackColor1B = Number(commandWindowItemBGColor1JsonObject.b);
-        const itemBackColor1A = Number(commandWindowItemBGColor1JsonObject.a);
-        const c1 = `rgba(${itemBackColor1R}, ${itemBackColor1G}, ${itemBackColor1B}, ${itemBackColor1A})`;
-        const itemBackColor2R = Number(commandWindowItemBGColor2JsonObject.r);
-        const itemBackColor2G = Number(commandWindowItemBGColor2JsonObject.g);
-        const itemBackColor2B = Number(commandWindowItemBGColor2JsonObject.b);
-        const itemBackColor2A = Number(commandWindowItemBGColor2JsonObject.a);
-        const c2 = `rgba(${itemBackColor2R}, ${itemBackColor2G}, ${itemBackColor2B}, ${itemBackColor2A})`;
-        const itemBGBorderColor2R = Number(commandWindowItemBGBorderColorJsonObject.r);
-        const itemBGBorderColor2G = Number(commandWindowItemBGBorderColorJsonObject.g);
-        const itemBGBorderColor2B = Number(commandWindowItemBGBorderColorJsonObject.b);
-        const itemBGBorderColor2A = Number(commandWindowItemBGBorderColorJsonObject.a);
-        const c3 = `rgba(${itemBGBorderColor2R}, ${itemBGBorderColor2G}, ${itemBGBorderColor2B}, ${itemBGBorderColor2A})`;
-        const x = rect.x;
-        const y = rect.y;
-        const w = rect.width;
-        const h = rect.height;
-        this.contentsBack.gradientFillRect(x, y, w, h, c1, c2, true);
-        this.contentsBack.strokeRect(x, y, w, h, c3);
     };
     
 
