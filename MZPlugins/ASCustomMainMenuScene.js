@@ -400,6 +400,11 @@ const ASCustomMainMenuSceneNameSpace = (() => {
 
     const statusWindowVisible = parameters.statusWindowVisible !== "false";
 
+
+    const colorJsonObjectConvertToColorRGBA = function(object) {
+        return `rgba(${Number(object.r)}, ${Number(object.g)}, ${Number(object.b)}, ${Number(object.a)})`;
+    }
+
     //Scene
 
     const _Scene_Menu_Needs_Cancel_Button = Scene_Menu.prototype.needsCancelButton;
@@ -557,21 +562,9 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     Window_MenuCommand.prototype.drawBackgroundRect = function(rect) {
         _Window_Menu_Command_Draw_Background_Rect.apply(this, arguments);
         this.contentsBack.clearRect(rect.x, rect.y, rect.width, rect.height);
-        const itemBackColor1R = Number(commandWindowItemBGColor1JsonObject.r);
-        const itemBackColor1G = Number(commandWindowItemBGColor1JsonObject.g);
-        const itemBackColor1B = Number(commandWindowItemBGColor1JsonObject.b);
-        const itemBackColor1A = Number(commandWindowItemBGColor1JsonObject.a);
-        const c1 = `rgba(${itemBackColor1R}, ${itemBackColor1G}, ${itemBackColor1B}, ${itemBackColor1A})`;
-        const itemBackColor2R = Number(commandWindowItemBGColor2JsonObject.r);
-        const itemBackColor2G = Number(commandWindowItemBGColor2JsonObject.g);
-        const itemBackColor2B = Number(commandWindowItemBGColor2JsonObject.b);
-        const itemBackColor2A = Number(commandWindowItemBGColor2JsonObject.a);
-        const c2 = `rgba(${itemBackColor2R}, ${itemBackColor2G}, ${itemBackColor2B}, ${itemBackColor2A})`;
-        const itemBGBorderColor2R = Number(commandWindowItemBGBorderColorJsonObject.r);
-        const itemBGBorderColor2G = Number(commandWindowItemBGBorderColorJsonObject.g);
-        const itemBGBorderColor2B = Number(commandWindowItemBGBorderColorJsonObject.b);
-        const itemBGBorderColor2A = Number(commandWindowItemBGBorderColorJsonObject.a);
-        const c3 = `rgba(${itemBGBorderColor2R}, ${itemBGBorderColor2G}, ${itemBGBorderColor2B}, ${itemBGBorderColor2A})`;
+        const c1 = colorJsonObjectConvertToColorRGBA(commandWindowItemBGColor1JsonObject);
+        const c2 = colorJsonObjectConvertToColorRGBA(commandWindowItemBGColor2JsonObject);
+        const c3 = colorJsonObjectConvertToColorRGBA(commandWindowItemBGBorderColorJsonObject);
         const x = rect.x;
         const y = rect.y;
         const w = rect.width;
@@ -583,16 +576,8 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const _Window_Menu_Command_Reset_Text_Color = Window_MenuCommand.prototype.resetTextColor;
     Window_MenuCommand.prototype.resetTextColor = function() {
         _Window_Menu_Command_Reset_Text_Color.apply(this, arguments);
-        const textColorR = Number(commandWindowItemTextColorJsonObject.r);
-        const textColorG = Number(commandWindowItemTextColorJsonObject.g);
-        const textColorB = Number(commandWindowItemTextColorJsonObject.b);
-        const textColorA = Number(commandWindowItemTextColorJsonObject.a);
-        this.changeTextColor(`rgba(${textColorR}, ${textColorG}, ${textColorB}, ${textColorA})`);
-        const OutlineColorR = Number(commandWindowItemTextOutlineColorJsonObject.r); 
-        const OutlineColorG = Number(commandWindowItemTextOutlineColorJsonObject.g); 
-        const OutlineColorB = Number(commandWindowItemTextOutlineColorJsonObject.b); 
-        const OutlineColorA = Number(commandWindowItemTextOutlineColorJsonObject.a); 
-        this.changeOutlineColor(`rgba(${OutlineColorR}, ${OutlineColorG}, ${OutlineColorB}, ${OutlineColorA})`);
+        this.changeTextColor(colorJsonObjectConvertToColorRGBA(commandWindowItemTextColorJsonObject));
+        this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(commandWindowItemTextOutlineColorJsonObject));
     };
 
     const _Window_Menu_Command_Item_Text_Align = Window_MenuCommand.prototype.itemTextAlign;
