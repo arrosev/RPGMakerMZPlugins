@@ -188,6 +188,23 @@
  * @type struct<Color>
  * @default {"r":"32","g":"32","b":"32","a":"0.5"}
  * 
+ * @param commandWindowItemBGBorderLineWidth
+ * @text Item BG Border LineWidth
+ * @desc Command Window Item BG Border LineWidth
+ * @parent commandWindowItemBackgroundColor
+ * @type string
+ * @default 1.0
+ * 
+ * @param commandWindowItemBGBorderLineJoin
+ * @text Item BG Border LineJoin
+ * @desc Command Window Item BG Border LineJoin
+ * @parent commandWindowItemBackgroundColor
+ * @type select
+ * @option miter
+ * @option round
+ * @option bevel
+ * @default miter
+ * 
  * @param commandWindowItemText
  * @text Item Text
  * @desc Command Window Item Text
@@ -201,6 +218,13 @@
  * @parent commandWindowItemText
  * @type number
  * @default 26
+ * 
+ * @param commandWindowItemTextOffsetX
+ * @text Item Text OffsetX
+ * @desc Command Window Item Text OffsetX
+ * @parent commandWindowItemText
+ * @type number
+ * @default 0
  * 
  * @param commandWindowItemTextAlign
  * @text Item Text Align
@@ -389,8 +413,11 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const commandWindowItemBGColor1JsonObject = JSON.parse(parameters.commandWindowItemBGColor1);
     const commandWindowItemBGColor2JsonObject = JSON.parse(parameters.commandWindowItemBGColor2);
     const commandWindowItemBGBorderColorJsonObject = JSON.parse(parameters.commandWindowItemBGBorderColor);
+    const commandWindowItemBGBorderLineWidth = Number(parameters.commandWindowItemBGBorderLineWidth) || 1.0;
+    const commandWindowItemBGBorderLineJoin = parameters.commandWindowItemBGBorderLineJoin;
 
     const commandWindowItemFontSize = Number(parameters.commandWindowItemFontSize) || 26;
+    const commandWindowItemTextOffsetX = Number(parameters.commandWindowItemTextOffsetX) || 0;
     const commandWindowItemTextAlign = parameters.commandWindowItemTextAlign;
     const commandWindowItemTextColorJsonObject = JSON.parse(parameters.commandWindowItemTextColor);
     const commandWindowItemTextOutlineColorJsonObject = JSON.parse(parameters.commandWindowItemTextOutlineColor);
@@ -401,9 +428,21 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowVisible = parameters.statusWindowVisible !== "false";
 
 
+    // Private Functions and System Class Extensions
     const colorJsonObjectConvertToColorRGBA = function(object) {
         return `rgba(${Number(object.r)}, ${Number(object.g)}, ${Number(object.b)}, ${Number(object.a)})`;
     }
+
+    Bitmap.prototype.strokeBetterRect = function(x, y, width, height, color, lineWidth, lineJoin) {
+        const context = this.context;
+        context.save();
+        context.strokeStyle = color;
+        context.lineWidth = lineWidth;
+        context.lineJoin = lineJoin;
+        context.strokeRect(x, y, width, height);
+        context.restore();
+        this._baseTexture.update();
+    };
 
     //Scene
 
@@ -570,7 +609,8 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         const w = rect.width;
         const h = rect.height;
         this.contentsBack.gradientFillRect(x, y, w, h, c1, c2, true);
-        this.contentsBack.strokeRect(x, y, w, h, c3);
+        this.contentsBack.strokeBetterRect(x, y, w, h, c3, commandWindowItemBGBorderLineWidth, commandWindowItemBGBorderLineJoin);
+        //this.contentsBack.strokeRect(x, y, w, h, c3);
     };
 
     const _Window_Menu_Command_Reset_Text_Color = Window_MenuCommand.prototype.resetTextColor;
@@ -585,6 +625,10 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         let textAlign = _Window_Menu_Command_Item_Text_Align.apply(this, arguments);
         textAlign = commandWindowItemTextAlign;
         return textAlign;
+    };
+
+    Window_MenuCommand.prototype.drawText = function(text, x, y, maxWidth, align) {
+        this.contents.drawText(text, x + commandWindowItemTextOffsetX, y, maxWidth, this.lineHeight(), align);
     };
 
     const _Window_Menu_Command_Draw_Item = Window_MenuCommand.prototype.drawItem;
