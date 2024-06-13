@@ -282,6 +282,21 @@
  * @off Hide
  * @default true
  * 
+ * @param statusWindowWindowSkin
+ * @text Window Skin
+ * @desc Status Window WindowSkin
+ * @parent statusWindowSet
+ * @type file
+ * @dir img/system/
+ * @default Window
+ * 
+ * @param statusWindowFrame
+ * @text Frame
+ * @desc Status Window Frame
+ * @parent statusWindowSet
+ * @type struct<Rect>
+ * @default {"x":"0","y":"52","width":"568","height":"564"}
+ * 
  */
 
 /*~struct~Color:
@@ -395,8 +410,8 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     //const sceneBackGroundMusic = parameters.sceneBackGroundMusic;
 
     const commandWindowWindowSkin = parameters.commandWindowWindowSkin;
-    const commandWindowFrameJsonObject = JSON.parse(parameters.commandWindowFrame);
-    const commandWindowFrame = new Rectangle(Number(commandWindowFrameJsonObject.x) || 0, Number(commandWindowFrameJsonObject.y) || 0, Number(commandWindowFrameJsonObject.width) || 0, Number(commandWindowFrameJsonObject.height) || 0);
+    const statusWindowFrameJsonObject = JSON.parse(parameters.statusWindowFrame);
+    const statusWindowFrame = new Rectangle(Number(statusWindowFrameJsonObject.x) || 0, Number(statusWindowFrameJsonObject.y) || 0, Number(statusWindowFrameJsonObject.width) || 0, Number(statusWindowFrameJsonObject.height) || 0);
     
     const commandWindowItemHeight = Number(parameters.commandWindowItemHeight) || 40;
     const commandWindowPadding = Number(parameters.commandWindowPadding) || 12;
@@ -426,6 +441,9 @@ const ASCustomMainMenuSceneNameSpace = (() => {
 
 
     const statusWindowVisible = parameters.statusWindowVisible !== "false";
+    const statusWindowWindowSkin = parameters.statusWindowWindowSkin;
+    const commandWindowFrameJsonObject = JSON.parse(parameters.commandWindowFrame);
+    const commandWindowFrame = new Rectangle(Number(commandWindowFrameJsonObject.x) || 0, Number(commandWindowFrameJsonObject.y) || 0, Number(commandWindowFrameJsonObject.width) || 0, Number(commandWindowFrameJsonObject.height) || 0);
 
 
     // Private Functions and System Class Extensions
@@ -650,6 +668,25 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     Scene_Menu.prototype.createStatusWindow = function() {
         _Scene_Menu_Create_Status_Window.apply(this, arguments);
         this._statusWindow.visible = statusWindowVisible;
+        this._statusWindow.windowskin = ImageManager.loadSystem(statusWindowWindowSkin);
+        //this._statusWindow._padding = 0;
+    };
+
+    const _Scene_Menu_Status_Window_Rect = Scene_Menu.prototype.statusWindowRect;
+    Scene_Menu.prototype.statusWindowRect = function() {
+        let frame = _Scene_Menu_Status_Window_Rect.apply(this, arguments);
+        frame = statusWindowFrame;
+        return frame;
+    };
+
+    Window_MenuStatus.prototype.drawActorSimpleStatus = function(actor, x, y) {
+        const lineHeight = this.lineHeight();
+        const x2 = x + 180;
+        this.drawActorName(actor, x, y);
+        this.drawActorLevel(actor, x, y + lineHeight * 1);
+        this.drawActorIcons(actor, x, y + lineHeight * 2);
+        this.drawActorClass(actor, x2, y);
+        this.placeBasicGauges(actor, x2, y + lineHeight);
     };
 
 })();
