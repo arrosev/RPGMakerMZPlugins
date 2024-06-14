@@ -410,8 +410,8 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     //const sceneBackGroundMusic = parameters.sceneBackGroundMusic;
 
     const commandWindowWindowSkin = parameters.commandWindowWindowSkin;
-    const statusWindowFrameJsonObject = JSON.parse(parameters.statusWindowFrame);
-    const statusWindowFrame = new Rectangle(Number(statusWindowFrameJsonObject.x) || 0, Number(statusWindowFrameJsonObject.y) || 0, Number(statusWindowFrameJsonObject.width) || 0, Number(statusWindowFrameJsonObject.height) || 0);
+    const commandWindowFrameJsonObject = JSON.parse(parameters.commandWindowFrame);
+    const commandWindowFrame = new Rectangle(Number(commandWindowFrameJsonObject.x) || 0, Number(commandWindowFrameJsonObject.y) || 0, Number(commandWindowFrameJsonObject.width) || 0, Number(commandWindowFrameJsonObject.height) || 0);
     
     const commandWindowItemHeight = Number(parameters.commandWindowItemHeight) || 40;
     const commandWindowPadding = Number(parameters.commandWindowPadding) || 12;
@@ -442,8 +442,9 @@ const ASCustomMainMenuSceneNameSpace = (() => {
 
     const statusWindowVisible = parameters.statusWindowVisible !== "false";
     const statusWindowWindowSkin = parameters.statusWindowWindowSkin;
-    const commandWindowFrameJsonObject = JSON.parse(parameters.commandWindowFrame);
-    const commandWindowFrame = new Rectangle(Number(commandWindowFrameJsonObject.x) || 0, Number(commandWindowFrameJsonObject.y) || 0, Number(commandWindowFrameJsonObject.width) || 0, Number(commandWindowFrameJsonObject.height) || 0);
+    const statusWindowFrameJsonObject = JSON.parse(parameters.statusWindowFrame);
+    const statusWindowFrame = new Rectangle(Number(statusWindowFrameJsonObject.x) || 0, Number(statusWindowFrameJsonObject.y) || 0, Number(statusWindowFrameJsonObject.width) || 0, Number(statusWindowFrameJsonObject.height) || 0);
+    
 
 
     // Private Functions and System Class Extensions
