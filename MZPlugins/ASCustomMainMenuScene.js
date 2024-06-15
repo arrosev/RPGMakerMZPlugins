@@ -91,6 +91,21 @@
  * @type struct<Rect>
  * @default {"x":"568","y":"52","width":"240","height":"496"}
  * 
+ * @param commandWindowOffset
+ * @text Offset
+ * @desc Command Window Offset
+ * @parent commandWindowSet
+ * @type struct<Point>
+ * @default {"x":"568","y":"52"}
+ * 
+ * @param commandWindowItemWidth
+ * @text Item Width
+ * @desc Command Window Item Width
+ * @parent commandWindowSet
+ * @type number
+ * @min 0
+ * @default 208
+ * 
  * @param commandWindowItemHeight
  * @text Item Height
  * @desc Command Window Item Height
@@ -412,11 +427,14 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const commandWindowWindowSkin = parameters.commandWindowWindowSkin;
     const commandWindowFrameJsonObject = JSON.parse(parameters.commandWindowFrame);
     const commandWindowFrame = new Rectangle(Number(commandWindowFrameJsonObject.x) || 0, Number(commandWindowFrameJsonObject.y) || 0, Number(commandWindowFrameJsonObject.width) || 0, Number(commandWindowFrameJsonObject.height) || 0);
-    
-    const commandWindowItemHeight = Number(parameters.commandWindowItemHeight) || 40;
-    const commandWindowPadding = Number(parameters.commandWindowPadding) || 12;
-    const commandWindowRowSpacing = Number(parameters.commandWindowRowSpacing) || 4;
-    const commandWindowColSpacing = Number(parameters.commandWindowColSpacing) || 8;
+    const commandWindowOffsetJsonObject = JSON.parse(parameters.commandWindowOffset);
+    const commandWindowOffset = new Rectangle(Number(commandWindowOffsetJsonObject.x) || 0, Number(commandWindowOffsetJsonObject.y) || 0);
+
+    const commandWindowItemWidth = Number(parameters.commandWindowItemWidth);
+    const commandWindowItemHeight = Number(parameters.commandWindowItemHeight);
+    const commandWindowPadding = Number(parameters.commandWindowPadding);
+    const commandWindowRowSpacing = Number(parameters.commandWindowRowSpacing);
+    const commandWindowColSpacing = Number(parameters.commandWindowColSpacing);
     const commandWindowMaxCols = Number(parameters.commandWindowMaxCols) || 1;
 
     const commandWindowCursor = parameters.commandWindowCursor;
@@ -529,12 +547,29 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         this._commandWindow._padding = commandWindowPadding;
     };
 
-    const _Scene_Menu_Command_Window_Rect = Scene_Menu.prototype.commandWindowRect;
-    Scene_Menu.prototype.commandWindowRect = function() {
-        let frame = _Scene_Menu_Command_Window_Rect.apply(this, arguments);
-        frame = commandWindowFrame;
-        return frame;
+    const _Window_Menu_Command_Make_Command_List = Window_MenuCommand.prototype.makeCommandList;
+    Window_MenuCommand.prototype.makeCommandList = function() {
+        _Window_Menu_Command_Make_Command_List.apply(this, arguments);
+        let rows = Math.ceil(this._list.length / commandWindowMaxCols);
+        this.move(commandWindowOffset.x, commandWindowOffset.y, commandWindowItemWidth * commandWindowMaxCols + 2 * commandWindowPadding + commandWindowColSpacing * commandWindowMaxCols, commandWindowItemHeight * rows + 2 * commandWindowPadding + commandWindowRowSpacing * rows);
+        this.contentsBack.resize(commandWindowItemWidth * commandWindowMaxCols + 2 * commandWindowPadding + commandWindowColSpacing * commandWindowMaxCols, commandWindowItemHeight * rows + 2 * commandWindowPadding + commandWindowRowSpacing * rows);
+        this.contents.resize(commandWindowItemWidth * commandWindowMaxCols + 2 * commandWindowPadding + commandWindowColSpacing * commandWindowMaxCols, commandWindowItemHeight * rows + 2 * commandWindowPadding + commandWindowRowSpacing * rows);
     };
+
+    // const _Scene_Menu_Command_Window_Rect = Scene_Menu.prototype.commandWindowRect;
+    // Scene_Menu.prototype.commandWindowRect = function() {
+    //     let frame = _Scene_Menu_Command_Window_Rect.apply(this, arguments);
+    //     //console.log("this._commandWindow: ", this._commandWindow)
+    //     frame = commandWindowFrame;
+    //     return frame;
+    // };
+
+    const _Window_Menu_Command_Item_Width = Window_MenuCommand.prototype.itemWidth;
+    Window_MenuCommand.prototype.itemWidth = function() {
+        let width = _Window_Menu_Command_Item_Width.apply(this, arguments);
+        width = commandWindowItemWidth + this.colSpacing();
+        return width;
+    }
 
     const _Window_Menu_Command_Item_Height = Window_MenuCommand.prototype.itemHeight;
     Window_MenuCommand.prototype.itemHeight = function() {
