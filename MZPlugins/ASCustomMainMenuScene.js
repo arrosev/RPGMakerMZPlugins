@@ -84,13 +84,6 @@
  * @dir img/system/
  * @default Window
  * 
- * @param commandWindowFrame
- * @text Frame
- * @desc Command Window Frame
- * @parent commandWindowSet
- * @type struct<Rect>
- * @default {"x":"568","y":"52","width":"240","height":"496"}
- * 
  * @param commandWindowOffset
  * @text Offset
  * @desc Command Window Offset
@@ -312,6 +305,60 @@
  * @type struct<Rect>
  * @default {"x":"0","y":"52","width":"568","height":"564"}
  * 
+ * @param statusWindowOffset
+ * @text Offset
+ * @desc Status Window Offset
+ * @parent statusWindowSet
+ * @type struct<Point>
+ * @default {"x":"0","y":"52"}
+ * 
+ * @param statusWindowItemWidth
+ * @text Item Width
+ * @desc Status Window Item Width
+ * @parent statusWindowSet
+ * @type number
+ * @min 0
+ * @default 536
+ * 
+ * @param statusWindowItemHeight
+ * @text Item Height
+ * @desc Status Window Item Height
+ * @parent statusWindowSet
+ * @type number
+ * @min 0
+ * @default 131
+ * 
+ * @param statusWindowPadding
+ * @text Padding
+ * @desc Status Window Padding
+ * @parent statusWindowSet
+ * @type number
+ * @default 12
+ * 
+ * @param statusWindowRowSpacing
+ * @text Row Spacing
+ * @desc Status Window Row Spacing
+ * @parent statusWindowSet
+ * @type number
+ * @default 4
+ * 
+ * @param statusWindowColSpacing
+ * @text Col Spacing
+ * @desc Status Window Col Spacing
+ * @parent statusWindowSet
+ * @type number
+ * @default 8
+ * 
+ * @param statusWindowMaxCols
+ * @text MaxCols
+ * @desc Status Window MaxCols
+ * @parent statusWindowSet
+ * @type select
+ * @option 1
+ * @option 2
+ * @option 4
+ * @default 1
+ * 
  */
 
 /*~struct~Color:
@@ -425,10 +472,8 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     //const sceneBackGroundMusic = parameters.sceneBackGroundMusic;
 
     const commandWindowWindowSkin = parameters.commandWindowWindowSkin;
-    const commandWindowFrameJsonObject = JSON.parse(parameters.commandWindowFrame);
-    const commandWindowFrame = new Rectangle(Number(commandWindowFrameJsonObject.x) || 0, Number(commandWindowFrameJsonObject.y) || 0, Number(commandWindowFrameJsonObject.width) || 0, Number(commandWindowFrameJsonObject.height) || 0);
     const commandWindowOffsetJsonObject = JSON.parse(parameters.commandWindowOffset);
-    const commandWindowOffset = new Rectangle(Number(commandWindowOffsetJsonObject.x) || 0, Number(commandWindowOffsetJsonObject.y) || 0);
+    const commandWindowOffset = new Point(Number(commandWindowOffsetJsonObject.x) || 0, Number(commandWindowOffsetJsonObject.y) || 0);
 
     const commandWindowItemWidth = Number(parameters.commandWindowItemWidth);
     const commandWindowItemHeight = Number(parameters.commandWindowItemHeight);
@@ -462,8 +507,13 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowWindowSkin = parameters.statusWindowWindowSkin;
     const statusWindowFrameJsonObject = JSON.parse(parameters.statusWindowFrame);
     const statusWindowFrame = new Rectangle(Number(statusWindowFrameJsonObject.x) || 0, Number(statusWindowFrameJsonObject.y) || 0, Number(statusWindowFrameJsonObject.width) || 0, Number(statusWindowFrameJsonObject.height) || 0);
-    
-
+    const statusWindowOffsetJsonObject = JSON.parse(parameters.statusWindowOffset);
+    const statusWindowOffset = new Point(Number(statusWindowOffsetJsonObject.x) || 0, Number(statusWindowOffsetJsonObject.y) || 0);
+    const statusWindowItemWidth = Number(parameters.statusWindowItemWidth);
+    const statusWindowItemHeight = Number(parameters.statusWindowItemHeight);
+    const statusWindowPadding = Number(parameters.statusWindowPadding);
+    const statusWindowRowSpacing = Number(parameters.statusWindowRowSpacing);
+    const statusWindowColSpacing = Number(parameters.statusWindowColSpacing);
 
     // Private Functions and System Class Extensions
     const colorJsonObjectConvertToColorRGBA = function(object) {
@@ -555,14 +605,6 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         this.contentsBack.resize(commandWindowItemWidth * commandWindowMaxCols + 2 * commandWindowPadding + commandWindowColSpacing * commandWindowMaxCols, commandWindowItemHeight * rows + 2 * commandWindowPadding + commandWindowRowSpacing * rows);
         this.contents.resize(commandWindowItemWidth * commandWindowMaxCols + 2 * commandWindowPadding + commandWindowColSpacing * commandWindowMaxCols, commandWindowItemHeight * rows + 2 * commandWindowPadding + commandWindowRowSpacing * rows);
     };
-
-    // const _Scene_Menu_Command_Window_Rect = Scene_Menu.prototype.commandWindowRect;
-    // Scene_Menu.prototype.commandWindowRect = function() {
-    //     let frame = _Scene_Menu_Command_Window_Rect.apply(this, arguments);
-    //     //console.log("this._commandWindow: ", this._commandWindow)
-    //     frame = commandWindowFrame;
-    //     return frame;
-    // };
 
     const _Window_Menu_Command_Item_Width = Window_MenuCommand.prototype.itemWidth;
     Window_MenuCommand.prototype.itemWidth = function() {
@@ -705,24 +747,71 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         _Scene_Menu_Create_Status_Window.apply(this, arguments);
         this._statusWindow.visible = statusWindowVisible;
         this._statusWindow.windowskin = ImageManager.loadSystem(statusWindowWindowSkin);
-        //this._statusWindow._padding = 0;
+        this._statusWindow._padding = statusWindowPadding;
     };
 
     const _Scene_Menu_Status_Window_Rect = Scene_Menu.prototype.statusWindowRect;
     Scene_Menu.prototype.statusWindowRect = function() {
-        let frame = _Scene_Menu_Status_Window_Rect.apply(this, arguments);
-        frame = statusWindowFrame;
-        return frame;
+        let rect = _Scene_Menu_Status_Window_Rect.apply(this, arguments);
+        rect = new Rectangle(statusWindowOffset.x, statusWindowOffset.y, statusWindowItemWidth + 2 * statusWindowPadding + statusWindowColSpacing, statusWindowItemHeight * 4 + 2 * statusWindowPadding + statusWindowRowSpacing * 4);
+        //rect = new Rectangle(statusWindowOffset.x, statusWindowOffset.y, statusWindowItemWidth * 2 + 2 * statusWindowPadding + statusWindowColSpacing * 2, statusWindowItemHeight * 2 + 2 * statusWindowPadding + statusWindowRowSpacing * 2);
+        return rect;
     };
 
-    Window_MenuStatus.prototype.drawActorSimpleStatus = function(actor, x, y) {
-        const lineHeight = this.lineHeight();
-        const x2 = x + 180;
-        this.drawActorName(actor, x, y);
-        this.drawActorLevel(actor, x, y + lineHeight * 1);
-        this.drawActorIcons(actor, x, y + lineHeight * 2);
-        this.drawActorClass(actor, x2, y);
-        this.placeBasicGauges(actor, x2, y + lineHeight);
+    const _Window_Menu_Status_Item_Width = Window_MenuStatus.prototype.itemWidth;
+    Window_MenuStatus.prototype.itemWidth = function() {
+        let width = _Window_Menu_Status_Item_Width.apply(this, arguments);
+        width = statusWindowItemWidth + this.colSpacing();
+        return width;
+    }
+
+    const _Window_Menu_Status_Item_Height = Window_MenuStatus.prototype.itemHeight;
+    Window_MenuStatus.prototype.itemHeight = function() {
+        let height = _Window_Menu_Status_Item_Height.apply(this, arguments);
+        height = statusWindowItemHeight + this.rowSpacing();
+        return height;
+    }
+
+    const _Window_Menu_Status_RowSpacing = Window_MenuStatus.prototype.rowSpacing;
+    Window_MenuStatus.prototype.rowSpacing = function() {
+        let rowSpacing = _Window_Menu_Status_RowSpacing.apply(this, arguments);
+        rowSpacing = statusWindowRowSpacing;
+        return rowSpacing;
+    };
+
+    const _Window_Menu_Status_ColSpacing = Window_MenuStatus.prototype.colSpacing;
+    Window_MenuStatus.prototype.colSpacing = function() {
+        let colSpacing = _Window_Menu_Status_ColSpacing.apply(this, arguments);
+        colSpacing = statusWindowColSpacing;
+        return colSpacing;
+    };
+    
+
+    // Window_MenuStatus.prototype.drawItemBackground = function(index) {
+    //     const rect = this.itemRect(index);
+    //     this.drawBackgroundRect(rect);
+    //     console.log("rect: ", rect)
+    // };
+
+    // const _Scene_Menu_Status_Window_Rect = Scene_Menu.prototype.statusWindowRect;
+    // Scene_Menu.prototype.statusWindowRect = function() {
+    //     let frame = _Scene_Menu_Status_Window_Rect.apply(this, arguments);
+    //     frame = statusWindowFrame;
+    //     return frame;
+    // };
+
+    // Window_MenuStatus.prototype.drawActorSimpleStatus = function(actor, x, y) {
+    //     // const lineHeight = this.lineHeight();
+    //     // const x2 = x + 180;
+    //     // this.drawActorName(actor, x, y);
+    //     // this.drawActorLevel(actor, x, y + lineHeight * 1);
+    //     // this.drawActorIcons(actor, x, y + lineHeight * 2);
+    //     // this.drawActorClass(actor, x2, y);
+    //     // this.placeBasicGauges(actor, x2, y + lineHeight);
+    // };
+
+    Window_MenuStatus.prototype.maxCols = function() {
+        return 1;
     };
 
 })();
