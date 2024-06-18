@@ -168,9 +168,9 @@
  * @min 1
  * @default 1
  * 
- * @param commandWindowItemBackgroundColor
- * @text Item Background Color
- * @desc Command Window Item Background Color
+ * @param commandWindowItemStyle
+ * @text Item Style
+ * @desc Command Window Item Style
  * @parent commandWindowSet
  * @type string
  * @default
@@ -178,66 +178,59 @@
  * @param commandWindowItemBGColor1
  * @text Item BG Color1
  * @desc Command Window Item Background Color1
- * @parent commandWindowItemBackgroundColor
+ * @parent commandWindowItemStyle
  * @type struct<Color>
  * @default {"r":"32","g":"32","b":"32","a":"0.5"}
  * 
  * @param commandWindowItemBGColor2
  * @text Item BG Color2
  * @desc Command Window Item Background Color2
- * @parent commandWindowItemBackgroundColor
+ * @parent commandWindowItemStyle
  * @type struct<Color>
  * @default {"r":"0","g":"0","b":"0","a":"0.5"}
  * 
  * @param commandWindowItemBGBorderColor
  * @text Item BG Border Color
  * @desc Command Window Item Background Border Color
- * @parent commandWindowItemBackgroundColor
+ * @parent commandWindowItemStyle
  * @type struct<Color>
  * @default {"r":"32","g":"32","b":"32","a":"0.5"}
  * 
  * @param commandWindowItemBGBorderLineWidth
- * @text Item BG Border LineWidth
+ * @text Item BG Border Width
  * @desc Command Window Item BG Border LineWidth
- * @parent commandWindowItemBackgroundColor
+ * @parent commandWindowItemStyle
  * @type string
  * @default 1.0
  * 
  * @param commandWindowItemBGBorderLineJoin
  * @text Item BG Border LineJoin
  * @desc Command Window Item BG Border LineJoin
- * @parent commandWindowItemBackgroundColor
+ * @parent commandWindowItemStyle
  * @type select
  * @option miter
  * @option round
  * @option bevel
  * @default miter
  * 
- * @param commandWindowItemText
- * @text Item Text
- * @desc Command Window Item Text
- * @parent commandWindowSet
- * @type string
- * @default
- * 
  * @param commandWindowItemFontSize
  * @text Item Font Size
  * @desc Command Window Item Font Size
- * @parent commandWindowItemText
+ * @parent commandWindowItemStyle
  * @type number
  * @default 26
  * 
  * @param commandWindowItemTextOffsetX
  * @text Item Text OffsetX
  * @desc Command Window Item Text OffsetX
- * @parent commandWindowItemText
+ * @parent commandWindowItemStyle
  * @type number
  * @default 0
  * 
  * @param commandWindowItemTextAlign
  * @text Item Text Align
  * @desc Command Window Item Text Align
- * @parent commandWindowItemText
+ * @parent commandWindowItemStyle
  * @type select
  * @option center
  * @option left
@@ -247,14 +240,14 @@
  * @param commandWindowItemTextColor
  * @text Item Text Color
  * @desc Command Window Item Text Color
- * @parent commandWindowItemText
+ * @parent commandWindowItemStyle
  * @type struct<Color>
  * @default {"r":"255","g":"255","b":"255","a":"1"}
  * 
  * @param commandWindowItemTextOutlineColor
  * @text Item Text Outline Color
  * @desc Command Window Item Text Outline Color
- * @parent commandWindowItemText
+ * @parent commandWindowItemStyle
  * @type struct<Color>
  * @default {"r":"0","g":"0","b":"0","a":"1"}
  * 
@@ -297,13 +290,6 @@
  * @type file
  * @dir img/system/
  * @default Window
- * 
- * @param statusWindowFrame
- * @text Frame
- * @desc Status Window Frame
- * @parent statusWindowSet
- * @type struct<Rect>
- * @default {"x":"0","y":"52","width":"568","height":"564"}
  * 
  * @param statusWindowOffset
  * @text Offset
@@ -505,8 +491,6 @@ const ASCustomMainMenuSceneNameSpace = (() => {
 
     const statusWindowVisible = parameters.statusWindowVisible !== "false";
     const statusWindowWindowSkin = parameters.statusWindowWindowSkin;
-    const statusWindowFrameJsonObject = JSON.parse(parameters.statusWindowFrame);
-    const statusWindowFrame = new Rectangle(Number(statusWindowFrameJsonObject.x) || 0, Number(statusWindowFrameJsonObject.y) || 0, Number(statusWindowFrameJsonObject.width) || 0, Number(statusWindowFrameJsonObject.height) || 0);
     const statusWindowOffsetJsonObject = JSON.parse(parameters.statusWindowOffset);
     const statusWindowOffset = new Point(Number(statusWindowOffsetJsonObject.x) || 0, Number(statusWindowOffsetJsonObject.y) || 0);
     const statusWindowItemWidth = Number(parameters.statusWindowItemWidth);
@@ -514,6 +498,7 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowPadding = Number(parameters.statusWindowPadding);
     const statusWindowRowSpacing = Number(parameters.statusWindowRowSpacing);
     const statusWindowColSpacing = Number(parameters.statusWindowColSpacing);
+    const statusWindowMaxCols = Number(parameters.statusWindowMaxCols) || 1;
 
     // Private Functions and System Class Extensions
     const colorJsonObjectConvertToColorRGBA = function(object) {
@@ -754,7 +739,12 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     Scene_Menu.prototype.statusWindowRect = function() {
         let rect = _Scene_Menu_Status_Window_Rect.apply(this, arguments);
         rect = new Rectangle(statusWindowOffset.x, statusWindowOffset.y, statusWindowItemWidth + 2 * statusWindowPadding + statusWindowColSpacing, statusWindowItemHeight * 4 + 2 * statusWindowPadding + statusWindowRowSpacing * 4);
-        //rect = new Rectangle(statusWindowOffset.x, statusWindowOffset.y, statusWindowItemWidth * 2 + 2 * statusWindowPadding + statusWindowColSpacing * 2, statusWindowItemHeight * 2 + 2 * statusWindowPadding + statusWindowRowSpacing * 2);
+        if (statusWindowMaxCols === 2) {
+            rect = new Rectangle(statusWindowOffset.x, statusWindowOffset.y, statusWindowItemWidth * 2 + 2 * statusWindowPadding + statusWindowColSpacing * 2, statusWindowItemHeight * 2 + 2 * statusWindowPadding + statusWindowRowSpacing * 2);
+        }
+        if (statusWindowMaxCols === 4) {
+            rect = new Rectangle(statusWindowOffset.x, statusWindowOffset.y, statusWindowItemWidth * 4 + 2 * statusWindowPadding + statusWindowColSpacing * 4, statusWindowItemHeight + 2 * statusWindowPadding + statusWindowRowSpacing);
+        }
         return rect;
     };
 
@@ -786,18 +776,16 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         return colSpacing;
     };
     
-
+    const _Window_Menu_Status_MaxCols = Window_MenuStatus.prototype.maxCols;
+    Window_MenuStatus.prototype.maxCols = function() {
+        let maxCols = _Window_Menu_Status_MaxCols.apply(this, arguments);
+        maxCols = statusWindowMaxCols;
+        return maxCols;
+    };
     // Window_MenuStatus.prototype.drawItemBackground = function(index) {
     //     const rect = this.itemRect(index);
     //     this.drawBackgroundRect(rect);
     //     console.log("rect: ", rect)
-    // };
-
-    // const _Scene_Menu_Status_Window_Rect = Scene_Menu.prototype.statusWindowRect;
-    // Scene_Menu.prototype.statusWindowRect = function() {
-    //     let frame = _Scene_Menu_Status_Window_Rect.apply(this, arguments);
-    //     frame = statusWindowFrame;
-    //     return frame;
     // };
 
     // Window_MenuStatus.prototype.drawActorSimpleStatus = function(actor, x, y) {
@@ -809,9 +797,5 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     //     // this.drawActorClass(actor, x2, y);
     //     // this.placeBasicGauges(actor, x2, y + lineHeight);
     // };
-
-    Window_MenuStatus.prototype.maxCols = function() {
-        return 1;
-    };
 
 })();
