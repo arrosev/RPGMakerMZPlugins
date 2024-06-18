@@ -7,6 +7,8 @@
  * 
  * @help
  * 
+ * this._windowLayer(808, 616)
+ * 
  * This plugin is released under the MIT license.
 
  * Copyright (c) 2024 Arrose
@@ -34,6 +36,13 @@
  * @desc Main Menu Scene Set
  * @type string
  * @default
+ * 
+ * @param sceneCancelButtonOffset
+ * @text Cancel Button Offset
+ * @desc Scene Cancel Button Offset
+ * @parent mainMenuSceneSet
+ * @type struct<Point>
+ * @default {"x":"708","y":"2"}
  * 
  * @param sceneCancelButtonVisible
  * @text Cancel Button Visible
@@ -450,6 +459,8 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const commandWindowCursorSelectNone = "none";
     const commandWindowCursorSelectImage = "images";
     
+    const sceneCancelButtonOffsetJsonObject = JSON.parse(parameters.sceneCancelButtonOffset);
+    const sceneCancelButtonOffset = new Point(Number(sceneCancelButtonOffsetJsonObject.x) || 0, Number(sceneCancelButtonOffsetJsonObject.y) || 0);
     const sceneCancelButtonVisible = parameters.sceneCancelButtonVisible !== "false";
 
     const sceneBackGround = parameters.sceneBackGround;
@@ -523,6 +534,13 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         let visible = _Scene_Menu_Needs_Cancel_Button.apply(this, arguments);
         visible = sceneCancelButtonVisible;
         return visible;
+    };
+
+    const _Scene_Menu_Create_Cancel_Button = Scene_Menu.prototype.createCancelButton;
+    Scene_Menu.prototype.createCancelButton = function() {
+        _Scene_Menu_Create_Cancel_Button.apply(this, arguments);
+        this._cancelButton.x = sceneCancelButtonOffset.x;
+        this._cancelButton.y = sceneCancelButtonOffset.y;
     };
 
     const _Scene_Menu_Create_Background = Scene_Menu.prototype.createBackground;
@@ -782,6 +800,17 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         maxCols = statusWindowMaxCols;
         return maxCols;
     };
+
+    Window_MenuStatus.prototype.drawItemImage = function(index) {
+        const actor = this.actor(index);
+        const rect = this.itemRect(index);
+        const width = ImageManager.faceWidth;
+        const height = ImageManager.faceWidth;
+        this.changePaintOpacity(actor.isBattleMember());
+        this.drawActorFace(actor, rect.x + (rect.width - width) / 2,0 , 0, width, height);
+        this.changePaintOpacity(true);
+    };
+
     // Window_MenuStatus.prototype.drawItemBackground = function(index) {
     //     const rect = this.itemRect(index);
     //     this.drawBackgroundRect(rect);
