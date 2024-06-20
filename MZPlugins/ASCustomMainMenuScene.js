@@ -429,12 +429,58 @@
  * @option bevel
  * @default miter
  * 
+ * @param statusWindowPendingItemBGStyle
+ * @text Pending Item BG Style
+ * @desc Status Window Pending Item BG Style
+ * @parent statusWindowItemStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowPendingItemBGOffset
+ * @text Pending Item BG Offset
+ * @desc Status Window Pending Item BG Offset
+ * @parent statusWindowPendingItemBGStyle
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
+ * 
+ * @param statusWindowPendingItemBGWidth
+ * @text Pending Item BG Width
+ * @desc Status Window Pending Item BG Width
+ * @parent statusWindowPendingItemBGStyle
+ * @type number
+ * @min 0
+ * @default 536
+ * 
+ * @param statusWindowPendingItemBGHeight
+ * @text Pending Item BG Height
+ * @desc Status Window Pending Item BG Height
+ * @parent statusWindowPendingItemBGStyle
+ * @type number
+ * @min 0
+ * @default 131
+ * 
+ * @param statusWindowPendingItemBGColor
+ * @text Pending Item BG Color
+ * @desc Status Window Pending Item Background Color
+ * @parent statusWindowPendingItemBGStyle
+ * @type struct<Color>
+ * @default {"r":"163","g":"255","b":"224","a":"1.0"}
+ * 
  * @param statusWindowItemFaceImageStyle
  * @text Item Face Image Style
  * @desc Status Window Item Face Image Style
  * @parent statusWindowItemStyle
  * @type string
  * @default
+ * 
+ * @param statusWindowItemFaceImageVisible
+ * @text Item Face Image Visible
+ * @desc Status Window Item Face Image Visible
+ * @parent statusWindowItemFaceImageStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
  * 
  * @param statusWindowItemFaceImageOffset
  * @text Item Face Image Offset
@@ -760,13 +806,19 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowItemBGOffset = new Point(Number(statusWindowItemBGOffsetJsonObject.x) || 0, Number(statusWindowItemBGOffsetJsonObject.y) || 0);
     const statusWindowItemBGWidth = Number(parameters.statusWindowItemBGWidth);
     const statusWindowItemBGHeight = Number(parameters.statusWindowItemBGHeight);
-
     const statusWindowItemBGColor1JsonObject = JSON.parse(parameters.statusWindowItemBGColor1);
     const statusWindowItemBGColor2JsonObject = JSON.parse(parameters.statusWindowItemBGColor2);
     const statusWindowItemBGBorderColorJsonObject = JSON.parse(parameters.statusWindowItemBGBorderColor);
     const statusWindowItemBGBorderLineWidth = Number(parameters.statusWindowItemBGBorderLineWidth) || 1.0;
     const statusWindowItemBGBorderLineJoin = parameters.statusWindowItemBGBorderLineJoin;
 
+    const statusWindowPendingItemBGOffsetJsonObject = JSON.parse(parameters.statusWindowPendingItemBGOffset);
+    const statusWindowPendingItemBGOffset = new Point(Number(statusWindowPendingItemBGOffsetJsonObject.x) || 0, Number(statusWindowPendingItemBGOffsetJsonObject.y) || 0);
+    const statusWindowPendingItemBGWidth = Number(parameters.statusWindowPendingItemBGWidth);
+    const statusWindowPendingItemBGHeight = Number(parameters.statusWindowPendingItemBGHeight);
+    const statusWindowPendingItemBGColorJsonObject = JSON.parse(parameters.statusWindowPendingItemBGColor);
+
+    const statusWindowItemFaceImageVisible = parameters.statusWindowItemFaceImageVisible !== "false";
     const statusWindowItemFaceImageOffsetJsonObject = JSON.parse(parameters.statusWindowItemFaceImageOffset);
     const statusWindowItemFaceImageOffset = new Point(Number(statusWindowItemFaceImageOffsetJsonObject.x) || 0, Number(statusWindowItemFaceImageOffsetJsonObject.y) || 0);
     const statusWindowItemFaceImageWidth = Number(parameters.statusWindowItemFaceImageWidth);
@@ -878,7 +930,7 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const _Scene_Menu_Create_Command_Window = Scene_Menu.prototype.createCommandWindow;
     Scene_Menu.prototype.createCommandWindow = function() {
         _Scene_Menu_Create_Command_Window.apply(this, arguments);
-        this._commandWindow.visible = false;
+        // this._commandWindow.visible = false;
         this._commandWindow.windowskin = ImageManager.loadSystem(commandWindowWindowSkin);
         this._commandWindow._padding = commandWindowPadding;
     };
@@ -1085,13 +1137,15 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     };
 
     Window_MenuStatus.prototype.drawItemImage = function(index) {
-        const actor = this.actor(index);
-        const rect = this.itemRect(index);
-        const width = statusWindowItemFaceImageWidth;
-        const height = statusWindowItemFaceImageHeight;
-        this.changePaintOpacity(actor.isBattleMember());
-        this.drawActorFace(actor, rect.x + statusWindowItemFaceImageOffset.x, rect.y + statusWindowItemFaceImageOffset.y, width, height);
-        this.changePaintOpacity(true);
+        if (statusWindowItemFaceImageVisible === true) {
+            const actor = this.actor(index);
+            const rect = this.itemRect(index);
+            const width = statusWindowItemFaceImageWidth;
+            const height = statusWindowItemFaceImageHeight;
+            this.changePaintOpacity(actor.isBattleMember());
+            this.drawActorFace(actor, rect.x + statusWindowItemFaceImageOffset.x, rect.y + statusWindowItemFaceImageOffset.y, width, height);
+            this.changePaintOpacity(true);
+        }
     };
 
     Window_MenuStatus.prototype.drawFace = function(
@@ -1119,6 +1173,20 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         const h = statusWindowItemBGHeight;
         this.contentsBack.gradientFillRect(x, y, w, h, c1, c2, true);
         this.contentsBack.strokeBetterRect(x, y, w, h, c3, statusWindowItemBGBorderLineWidth, statusWindowItemBGBorderLineJoin);
+    };
+
+    Window_MenuStatus.prototype.drawPendingItemBackground = function(index) {
+        if (index === this._pendingIndex) {
+            const rect = this.itemRect(index);
+            const c1 = colorJsonObjectConvertToColorRGBA(statusWindowPendingItemBGColorJsonObject);
+            const x = rect.x + statusWindowPendingItemBGOffset.x;
+            const y = rect.y + statusWindowPendingItemBGOffset.y;
+            const w = statusWindowPendingItemBGWidth;
+            const h = statusWindowPendingItemBGHeight;
+            this.changePaintOpacity(false);
+            this.contents.fillRect(x, y, w, h, c1);
+            this.changePaintOpacity(true);
+        }
     };
 
     Window_MenuStatus.prototype.drawItemStatus = function(index) {
