@@ -459,7 +459,145 @@
  * @min 0
  * @default 131
  * 
+ * @param statusWindowItemNameStyle
+ * @text Item Name Style
+ * @desc Status Window Item Name Style
+ * @parent statusWindowItemStyle
+ * @type string
+ * @default
  * 
+ * @param statusWindowItemNameVisible
+ * @text Item Name Visible
+ * @desc Status Window Item Name Visible
+ * @parent statusWindowItemNameStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemNameOffset
+ * @text Item Name Offset
+ * @desc Status Window Item Name Offset
+ * @parent statusWindowItemNameStyle
+ * @type struct<Point>
+ * @default {"x":"180","y":"11"}
+ * 
+ * @param statusWindowItemNameWidth
+ * @text Item Name Width
+ * @desc Status Window Item Name Width
+ * @parent statusWindowItemNameStyle
+ * @type number
+ * @min 0
+ * @default 168
+ * 
+ * @param statusWindowItemNameFontSize
+ * @text Item Name Font Size
+ * @desc Status Window Item Name Font Size
+ * @parent statusWindowItemNameStyle
+ * @type number
+ * @default 26
+ * 
+ * @param statusWindowItemNameTextColor
+ * @text Item Name Text Color
+ * @desc Status Window Item Name Text Color
+ * @parent statusWindowItemNameStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param statusWindowItemNameTextOutlineColor
+ * @text Item Name Text Outline Color
+ * @desc Status Window Item Name Text Outline Color
+ * @parent statusWindowItemNameStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param statusWindowItemLevelStyle
+ * @text Item Level Style
+ * @desc Status Window Item Level Style
+ * @parent statusWindowItemStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemLevelVisible
+ * @text Item Level Visible
+ * @desc Status Window Item Level Visible
+ * @parent statusWindowItemLevelStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemLevelTagOffset
+ * @text Item Level Tag Offset
+ * @desc Status Window Item Level Tag Offset
+ * @parent statusWindowItemLevelStyle
+ * @type struct<Point>
+ * @default {"x":"180","y":"47"}
+ * 
+ * @param statusWindowItemLevelTagWidth
+ * @text Item Level Tag Width
+ * @desc Status Window Item Level Tag Width
+ * @parent statusWindowItemLevelStyle
+ * @type number
+ * @min 0
+ * @default 48
+ * 
+ * @param statusWindowItemLevelTagFontSize
+ * @text Item Level Tag Font Size
+ * @desc Status Window Item Level Tag Font Size
+ * @parent statusWindowItemLevelStyle
+ * @type number
+ * @default 26
+ * 
+ * @param statusWindowItemLevelTagTextColor
+ * @text Item Level Tag Text Color
+ * @desc Status Window Item Level Tag Text Color
+ * @parent statusWindowItemLevelStyle
+ * @type struct<Color>
+ * @default {"r":"132","g":"170","b":"255","a":"1"}
+ * 
+ * @param statusWindowItemLevelTagTextOutlineColor
+ * @text Item Level Tag Text Outline Color
+ * @desc Status Window Item Level Tag Text Outline Color
+ * @parent statusWindowItemLevelStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param statusWindowItemLevelValueOffset
+ * @text Item Level Value Offset
+ * @desc Status Window Item Level Value Offset
+ * @parent statusWindowItemLevelStyle
+ * @type struct<Point>
+ * @default {"x":"264","y":"47"}
+ * 
+ * @param statusWindowItemLevelValueWidth
+ * @text Item Level Value Width
+ * @desc Status Window Item Level Value Width
+ * @parent statusWindowItemLevelStyle
+ * @type number
+ * @min 0
+ * @default 36
+ * 
+ * @param statusWindowItemLevelValueFontSize
+ * @text Item Level Value Font Size
+ * @desc Status Window Item Level Value Font Size
+ * @parent statusWindowItemLevelStyle
+ * @type number
+ * @default 26
+ * 
+ * @param statusWindowItemLevelValueTextColor
+ * @text Item Level Value Text Color
+ * @desc Status Window Item Level Value Text Color
+ * @parent statusWindowItemLevelStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param statusWindowItemLevelValueTextOutlineColor
+ * @text Item Level Value Text Outline Color
+ * @desc Status Window Item Level Value Text Outline Color
+ * @parent statusWindowItemLevelStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
  * 
  */
 
@@ -633,6 +771,28 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowItemFaceImageOffset = new Point(Number(statusWindowItemFaceImageOffsetJsonObject.x) || 0, Number(statusWindowItemFaceImageOffsetJsonObject.y) || 0);
     const statusWindowItemFaceImageWidth = Number(parameters.statusWindowItemFaceImageWidth);
     const statusWindowItemFaceImageHeight = Number(parameters.statusWindowItemFaceImageHeight);
+
+    const statusWindowItemNameVisible = parameters.statusWindowItemNameVisible !== "false";
+    const statusWindowItemNameOffsetJsonObject = JSON.parse(parameters.statusWindowItemNameOffset);
+    const statusWindowItemNameOffset = new Point(Number(statusWindowItemNameOffsetJsonObject.x) || 0, Number(statusWindowItemNameOffsetJsonObject.y) || 0);
+    const statusWindowItemNameWidth = Number(parameters.statusWindowItemNameWidth);
+    const statusWindowItemNameFontSize = Number(parameters.statusWindowItemNameFontSize) || 26;
+    const statusWindowItemNameTextColorJsonObject = JSON.parse(parameters.statusWindowItemNameTextColor);
+    const statusWindowItemNameTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemNameTextOutlineColor);
+
+    const statusWindowItemLevelVisible = parameters.statusWindowItemLevelVisible !== "false";
+    const statusWindowItemLevelTagOffsetJsonObject = JSON.parse(parameters.statusWindowItemLevelTagOffset);
+    const statusWindowItemLevelTagOffset = new Point(Number(statusWindowItemLevelTagOffsetJsonObject.x) || 0, Number(statusWindowItemLevelTagOffsetJsonObject.y) || 0);
+    const statusWindowItemLevelTagWidth = Number(parameters.statusWindowItemLevelTagWidth);
+    const statusWindowItemLevelTagFontSize = Number(parameters.statusWindowItemLevelTagFontSize) || 26;
+    const statusWindowItemLevelTagTextColorJsonObject = JSON.parse(parameters.statusWindowItemLevelTagTextColor);
+    const statusWindowItemLevelTagTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemLevelTagTextOutlineColor);
+    const statusWindowItemLevelValueOffsetJsonObject = JSON.parse(parameters.statusWindowItemLevelValueOffset);
+    const statusWindowItemLevelValueOffset = new Point(Number(statusWindowItemLevelValueOffsetJsonObject.x) || 0, Number(statusWindowItemLevelValueOffsetJsonObject.y) || 0);
+    const statusWindowItemLevelValueWidth = Number(parameters.statusWindowItemLevelValueWidth);
+    const statusWindowItemLevelValueFontSize = Number(parameters.statusWindowItemLevelValueFontSize) || 26;
+    const statusWindowItemLevelValueTextColorJsonObject = JSON.parse(parameters.statusWindowItemLevelValueTextColor);
+    const statusWindowItemLevelValueTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemLevelValueTextOutlineColor);
 
     // Private Functions and System Class Extensions
     const colorJsonObjectConvertToColorRGBA = function(object) {
@@ -961,14 +1121,49 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         this.contentsBack.strokeBetterRect(x, y, w, h, c3, statusWindowItemBGBorderLineWidth, statusWindowItemBGBorderLineJoin);
     };
 
+    Window_MenuStatus.prototype.drawItemStatus = function(index) {
+        const actor = this.actor(index);
+        const rect = this.itemRect(index);
+        const x = rect.x;
+        const y = rect.y;
+        this.drawActorSimpleStatus(actor, x, y);
+    };
+
     Window_MenuStatus.prototype.drawActorSimpleStatus = function(actor, x, y) {
-        // const lineHeight = this.lineHeight();
-        // const x2 = x + 180;
-        // this.drawActorName(actor, x, y);
-        // this.drawActorLevel(actor, x, y + lineHeight * 1);
-        // this.drawActorIcons(actor, x, y + lineHeight * 2);
-        // this.drawActorClass(actor, x2, y);
-        // this.placeBasicGauges(actor, x2, y + lineHeight);
+        const lineHeight = this.lineHeight();
+        const x2 = x + statusWindowItemNameOffset.x + 180;
+        if (statusWindowItemNameVisible === true) {
+            this.drawActorName(actor, x, y);
+        }
+        if (statusWindowItemLevelVisible === true) {
+            this.drawActorLevel(actor, x, y);
+        }
+        this.drawActorIcons(actor, x, y + lineHeight * 2);
+        this.drawActorClass(actor, x2, y);
+        this.placeBasicGauges(actor, x2, y + lineHeight);
+    };
+
+    Window_MenuStatus.prototype.drawActorName = function(actor, x, y, width) {
+        width = width || 168;
+        this.contents.fontSize = statusWindowItemNameFontSize;
+        this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemNameTextColorJsonObject));
+        this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemNameTextOutlineColorJsonObject));
+        // console.log("x: ", x)//184
+        // console.log("y: ", y)//13
+        // console.log("width: ", width)//168
+        this.drawText(actor.name(), x + statusWindowItemNameOffset.x, y + statusWindowItemNameOffset.y, statusWindowItemNameWidth);
+    };
+
+    Window_StatusBase.prototype.drawActorLevel = function(actor, x, y) {
+        this.contents.fontSize = statusWindowItemLevelTagFontSize;
+        this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelTagTextColorJsonObject));
+        this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelTagTextOutlineColorJsonObject));
+        this.drawText(TextManager.levelA, x + statusWindowItemLevelTagOffset.x, y + statusWindowItemLevelTagOffset.y, statusWindowItemLevelTagWidth);
+
+        this.contents.fontSize = statusWindowItemLevelValueFontSize;
+        this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelValueTextColorJsonObject));
+        this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelValueTextOutlineColorJsonObject));
+        this.drawText(actor.level, x + statusWindowItemLevelValueOffset.x, y + statusWindowItemLevelValueOffset.y, statusWindowItemLevelValueWidth);
     };
 
 })();
