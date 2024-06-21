@@ -645,6 +645,43 @@
  * @type struct<Color>
  * @default {"r":"0","g":"0","b":"0","a":"1"}
  * 
+ * @param statusWindowItemIconsStyle
+ * @text Item Icons Style
+ * @desc Status Window Item Icons Style
+ * @parent statusWindowItemStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemIconsOffset
+ * @text Item Icons Offset
+ * @desc Status Window Item Icons Offset
+ * @parent statusWindowItemIconsStyle
+ * @type struct<Point>
+ * @default {"x":"180","y":"85"}
+ * 
+ * @param statusWindowItemAllIconsWidth
+ * @text Item All Icons Width
+ * @desc Status Window Item Icons Width
+ * @parent statusWindowItemIconsStyle
+ * @type number
+ * @min 0
+ * @default 144
+ * 
+ * @param statusWindowItemIconWidth
+ * @text Item Icon Width
+ * @desc Status Window Item Icon Width
+ * @parent statusWindowItemIconsStyle
+ * @type number
+ * @min 0
+ * @default 32
+ * 
+ * @param statusWindowItemIconColSpacing
+ * @text Item Icon Col Spacing
+ * @desc Status Window Item Icon Col Spacing
+ * @parent statusWindowItemIconsStyle
+ * @type number
+ * @default 0
+ * 
  */
 
 /*~struct~Color:
@@ -845,6 +882,12 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowItemLevelValueFontSize = Number(parameters.statusWindowItemLevelValueFontSize) || 26;
     const statusWindowItemLevelValueTextColorJsonObject = JSON.parse(parameters.statusWindowItemLevelValueTextColor);
     const statusWindowItemLevelValueTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemLevelValueTextOutlineColor);
+
+    const statusWindowItemIconsOffsetJsonObject = JSON.parse(parameters.statusWindowItemIconsOffset);
+    const statusWindowItemIconsOffset = new Point(Number(statusWindowItemIconsOffsetJsonObject.x) || 0, Number(statusWindowItemIconsOffsetJsonObject.y) || 0);
+    const statusWindowItemAllIconsWidth = Number(parameters.statusWindowItemAllIconsWidth);
+    const statusWindowItemIconWidth = Number(parameters.statusWindowItemIconWidth);
+    const statusWindowItemIconColSpacing = Number(parameters.statusWindowItemIconColSpacing);
 
     // Private Functions and System Class Extensions
     const colorJsonObjectConvertToColorRGBA = function(object) {
@@ -1206,7 +1249,7 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         if (statusWindowItemLevelVisible === true) {
             this.drawActorLevel(actor, x, y);
         }
-        this.drawActorIcons(actor, x, y + lineHeight * 2);
+        this.drawActorIcons(actor, x, y);
         this.drawActorClass(actor, x2, y);
         this.placeBasicGauges(actor, x2, y + lineHeight);
     };
@@ -1222,7 +1265,7 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         this.drawText(actor.name(), x + statusWindowItemNameOffset.x, y + statusWindowItemNameOffset.y, statusWindowItemNameWidth);
     };
 
-    Window_StatusBase.prototype.drawActorLevel = function(actor, x, y) {
+    Window_MenuStatus.prototype.drawActorLevel = function(actor, x, y) {
         this.contents.fontSize = statusWindowItemLevelTagFontSize;
         this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelTagTextColorJsonObject));
         this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelTagTextOutlineColorJsonObject));
@@ -1232,6 +1275,28 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelValueTextColorJsonObject));
         this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelValueTextOutlineColorJsonObject));
         this.drawText(actor.level, x + statusWindowItemLevelValueOffset.x, y + statusWindowItemLevelValueOffset.y, statusWindowItemLevelValueWidth);
+    };
+
+    Window_MenuStatus.prototype.drawActorIcons = function(actor, x, y, width) {
+        width = width || 144;
+        const iconWidth = statusWindowItemIconWidth;
+        const icons = actor.allIcons().slice(0, Math.floor(statusWindowItemAllIconsWidth / (iconWidth + statusWindowItemIconColSpacing)));
+        let iconX = x + statusWindowItemIconsOffset.x;
+        let iconY = y + statusWindowItemIconsOffset.y;
+        let nextX = iconWidth + statusWindowItemIconColSpacing;
+        for (const icon of icons) {
+            this.drawIcon(icon, iconX, iconY);
+            iconX += nextX;
+        }
+    };
+
+    Window_MenuStatus.prototype.drawIcon = function(iconIndex, x, y) {
+        const bitmap = ImageManager.loadSystem("IconSet");
+        const pw = ImageManager.iconWidth;
+        const ph = ImageManager.iconHeight;
+        const sx = (iconIndex % 16) * pw;
+        const sy = Math.floor(iconIndex / 16) * ph;
+        this.contents.blt(bitmap, sx, sy, pw, ph, x, y, statusWindowItemIconWidth, statusWindowItemIconWidth);
     };
 
 })();
