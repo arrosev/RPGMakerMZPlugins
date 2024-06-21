@@ -652,6 +652,15 @@
  * @type string
  * @default
  * 
+ * @param statusWindowItemIconsVisible
+ * @text Item Icons Visible
+ * @desc Status Window Item Icons Visible
+ * @parent statusWindowItemIconsStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
  * @param statusWindowItemIconsOffset
  * @text Item Icons Offset
  * @desc Status Window Item Icons Offset
@@ -681,6 +690,58 @@
  * @parent statusWindowItemIconsStyle
  * @type number
  * @default 0
+ * 
+ * @param statusWindowItemClassStyle
+ * @text Item Class Style
+ * @desc Status Window Item Class Style
+ * @parent statusWindowItemStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemClassVisible
+ * @text Item Class Visible
+ * @desc Status Window Item Class Visible
+ * @parent statusWindowItemClassStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemClassOffset
+ * @text Item Class Offset
+ * @desc Status Window Item Class Offset
+ * @parent statusWindowItemClassStyle
+ * @type struct<Point>
+ * @default {"x":"360","y":"11"}
+ * 
+ * @param statusWindowItemClassWidth
+ * @text Item Class Width
+ * @desc Status Window Item Class Width
+ * @parent statusWindowItemClassStyle
+ * @type number
+ * @min 0
+ * @default 168
+ * 
+ * @param statusWindowItemClassFontSize
+ * @text Item Class Font Size
+ * @desc Status Window Item Class Font Size
+ * @parent statusWindowItemClassStyle
+ * @type number
+ * @default 26
+ * 
+ * @param statusWindowItemClassTextColor
+ * @text Item Class Text Color
+ * @desc Status Window Item Class Text Color
+ * @parent statusWindowItemClassStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param statusWindowItemClassTextOutlineColor
+ * @text Item Class Text Outline Color
+ * @desc Status Window Item Class Text Outline Color
+ * @parent statusWindowItemClassStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
  * 
  */
 
@@ -883,11 +944,20 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowItemLevelValueTextColorJsonObject = JSON.parse(parameters.statusWindowItemLevelValueTextColor);
     const statusWindowItemLevelValueTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemLevelValueTextOutlineColor);
 
+    const statusWindowItemIconsVisible = parameters.statusWindowItemIconsVisible !== "false";
     const statusWindowItemIconsOffsetJsonObject = JSON.parse(parameters.statusWindowItemIconsOffset);
     const statusWindowItemIconsOffset = new Point(Number(statusWindowItemIconsOffsetJsonObject.x) || 0, Number(statusWindowItemIconsOffsetJsonObject.y) || 0);
     const statusWindowItemAllIconsWidth = Number(parameters.statusWindowItemAllIconsWidth);
     const statusWindowItemIconWidth = Number(parameters.statusWindowItemIconWidth);
     const statusWindowItemIconColSpacing = Number(parameters.statusWindowItemIconColSpacing);
+
+    const statusWindowItemClassVisible = parameters.statusWindowItemClassVisible !== "false";
+    const statusWindowItemClassOffsetJsonObject = JSON.parse(parameters.statusWindowItemClassOffset);
+    const statusWindowItemClassOffset = new Point(Number(statusWindowItemClassOffsetJsonObject.x) || 0, Number(statusWindowItemClassOffsetJsonObject.y) || 0);
+    const statusWindowItemClassWidth = Number(parameters.statusWindowItemClassWidth);
+    const statusWindowItemClassFontSize = Number(parameters.statusWindowItemClassFontSize) || 26;
+    const statusWindowItemClassTextColorJsonObject = JSON.parse(parameters.statusWindowItemClassTextColor);
+    const statusWindowItemClassTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemClassTextOutlineColor);
 
     // Private Functions and System Class Extensions
     const colorJsonObjectConvertToColorRGBA = function(object) {
@@ -1249,9 +1319,13 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         if (statusWindowItemLevelVisible === true) {
             this.drawActorLevel(actor, x, y);
         }
-        this.drawActorIcons(actor, x, y);
-        this.drawActorClass(actor, x2, y);
-        this.placeBasicGauges(actor, x2, y + lineHeight);
+        if (statusWindowItemIconsVisible === true) {
+            this.drawActorIcons(actor, x, y);
+        }
+        if (statusWindowItemClassVisible === true) {
+            this.drawActorClass(actor, x, y);
+        }
+        this.placeBasicGauges(actor, x2, y + lineHeight + 11);
     };
 
     Window_MenuStatus.prototype.drawActorName = function(actor, x, y, width) {
@@ -1297,6 +1371,14 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         const sx = (iconIndex % 16) * pw;
         const sy = Math.floor(iconIndex / 16) * ph;
         this.contents.blt(bitmap, sx, sy, pw, ph, x, y, statusWindowItemIconWidth, statusWindowItemIconWidth);
+    };
+
+    Window_MenuStatus.prototype.drawActorClass = function(actor, x, y, width) {
+        width = width || 168;
+        this.contents.fontSize = statusWindowItemClassFontSize;
+        this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemClassTextColorJsonObject));
+        this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemClassTextOutlineColorJsonObject));
+        this.drawText(actor.currentClass().name, x + statusWindowItemClassOffset.x, y + statusWindowItemClassOffset.y, statusWindowItemClassWidth);
     };
 
 })();
