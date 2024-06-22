@@ -959,6 +959,16 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowItemClassTextColorJsonObject = JSON.parse(parameters.statusWindowItemClassTextColor);
     const statusWindowItemClassTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemClassTextOutlineColor);
 
+    // Custom Classes
+
+    class Sprite_MenuGauge extends Sprite_Gauge {
+
+        initialize() {
+            Sprite_Gauge.prototype.initialize.call(this);
+        }
+
+    }
+
     // Private Functions and System Class Extensions
     const colorJsonObjectConvertToColorRGBA = function(object) {
         return `rgba(${Number(object.r)}, ${Number(object.g)}, ${Number(object.b)}, ${Number(object.a)})`;
@@ -971,6 +981,99 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         context.lineWidth = lineWidth;
         context.lineJoin = lineJoin;
         context.strokeRect(x, y, width, height);
+        context.restore();
+        this._baseTexture.update();
+    };
+
+    Bitmap.prototype.strokeRoundRect = function(x, y, width, height, color, lineWidth, radius) {
+        const context = this.context;
+        context.save();
+        context.strokeStyle = color;
+        context.lineWidth = lineWidth;
+
+        context.beginPath();
+        
+        context.moveTo(x + radius, y);
+
+        context.lineTo(x + width - radius, y);
+        context.quadraticCurveTo(x + width, y, x + width, y + radius);
+        
+        context.lineTo(x + width, y + height - radius);
+        context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+
+        context.lineTo(x + radius, y + height);
+        context.quadraticCurveTo(x, y + height, x, y + height - radius);
+
+        context.lineTo(x, y + radius);
+        context.quadraticCurveTo(x, y, x + radius, y);
+
+        context.closePath();
+
+        context.stroke();
+
+        context.restore();
+        this._baseTexture.update();
+    };
+
+    Bitmap.prototype.fillRoundRect = function(x, y, width, height, color, radius) {
+        const context = this.context;
+        context.save();
+        context.fillStyle = color;
+
+        context.beginPath();
+        
+        context.moveTo(x + radius, y);
+
+        context.lineTo(x + width - radius, y);
+        context.quadraticCurveTo(x + width, y, x + width, y + radius);
+        
+        context.lineTo(x + width, y + height - radius);
+        context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+
+        context.lineTo(x + radius, y + height);
+        context.quadraticCurveTo(x, y + height, x, y + height - radius);
+
+        context.lineTo(x, y + radius);
+        context.quadraticCurveTo(x, y, x + radius, y);
+
+        context.closePath();
+
+        context.fill();
+
+        context.restore();
+        this._baseTexture.update();
+    };
+
+    Bitmap.prototype.gradientFillRoundRect = function (x, y, width, height, color1, color2, vertical, radius) {
+        const context = this.context;
+        const x1 = vertical ? x : x + width;
+        const y1 = vertical ? y + height : y;
+        const grad = context.createLinearGradient(x, y, x1, y1);
+        grad.addColorStop(0, color1);
+        grad.addColorStop(1, color2);
+        context.save();
+        context.fillStyle = grad;
+
+        context.beginPath();
+        
+        context.moveTo(x + radius, y);
+
+        context.lineTo(x + width - radius, y);
+        context.quadraticCurveTo(x + width, y, x + width, y + radius);
+        
+        context.lineTo(x + width, y + height - radius);
+        context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+
+        context.lineTo(x + radius, y + height);
+        context.quadraticCurveTo(x, y + height, x, y + height - radius);
+
+        context.lineTo(x, y + radius);
+        context.quadraticCurveTo(x, y, x + radius, y);
+
+        context.closePath();
+
+        context.fill();
+
         context.restore();
         this._baseTexture.update();
     };
@@ -1155,9 +1258,10 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         const y = rect.y;
         const w = rect.width;
         const h = rect.height;
-        this.contentsBack.gradientFillRect(x, y, w, h, c1, c2, true);
-        this.contentsBack.strokeBetterRect(x, y, w, h, c3, commandWindowItemBGBorderLineWidth, commandWindowItemBGBorderLineJoin);
+        //this.contentsBack.gradientFillRect(x, y, w, h, c1, c2, true);
+        this.contentsBack.gradientFillRoundRect(x, y, w, h, c1, c2, true, 20);
         //this.contentsBack.strokeRect(x, y, w, h, c3);
+        this.contentsBack.strokeRoundRect(x, y, w, h, c3, commandWindowItemBGBorderLineWidth, 20);
     };
 
     const _Window_Menu_Command_Reset_Text_Color = Window_MenuCommand.prototype.resetTextColor;
@@ -1379,6 +1483,14 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemClassTextColorJsonObject));
         this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemClassTextOutlineColorJsonObject));
         this.drawText(actor.currentClass().name, x + statusWindowItemClassOffset.x, y + statusWindowItemClassOffset.y, statusWindowItemClassWidth);
+    };
+
+    Window_MenuStatus.prototype.placeGauge = function(actor, type, x, y) {
+        const key = "actor%1-gauge-%2".format(actor.actorId(), type);
+        const sprite = this.createInnerSprite(key, Sprite_MenuGauge);
+        sprite.setup(actor, type);
+        sprite.move(x, y);
+        sprite.show();
     };
 
 })();
