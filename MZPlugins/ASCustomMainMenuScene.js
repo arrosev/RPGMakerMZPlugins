@@ -184,6 +184,29 @@
  * @type string
  * @default
  * 
+ * @param commandWindowItemBGOffset
+ * @text Item BG Offset
+ * @desc Command Window Item Background Offset
+ * @parent commandWindowItemStyle
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
+ * 
+ * @param commandWindowItemBGWidth
+ * @text Item BG Width
+ * @desc Command Window Item Background Width
+ * @parent commandWindowItemStyle
+ * @type number
+ * @min 0
+ * @default 208
+ * 
+ * @param commandWindowItemBGHeight
+ * @text Item BG Height
+ * @desc Command Window Item Background Height
+ * @parent commandWindowItemStyle
+ * @type number
+ * @min 0
+ * @default 40
+ * 
  * @param commandWindowItemBGColor1
  * @text Item BG Color1
  * @desc Command Window Item Background Color1
@@ -207,20 +230,19 @@
  * 
  * @param commandWindowItemBGBorderLineWidth
  * @text Item BG Border Width
- * @desc Command Window Item BG Border LineWidth
+ * @desc Command Window Item Background Border LineWidth
  * @parent commandWindowItemStyle
- * @type string
- * @default 1.0
+ * @type number
+ * @min 0
+ * @default 1
  * 
- * @param commandWindowItemBGBorderLineJoin
- * @text Item BG Border LineJoin
- * @desc Command Window Item BG Border LineJoin
+ * @param commandWindowItemBGBorderRadius
+ * @text Item BG Border Radius
+ * @desc Command Window Item Background Border Radius
  * @parent commandWindowItemStyle
- * @type select
- * @option miter
- * @option round
- * @option bevel
- * @default miter
+ * @type number
+ * @min 0
+ * @default 0
  * 
  * @param commandWindowItemFontSize
  * @text Item Font Size
@@ -363,21 +385,21 @@
  * 
  * @param statusWindowItemBGStyle
  * @text Item BG Style
- * @desc Status Window Item BG Style
+ * @desc Status Window Item Background Style
  * @parent statusWindowItemStyle
  * @type string
  * @default
  * 
  * @param statusWindowItemBGOffset
  * @text Item BG Offset
- * @desc Status Window Item BG Offset
+ * @desc Status Window Item Background Offset
  * @parent statusWindowItemBGStyle
  * @type struct<Point>
  * @default {"x":"0","y":"0"}
  * 
  * @param statusWindowItemBGWidth
  * @text Item BG Width
- * @desc Status Window Item BG Width
+ * @desc Status Window Item Background Width
  * @parent statusWindowItemBGStyle
  * @type number
  * @min 0
@@ -385,7 +407,7 @@
  * 
  * @param statusWindowItemBGHeight
  * @text Item BG Height
- * @desc Status Window Item BG Height
+ * @desc Status Window Item Background Height
  * @parent statusWindowItemBGStyle
  * @type number
  * @min 0
@@ -414,38 +436,37 @@
  * 
  * @param statusWindowItemBGBorderLineWidth
  * @text Item BG Border Width
- * @desc Status Window Item BG Border LineWidth
+ * @desc Status Window Item Background Border LineWidth
  * @parent statusWindowItemBGStyle
- * @type string
- * @default 1.0
+ * @type number
+ * @min 0
+ * @default 1
  * 
- * @param statusWindowItemBGBorderLineJoin
- * @text Item BG Border LineJoin
- * @desc Status Window Item BG Border LineJoin
+ * @param statusWindowItemBGBorderRadius
+ * @text Item BG Border Radius
+ * @desc Status Window Item Background Border Radius
  * @parent statusWindowItemBGStyle
- * @type select
- * @option miter
- * @option round
- * @option bevel
- * @default miter
+ * @type number
+ * @min 0
+ * @default 0
  * 
  * @param statusWindowPendingItemBGStyle
  * @text Pending Item BG Style
- * @desc Status Window Pending Item BG Style
+ * @desc Status Window Pending Item Background Style
  * @parent statusWindowItemStyle
  * @type string
  * @default
  * 
  * @param statusWindowPendingItemBGOffset
  * @text Pending Item BG Offset
- * @desc Status Window Pending Item BG Offset
+ * @desc Status Window Pending Item Background Offset
  * @parent statusWindowPendingItemBGStyle
  * @type struct<Point>
  * @default {"x":"0","y":"0"}
  * 
  * @param statusWindowPendingItemBGWidth
  * @text Pending Item BG Width
- * @desc Status Window Pending Item BG Width
+ * @desc Status Window Pending Item Background Width
  * @parent statusWindowPendingItemBGStyle
  * @type number
  * @min 0
@@ -453,7 +474,7 @@
  * 
  * @param statusWindowPendingItemBGHeight
  * @text Pending Item BG Height
- * @desc Status Window Pending Item BG Height
+ * @desc Status Window Pending Item Background Height
  * @parent statusWindowPendingItemBGStyle
  * @type number
  * @min 0
@@ -465,6 +486,14 @@
  * @parent statusWindowPendingItemBGStyle
  * @type struct<Color>
  * @default {"r":"163","g":"255","b":"224","a":"1.0"}
+ * 
+ * @param statusWindowPendingItemBGRadius
+ * @text Pending Item BG Radius
+ * @desc Status Window Item Background Radius
+ * @parent statusWindowPendingItemBGStyle
+ * @type number
+ * @min 0
+ * @default 0
  * 
  * @param statusWindowItemFaceImageStyle
  * @text Item Face Image Style
@@ -573,38 +602,38 @@
  * @off Hide
  * @default true
  * 
- * @param statusWindowItemLevelTagOffset
- * @text Item Level Tag Offset
- * @desc Status Window Item Level Tag Offset
+ * @param statusWindowItemLevelLabelOffset
+ * @text Item Level Label Offset
+ * @desc Status Window Item Level Label Offset
  * @parent statusWindowItemLevelStyle
  * @type struct<Point>
  * @default {"x":"180","y":"47"}
  * 
- * @param statusWindowItemLevelTagWidth
- * @text Item Level Tag Width
- * @desc Status Window Item Level Tag Width
+ * @param statusWindowItemLevelLabelWidth
+ * @text Item Level Label Width
+ * @desc Status Window Item Level Label Width
  * @parent statusWindowItemLevelStyle
  * @type number
  * @min 0
  * @default 48
  * 
- * @param statusWindowItemLevelTagFontSize
- * @text Item Level Tag Font Size
- * @desc Status Window Item Level Tag Font Size
+ * @param statusWindowItemLevelLabelFontSize
+ * @text Item Level Label Font Size
+ * @desc Status Window Item Level Label Font Size
  * @parent statusWindowItemLevelStyle
  * @type number
  * @default 26
  * 
- * @param statusWindowItemLevelTagTextColor
- * @text Item Level Tag Text Color
- * @desc Status Window Item Level Tag Text Color
+ * @param statusWindowItemLevelLabelTextColor
+ * @text Item Level Label Text Color
+ * @desc Status Window Item Level Label Text Color
  * @parent statusWindowItemLevelStyle
  * @type struct<Color>
  * @default {"r":"132","g":"170","b":"255","a":"1"}
  * 
- * @param statusWindowItemLevelTagTextOutlineColor
- * @text Item Level Tag Text Outline Color
- * @desc Status Window Item Level Tag Text Outline Color
+ * @param statusWindowItemLevelLabelTextOutlineColor
+ * @text Item Level Label Text Outline Color
+ * @desc Status Window Item Level Label Text Outline Color
  * @parent statusWindowItemLevelStyle
  * @type struct<Color>
  * @default {"r":"0","g":"0","b":"0","a":"1"}
@@ -874,11 +903,15 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const commandWindowCursorOffset = new Point(Number(commandWindowCursorOffsetJsonObject.x) || 0, Number(commandWindowCursorOffsetJsonObject.y) || 0);
     const commandWindowCursorAnimationSpeed = Number(parameters.commandWindowCursorAnimationSpeed);
 
+    const commandWindowItemBGOffsetJsonObject = JSON.parse(parameters.commandWindowItemBGOffset);
+    const commandWindowItemBGOffset = new Point(Number(commandWindowItemBGOffsetJsonObject.x) || 0, Number(commandWindowItemBGOffsetJsonObject.y) || 0);
+    const commandWindowItemBGWidth = Number(parameters.commandWindowItemBGWidth);
+    const commandWindowItemBGHeight = Number(parameters.commandWindowItemBGHeight);
     const commandWindowItemBGColor1JsonObject = JSON.parse(parameters.commandWindowItemBGColor1);
     const commandWindowItemBGColor2JsonObject = JSON.parse(parameters.commandWindowItemBGColor2);
     const commandWindowItemBGBorderColorJsonObject = JSON.parse(parameters.commandWindowItemBGBorderColor);
-    const commandWindowItemBGBorderLineWidth = Number(parameters.commandWindowItemBGBorderLineWidth) || 1.0;
-    const commandWindowItemBGBorderLineJoin = parameters.commandWindowItemBGBorderLineJoin;
+    const commandWindowItemBGBorderLineWidth = Number(parameters.commandWindowItemBGBorderLineWidth);
+    const commandWindowItemBGBorderRadius = Number(parameters.commandWindowItemBGBorderRadius);
 
     const commandWindowItemFontSize = Number(parameters.commandWindowItemFontSize) || 26;
     const commandWindowItemTextOffsetX = Number(parameters.commandWindowItemTextOffsetX) || 0;
@@ -907,14 +940,15 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowItemBGColor1JsonObject = JSON.parse(parameters.statusWindowItemBGColor1);
     const statusWindowItemBGColor2JsonObject = JSON.parse(parameters.statusWindowItemBGColor2);
     const statusWindowItemBGBorderColorJsonObject = JSON.parse(parameters.statusWindowItemBGBorderColor);
-    const statusWindowItemBGBorderLineWidth = Number(parameters.statusWindowItemBGBorderLineWidth) || 1.0;
-    const statusWindowItemBGBorderLineJoin = parameters.statusWindowItemBGBorderLineJoin;
+    const statusWindowItemBGBorderLineWidth = Number(parameters.statusWindowItemBGBorderLineWidth);
+    const statusWindowItemBGBorderRadius = Number(parameters.statusWindowItemBGBorderRadius);
 
     const statusWindowPendingItemBGOffsetJsonObject = JSON.parse(parameters.statusWindowPendingItemBGOffset);
     const statusWindowPendingItemBGOffset = new Point(Number(statusWindowPendingItemBGOffsetJsonObject.x) || 0, Number(statusWindowPendingItemBGOffsetJsonObject.y) || 0);
     const statusWindowPendingItemBGWidth = Number(parameters.statusWindowPendingItemBGWidth);
     const statusWindowPendingItemBGHeight = Number(parameters.statusWindowPendingItemBGHeight);
     const statusWindowPendingItemBGColorJsonObject = JSON.parse(parameters.statusWindowPendingItemBGColor);
+    const statusWindowPendingItemBGRadius = Number(parameters.statusWindowPendingItemBGRadius);
 
     const statusWindowItemFaceImageVisible = parameters.statusWindowItemFaceImageVisible !== "false";
     const statusWindowItemFaceImageOffsetJsonObject = JSON.parse(parameters.statusWindowItemFaceImageOffset);
@@ -931,12 +965,12 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowItemNameTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemNameTextOutlineColor);
 
     const statusWindowItemLevelVisible = parameters.statusWindowItemLevelVisible !== "false";
-    const statusWindowItemLevelTagOffsetJsonObject = JSON.parse(parameters.statusWindowItemLevelTagOffset);
-    const statusWindowItemLevelTagOffset = new Point(Number(statusWindowItemLevelTagOffsetJsonObject.x) || 0, Number(statusWindowItemLevelTagOffsetJsonObject.y) || 0);
-    const statusWindowItemLevelTagWidth = Number(parameters.statusWindowItemLevelTagWidth);
-    const statusWindowItemLevelTagFontSize = Number(parameters.statusWindowItemLevelTagFontSize) || 26;
-    const statusWindowItemLevelTagTextColorJsonObject = JSON.parse(parameters.statusWindowItemLevelTagTextColor);
-    const statusWindowItemLevelTagTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemLevelTagTextOutlineColor);
+    const statusWindowItemLevelLabelOffsetJsonObject = JSON.parse(parameters.statusWindowItemLevelLabelOffset);
+    const statusWindowItemLevelLabelOffset = new Point(Number(statusWindowItemLevelLabelOffsetJsonObject.x) || 0, Number(statusWindowItemLevelLabelOffsetJsonObject.y) || 0);
+    const statusWindowItemLevelLabelWidth = Number(parameters.statusWindowItemLevelLabelWidth);
+    const statusWindowItemLevelLabelFontSize = Number(parameters.statusWindowItemLevelLabelFontSize) || 26;
+    const statusWindowItemLevelLabelTextColorJsonObject = JSON.parse(parameters.statusWindowItemLevelLabelTextColor);
+    const statusWindowItemLevelLabelTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemLevelLabelTextOutlineColor);
     const statusWindowItemLevelValueOffsetJsonObject = JSON.parse(parameters.statusWindowItemLevelValueOffset);
     const statusWindowItemLevelValueOffset = new Point(Number(statusWindowItemLevelValueOffsetJsonObject.x) || 0, Number(statusWindowItemLevelValueOffsetJsonObject.y) || 0);
     const statusWindowItemLevelValueWidth = Number(parameters.statusWindowItemLevelValueWidth);
@@ -973,17 +1007,6 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const colorJsonObjectConvertToColorRGBA = function(object) {
         return `rgba(${Number(object.r)}, ${Number(object.g)}, ${Number(object.b)}, ${Number(object.a)})`;
     }
-
-    Bitmap.prototype.strokeBetterRect = function(x, y, width, height, color, lineWidth, lineJoin) {
-        const context = this.context;
-        context.save();
-        context.strokeStyle = color;
-        context.lineWidth = lineWidth;
-        context.lineJoin = lineJoin;
-        context.strokeRect(x, y, width, height);
-        context.restore();
-        this._baseTexture.update();
-    };
 
     Bitmap.prototype.strokeRoundRect = function(x, y, width, height, color, lineWidth, radius) {
         const context = this.context;
@@ -1254,14 +1277,14 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         const c1 = colorJsonObjectConvertToColorRGBA(commandWindowItemBGColor1JsonObject);
         const c2 = colorJsonObjectConvertToColorRGBA(commandWindowItemBGColor2JsonObject);
         const c3 = colorJsonObjectConvertToColorRGBA(commandWindowItemBGBorderColorJsonObject);
-        const x = rect.x;
-        const y = rect.y;
-        const w = rect.width;
-        const h = rect.height;
-        //this.contentsBack.gradientFillRect(x, y, w, h, c1, c2, true);
-        this.contentsBack.gradientFillRoundRect(x, y, w, h, c1, c2, true, 20);
-        //this.contentsBack.strokeRect(x, y, w, h, c3);
-        this.contentsBack.strokeRoundRect(x, y, w, h, c3, commandWindowItemBGBorderLineWidth, 20);
+        const x = rect.x + commandWindowItemBGOffset.x;
+        const y = rect.y + commandWindowItemBGOffset.y;
+        const w = commandWindowItemBGWidth;
+        const h = commandWindowItemBGHeight;
+        this.contentsBack.gradientFillRoundRect(x, y, w, h, c1, c2, true, commandWindowItemBGBorderRadius);
+        if (commandWindowItemBGBorderLineWidth > 0) {
+            this.contentsBack.strokeRoundRect(x, y, w, h, c3, commandWindowItemBGBorderLineWidth, commandWindowItemBGBorderRadius);
+        }
     };
 
     const _Window_Menu_Command_Reset_Text_Color = Window_MenuCommand.prototype.resetTextColor;
@@ -1388,8 +1411,10 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         const y = rect.y + statusWindowItemBGOffset.y;
         const w = statusWindowItemBGWidth;
         const h = statusWindowItemBGHeight;
-        this.contentsBack.gradientFillRect(x, y, w, h, c1, c2, true);
-        this.contentsBack.strokeBetterRect(x, y, w, h, c3, statusWindowItemBGBorderLineWidth, statusWindowItemBGBorderLineJoin);
+        this.contentsBack.gradientFillRoundRect(x, y, w, h, c1, c2, true, statusWindowItemBGBorderRadius);
+        if (statusWindowItemBGBorderLineWidth > 0) {
+            this.contentsBack.strokeRoundRect(x, y, w, h, c3, statusWindowItemBGBorderLineWidth, statusWindowItemBGBorderRadius);
+        }
     };
 
     Window_MenuStatus.prototype.drawPendingItemBackground = function(index) {
@@ -1401,7 +1426,7 @@ const ASCustomMainMenuSceneNameSpace = (() => {
             const w = statusWindowPendingItemBGWidth;
             const h = statusWindowPendingItemBGHeight;
             this.changePaintOpacity(false);
-            this.contents.fillRect(x, y, w, h, c1);
+            this.contents.fillRoundRect(x, y, w, h, c1, statusWindowPendingItemBGRadius);
             this.changePaintOpacity(true);
         }
     };
@@ -1444,10 +1469,10 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     };
 
     Window_MenuStatus.prototype.drawActorLevel = function(actor, x, y) {
-        this.contents.fontSize = statusWindowItemLevelTagFontSize;
-        this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelTagTextColorJsonObject));
-        this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelTagTextOutlineColorJsonObject));
-        this.drawText(TextManager.levelA, x + statusWindowItemLevelTagOffset.x, y + statusWindowItemLevelTagOffset.y, statusWindowItemLevelTagWidth);
+        this.contents.fontSize = statusWindowItemLevelLabelFontSize;
+        this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelLabelTextColorJsonObject));
+        this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelLabelTextOutlineColorJsonObject));
+        this.drawText(TextManager.levelA, x + statusWindowItemLevelLabelOffset.x, y + statusWindowItemLevelLabelOffset.y, statusWindowItemLevelLabelWidth);
 
         this.contents.fontSize = statusWindowItemLevelValueFontSize;
         this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelValueTextColorJsonObject));
@@ -1483,6 +1508,14 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemClassTextColorJsonObject));
         this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemClassTextOutlineColorJsonObject));
         this.drawText(actor.currentClass().name, x + statusWindowItemClassOffset.x, y + statusWindowItemClassOffset.y, statusWindowItemClassWidth);
+    };
+
+    Window_MenuStatus.prototype.placeBasicGauges = function(actor, x, y) {
+        this.placeGauge(actor, "hp", x, y);
+        this.placeGauge(actor, "mp", x, y + this.gaugeLineHeight());
+        if ($dataSystem.optDisplayTp) {
+            this.placeGauge(actor, "tp", x, y + this.gaugeLineHeight() * 2);
+        }
     };
 
     Window_MenuStatus.prototype.placeGauge = function(actor, type, x, y) {
