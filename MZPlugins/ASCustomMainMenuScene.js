@@ -185,14 +185,14 @@
  * @default
  * 
  * @param commandWindowItemBGOffset
- * @text Item BG Offset
+ * @text BG Offset
  * @desc Command Window Item Background Offset
  * @parent commandWindowItemStyle
  * @type struct<Point>
  * @default {"x":"0","y":"0"}
  * 
  * @param commandWindowItemBGWidth
- * @text Item BG Width
+ * @text BG Width
  * @desc Command Window Item Background Width
  * @parent commandWindowItemStyle
  * @type number
@@ -200,7 +200,7 @@
  * @default 208
  * 
  * @param commandWindowItemBGHeight
- * @text Item BG Height
+ * @text BG Height
  * @desc Command Window Item Background Height
  * @parent commandWindowItemStyle
  * @type number
@@ -208,28 +208,28 @@
  * @default 40
  * 
  * @param commandWindowItemBGColor1
- * @text Item BG Color1
+ * @text BG Color1
  * @desc Command Window Item Background Color1
  * @parent commandWindowItemStyle
  * @type struct<Color>
  * @default {"r":"32","g":"32","b":"32","a":"0.5"}
  * 
  * @param commandWindowItemBGColor2
- * @text Item BG Color2
+ * @text BG Color2
  * @desc Command Window Item Background Color2
  * @parent commandWindowItemStyle
  * @type struct<Color>
  * @default {"r":"0","g":"0","b":"0","a":"0.5"}
  * 
  * @param commandWindowItemBGBorderColor
- * @text Item BG Border Color
+ * @text BG Border Color
  * @desc Command Window Item Background Border Color
  * @parent commandWindowItemStyle
  * @type struct<Color>
  * @default {"r":"32","g":"32","b":"32","a":"0.5"}
  * 
  * @param commandWindowItemBGBorderLineWidth
- * @text Item BG Border Width
+ * @text BG Border Width
  * @desc Command Window Item Background Border LineWidth
  * @parent commandWindowItemStyle
  * @type number
@@ -237,7 +237,7 @@
  * @default 1
  * 
  * @param commandWindowItemBGBorderRadius
- * @text Item BG Border Radius
+ * @text BG Border Radius
  * @desc Command Window Item Background Border Radius
  * @parent commandWindowItemStyle
  * @type number
@@ -245,21 +245,21 @@
  * @default 0
  * 
  * @param commandWindowItemFontSize
- * @text Item Font Size
+ * @text Font Size
  * @desc Command Window Item Font Size
  * @parent commandWindowItemStyle
  * @type number
  * @default 26
  * 
  * @param commandWindowItemTextOffsetX
- * @text Item Text OffsetX
+ * @text Text OffsetX
  * @desc Command Window Item Text OffsetX
  * @parent commandWindowItemStyle
  * @type number
  * @default 0
  * 
  * @param commandWindowItemTextAlign
- * @text Item Text Align
+ * @text Text Align
  * @desc Command Window Item Text Align
  * @parent commandWindowItemStyle
  * @type select
@@ -269,14 +269,14 @@
  * @default center
  * 
  * @param commandWindowItemTextColor
- * @text Item Text Color
+ * @text Text Color
  * @desc Command Window Item Text Color
  * @parent commandWindowItemStyle
  * @type struct<Color>
  * @default {"r":"255","g":"255","b":"255","a":"1"}
  * 
  * @param commandWindowItemTextOutlineColor
- * @text Item Text Outline Color
+ * @text Text Outline Color
  * @desc Command Window Item Text Outline Color
  * @parent commandWindowItemStyle
  * @type struct<Color>
@@ -391,14 +391,14 @@
  * @default
  * 
  * @param statusWindowItemBGOffset
- * @text Item BG Offset
+ * @text BG Offset
  * @desc Status Window Item Background Offset
  * @parent statusWindowItemBGStyle
  * @type struct<Point>
  * @default {"x":"0","y":"0"}
  * 
  * @param statusWindowItemBGWidth
- * @text Item BG Width
+ * @text BG Width
  * @desc Status Window Item Background Width
  * @parent statusWindowItemBGStyle
  * @type number
@@ -406,7 +406,7 @@
  * @default 536
  * 
  * @param statusWindowItemBGHeight
- * @text Item BG Height
+ * @text BG Height
  * @desc Status Window Item Background Height
  * @parent statusWindowItemBGStyle
  * @type number
@@ -414,28 +414,28 @@
  * @default 131
  * 
  * @param statusWindowItemBGColor1
- * @text Item BG Color1
+ * @text BG Color1
  * @desc Status Window Item Background Color1
  * @parent statusWindowItemBGStyle
  * @type struct<Color>
  * @default {"r":"32","g":"32","b":"32","a":"0.5"}
  * 
  * @param statusWindowItemBGColor2
- * @text Item BG Color2
+ * @text BG Color2
  * @desc Status Window Item Background Color2
  * @parent statusWindowItemBGStyle
  * @type struct<Color>
  * @default {"r":"0","g":"0","b":"0","a":"0.5"}
  * 
  * @param statusWindowItemBGBorderColor
- * @text Item BG Border Color
+ * @text BG Border Color
  * @desc Status Window Item Background Border Color
  * @parent statusWindowItemBGStyle
  * @type struct<Color>
  * @default {"r":"32","g":"32","b":"32","a":"0.5"}
  * 
  * @param statusWindowItemBGBorderLineWidth
- * @text Item BG Border Width
+ * @text BG Border Width
  * @desc Status Window Item Background Border LineWidth
  * @parent statusWindowItemBGStyle
  * @type number
@@ -443,7 +443,7 @@
  * @default 1
  * 
  * @param statusWindowItemBGBorderRadius
- * @text Item BG Border Radius
+ * @text BG Border Radius
  * @desc Status Window Item Background Border Radius
  * @parent statusWindowItemBGStyle
  * @type number
@@ -458,14 +458,14 @@
  * @default
  * 
  * @param statusWindowPendingItemBGOffset
- * @text Pending Item BG Offset
+ * @text Pending BG Offset
  * @desc Status Window Pending Item Background Offset
  * @parent statusWindowPendingItemBGStyle
  * @type struct<Point>
  * @default {"x":"0","y":"0"}
  * 
  * @param statusWindowPendingItemBGWidth
- * @text Pending Item BG Width
+ * @text Pending BG Width
  * @desc Status Window Pending Item Background Width
  * @parent statusWindowPendingItemBGStyle
  * @type number
@@ -473,7 +473,7 @@
  * @default 536
  * 
  * @param statusWindowPendingItemBGHeight
- * @text Pending Item BG Height
+ * @text Pending BG Height
  * @desc Status Window Pending Item Background Height
  * @parent statusWindowPendingItemBGStyle
  * @type number
@@ -481,14 +481,14 @@
  * @default 131
  * 
  * @param statusWindowPendingItemBGColor
- * @text Pending Item BG Color
+ * @text Pending BG Color
  * @desc Status Window Pending Item Background Color
  * @parent statusWindowPendingItemBGStyle
  * @type struct<Color>
  * @default {"r":"163","g":"255","b":"224","a":"1.0"}
  * 
  * @param statusWindowPendingItemBGRadius
- * @text Pending Item BG Radius
+ * @text Pending BG Radius
  * @desc Status Window Item Background Radius
  * @parent statusWindowPendingItemBGStyle
  * @type number
@@ -496,14 +496,14 @@
  * @default 0
  * 
  * @param statusWindowItemFaceImageStyle
- * @text Item Face Image Style
+ * @text Face Image Style
  * @desc Status Window Item Face Image Style
  * @parent statusWindowItemStyle
  * @type string
  * @default
  * 
  * @param statusWindowItemFaceImageVisible
- * @text Item Face Image Visible
+ * @text Face Image Visible
  * @desc Status Window Item Face Image Visible
  * @parent statusWindowItemFaceImageStyle
  * @type boolean
@@ -512,14 +512,14 @@
  * @default true
  * 
  * @param statusWindowItemFaceImageOffset
- * @text Item Face Image Offset
+ * @text Face Image Offset
  * @desc Status Window Item Face Image Offset
  * @parent statusWindowItemFaceImageStyle
  * @type struct<Point>
  * @default {"x":"0","y":"0"}
  * 
  * @param statusWindowItemFaceImageWidth
- * @text Item Face Image Width
+ * @text Face Image Width
  * @desc Status Window Item Face Image Width
  * @parent statusWindowItemFaceImageStyle
  * @type number
@@ -527,7 +527,7 @@
  * @default 131
  * 
  * @param statusWindowItemFaceImageHeight
- * @text Item Face Image Height
+ * @text Face Image Height
  * @desc Status Window Item Face Image Height
  * @parent statusWindowItemFaceImageStyle
  * @type number
@@ -542,7 +542,7 @@
  * @default
  * 
  * @param statusWindowItemNameVisible
- * @text Item Name Visible
+ * @text Name Visible
  * @desc Status Window Item Name Visible
  * @parent statusWindowItemNameStyle
  * @type boolean
@@ -551,14 +551,14 @@
  * @default true
  * 
  * @param statusWindowItemNameOffset
- * @text Item Name Offset
+ * @text Name Offset
  * @desc Status Window Item Name Offset
  * @parent statusWindowItemNameStyle
  * @type struct<Point>
  * @default {"x":"180","y":"11"}
  * 
  * @param statusWindowItemNameWidth
- * @text Item Name Width
+ * @text Name Width
  * @desc Status Window Item Name Width
  * @parent statusWindowItemNameStyle
  * @type number
@@ -566,21 +566,21 @@
  * @default 168
  * 
  * @param statusWindowItemNameFontSize
- * @text Item Name Font Size
+ * @text Name Font Size
  * @desc Status Window Item Name Font Size
  * @parent statusWindowItemNameStyle
  * @type number
  * @default 26
  * 
  * @param statusWindowItemNameTextColor
- * @text Item Name Text Color
+ * @text Name Text Color
  * @desc Status Window Item Name Text Color
  * @parent statusWindowItemNameStyle
  * @type struct<Color>
  * @default {"r":"255","g":"255","b":"255","a":"1"}
  * 
  * @param statusWindowItemNameTextOutlineColor
- * @text Item Name Text Outline Color
+ * @text Name Text Outline Color
  * @desc Status Window Item Name Text Outline Color
  * @parent statusWindowItemNameStyle
  * @type struct<Color>
@@ -594,7 +594,7 @@
  * @default
  * 
  * @param statusWindowItemLevelVisible
- * @text Item Level Visible
+ * @text Level Visible
  * @desc Status Window Item Level Visible
  * @parent statusWindowItemLevelStyle
  * @type boolean
@@ -603,14 +603,14 @@
  * @default true
  * 
  * @param statusWindowItemLevelLabelOffset
- * @text Item Level Label Offset
+ * @text Level Label Offset
  * @desc Status Window Item Level Label Offset
  * @parent statusWindowItemLevelStyle
  * @type struct<Point>
  * @default {"x":"180","y":"47"}
  * 
  * @param statusWindowItemLevelLabelWidth
- * @text Item Level Label Width
+ * @text Level Label Width
  * @desc Status Window Item Level Label Width
  * @parent statusWindowItemLevelStyle
  * @type number
@@ -618,35 +618,35 @@
  * @default 48
  * 
  * @param statusWindowItemLevelLabelFontSize
- * @text Item Level Label Font Size
+ * @text Level Label Font Size
  * @desc Status Window Item Level Label Font Size
  * @parent statusWindowItemLevelStyle
  * @type number
  * @default 26
  * 
  * @param statusWindowItemLevelLabelTextColor
- * @text Item Level Label Text Color
+ * @text Level Label Text Color
  * @desc Status Window Item Level Label Text Color
  * @parent statusWindowItemLevelStyle
  * @type struct<Color>
  * @default {"r":"132","g":"170","b":"255","a":"1"}
  * 
  * @param statusWindowItemLevelLabelTextOutlineColor
- * @text Item Level Label Text Outline Color
+ * @text Level Label Text Outline Color
  * @desc Status Window Item Level Label Text Outline Color
  * @parent statusWindowItemLevelStyle
  * @type struct<Color>
  * @default {"r":"0","g":"0","b":"0","a":"1"}
  * 
  * @param statusWindowItemLevelValueOffset
- * @text Item Level Value Offset
+ * @text Level Value Offset
  * @desc Status Window Item Level Value Offset
  * @parent statusWindowItemLevelStyle
  * @type struct<Point>
  * @default {"x":"264","y":"47"}
  * 
  * @param statusWindowItemLevelValueWidth
- * @text Item Level Value Width
+ * @text Level Value Width
  * @desc Status Window Item Level Value Width
  * @parent statusWindowItemLevelStyle
  * @type number
@@ -654,21 +654,21 @@
  * @default 36
  * 
  * @param statusWindowItemLevelValueFontSize
- * @text Item Level Value Font Size
+ * @text Level Value Font Size
  * @desc Status Window Item Level Value Font Size
  * @parent statusWindowItemLevelStyle
  * @type number
  * @default 26
  * 
  * @param statusWindowItemLevelValueTextColor
- * @text Item Level Value Text Color
+ * @text Level Value Text Color
  * @desc Status Window Item Level Value Text Color
  * @parent statusWindowItemLevelStyle
  * @type struct<Color>
  * @default {"r":"255","g":"255","b":"255","a":"1"}
  * 
  * @param statusWindowItemLevelValueTextOutlineColor
- * @text Item Level Value Text Outline Color
+ * @text Level Value Text Outline Color
  * @desc Status Window Item Level Value Text Outline Color
  * @parent statusWindowItemLevelStyle
  * @type struct<Color>
@@ -682,7 +682,7 @@
  * @default
  * 
  * @param statusWindowItemIconsVisible
- * @text Item Icons Visible
+ * @text Icons Visible
  * @desc Status Window Item Icons Visible
  * @parent statusWindowItemIconsStyle
  * @type boolean
@@ -691,14 +691,14 @@
  * @default true
  * 
  * @param statusWindowItemIconsOffset
- * @text Item Icons Offset
+ * @text Icons Offset
  * @desc Status Window Item Icons Offset
  * @parent statusWindowItemIconsStyle
  * @type struct<Point>
  * @default {"x":"180","y":"85"}
  * 
  * @param statusWindowItemAllIconsWidth
- * @text Item All Icons Width
+ * @text All Icons Width
  * @desc Status Window Item Icons Width
  * @parent statusWindowItemIconsStyle
  * @type number
@@ -706,7 +706,7 @@
  * @default 144
  * 
  * @param statusWindowItemIconWidth
- * @text Item Icon Width
+ * @text Icon Width
  * @desc Status Window Item Icon Width
  * @parent statusWindowItemIconsStyle
  * @type number
@@ -714,7 +714,7 @@
  * @default 32
  * 
  * @param statusWindowItemIconColSpacing
- * @text Item Icon Col Spacing
+ * @text Icon Col Spacing
  * @desc Status Window Item Icon Col Spacing
  * @parent statusWindowItemIconsStyle
  * @type number
@@ -728,7 +728,7 @@
  * @default
  * 
  * @param statusWindowItemClassVisible
- * @text Item Class Visible
+ * @text Class Visible
  * @desc Status Window Item Class Visible
  * @parent statusWindowItemClassStyle
  * @type boolean
@@ -737,14 +737,14 @@
  * @default true
  * 
  * @param statusWindowItemClassOffset
- * @text Item Class Offset
+ * @text Class Offset
  * @desc Status Window Item Class Offset
  * @parent statusWindowItemClassStyle
  * @type struct<Point>
  * @default {"x":"360","y":"11"}
  * 
  * @param statusWindowItemClassWidth
- * @text Item Class Width
+ * @text Class Width
  * @desc Status Window Item Class Width
  * @parent statusWindowItemClassStyle
  * @type number
@@ -752,23 +752,130 @@
  * @default 168
  * 
  * @param statusWindowItemClassFontSize
- * @text Item Class Font Size
+ * @text Class Font Size
  * @desc Status Window Item Class Font Size
  * @parent statusWindowItemClassStyle
  * @type number
  * @default 26
  * 
  * @param statusWindowItemClassTextColor
- * @text Item Class Text Color
+ * @text Class Text Color
  * @desc Status Window Item Class Text Color
  * @parent statusWindowItemClassStyle
  * @type struct<Color>
  * @default {"r":"255","g":"255","b":"255","a":"1"}
  * 
  * @param statusWindowItemClassTextOutlineColor
- * @text Item Class Text Outline Color
+ * @text Class Text Outline Color
  * @desc Status Window Item Class Text Outline Color
  * @parent statusWindowItemClassStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param statusWindowItemHPStyle
+ * @text Item HP Style
+ * @desc Status Window Item HP Style
+ * @parent statusWindowItemStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemHPContainerStyleStart
+ * @text ------Container------
+ * @desc Styles for the container of the HP view element
+ * @parent statusWindowItemHPStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemHPVisible
+ * @text HP Visible
+ * @desc Status Window Item HP Visible
+ * @parent statusWindowItemHPStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemHPOffset
+ * @text HP Offset
+ * @desc Status Window Item HP Offset
+ * @parent statusWindowItemHPStyle
+ * @type struct<Point>
+ * @default {"x":"360","y":"47"}
+ * 
+ * @param statusWindowItemHPWidth
+ * @text HP Width
+ * @desc Status Window Item HP Width
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 128
+ * 
+ * @param statusWindowItemHPHeight
+ * @text HP Height
+ * @desc Status Window Item HP Height
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 32
+ * 
+ * @param statusWindowItemHPContainerStyleEnd
+ * @text ---------------------
+ * @desc Styles for the container of the HP view element
+ * @parent statusWindowItemHPStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemHPLabelFormality
+ * @text HP Label Formality
+ * @desc Status Window Item HP Label Formality
+ * @parent statusWindowItemHPStyle
+ * @type select
+ * @option none
+ * @option text
+ * @option icon
+ * @default text
+ * 
+ * @param statusWindowItemHPTextLabelOffset
+ * @text HP Text Label
+ * @desc Status Window Item HP Text Label
+ * @parent statusWindowItemHPStyle
+ * @type struct<Point>
+ * @default {"x":"360","y":"11"}
+ * 
+ * @param statusWindowItemHPTextLabelWidth
+ * @text HP Text Label Width
+ * @desc Status Window Item HP Text Label Width
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 168
+ * 
+ * @param statusWindowItemHPTextLabelHeight
+ * @text HP Text Label Height
+ * @desc Status Window Item HP Text Label Height
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 24
+ * 
+ * @param statusWindowItemHPTextLabelFontSize
+ * @text HP Text Label Font Size
+ * @desc Status Window Item HP Text Label Font Size
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @default 24
+ * 
+ * @param statusWindowItemHPTextLabelTextColor
+ * @text HP Text Label Text Color
+ * @desc Status Window Item HP Text Label Text Color
+ * @parent statusWindowItemHPStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param statusWindowItemHPTextLabelTextOutlineColor
+ * @text HP Text Label Text Outline Color
+ * @desc Status Window Item HP Text Label Text Outline Color
+ * @parent statusWindowItemHPStyle
  * @type struct<Color>
  * @default {"r":"0","g":"0","b":"0","a":"1"}
  * 
@@ -993,6 +1100,12 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowItemClassTextColorJsonObject = JSON.parse(parameters.statusWindowItemClassTextColor);
     const statusWindowItemClassTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemClassTextOutlineColor);
 
+    const statusWindowItemHPVisible = parameters.statusWindowItemHPVisible !== "false";
+    const statusWindowItemHPOffsetJsonObject = JSON.parse(parameters.statusWindowItemHPOffset);
+    const statusWindowItemHPOffset = new Point(Number(statusWindowItemHPOffsetJsonObject.x) || 0, Number(statusWindowItemHPOffsetJsonObject.y) || 0);
+    const statusWindowItemHPWidth = Number(parameters.statusWindowItemHPWidth);
+    const statusWindowItemHPHeight = Number(parameters.statusWindowItemHPHeight);
+
     // Custom Classes
 
     class Sprite_MenuGauge extends Sprite_Gauge {
@@ -1000,6 +1113,110 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         initialize() {
             Sprite_Gauge.prototype.initialize.call(this);
         }
+
+        // redraw() {
+        //     this.bitmap.clear();
+        //     const currentValue = this.currentValue();
+        //     if (!isNaN(currentValue)) {
+        //         this.drawGauge();
+        //         if (this._statusType !== "time") {
+        //             this.drawLabel();
+        //             if (this.isValid()) {
+        //                 this.drawValue();
+        //             }
+        //         }
+        //     }
+        // };
+
+        setup(battler, statusType) {
+            this._battler = battler;
+            this._statusType = statusType;
+            this._value = this.currentValue();
+            this._maxValue = this.currentMaxValue();
+            this.width = this.bitmapWidth();
+            this.height = this.bitmapHeight();
+            this.bitmap.resize(this.bitmapWidth(), this.bitmapHeight());
+            this.updateBitmap();
+        };
+
+        bitmapWidth() {
+            switch (this._statusType) {
+                case "hp":
+                    return statusWindowItemHPWidth;
+                case "mp":
+                    return 128;
+                case "tp":
+                    return 128;
+                default:
+                    return 128;
+            }
+        };
+        
+        bitmapHeight() {
+            switch (this._statusType) {
+                case "hp":
+                    return statusWindowItemHPHeight;
+                case "mp":
+                    return 32;
+                case "tp":
+                    return 32;
+                default:
+                    return 32;
+            }
+        };
+
+        textHeight() {
+            return 24;
+        };
+        
+        gaugeHeight() {
+            return 12;
+        };
+
+        drawGauge() {
+            const gaugeX = this.gaugeX();
+            const gaugeY = this.textHeight() - this.gaugeHeight();
+            const gaugewidth = this.bitmapWidth() - gaugeX;
+            const gaugeHeight = this.gaugeHeight();
+            // console.log("this.bitmapWidth(): ", this.bitmapWidth())
+            // console.log("this.gaugeX(): ", this.gaugeX())
+            // console.log("gaugeX, gaugeY, gaugewidth, gaugeHeight: ", gaugeX, gaugeY, gaugewidth, gaugeHeight)
+            // //console.log("this: ", this)
+            this.drawGaugeRect(gaugeX, gaugeY, gaugewidth, gaugeHeight);
+        };
+        
+        drawGaugeRect(x, y, width, height) {
+            const rate = this.gaugeRate();
+            const fillW = Math.floor((width - 2) * rate);
+            const fillH = height - 2;
+            const color0 = this.gaugeBackColor();
+            const color1 = this.gaugeColor1();
+            const color2 = this.gaugeColor2();
+            //console.log("x, y, width, height: ", x, y, width, height)
+            this.bitmap.fillRect(x, y, width, height, color0);
+            this.bitmap.gradientFillRect(x + 1, y + 1, fillW, fillH, color1, color2);
+        };
+
+        setupLabelFont() {
+            this.bitmap.fontFace = this.labelFontFace();
+            this.bitmap.fontSize = this.labelFontSize();
+            this.bitmap.textColor = this.labelColor();
+            this.bitmap.outlineColor = this.labelOutlineColor();
+            this.bitmap.outlineWidth = this.labelOutlineWidth();
+        };
+
+        drawLabel() {
+            const label = this.label();
+            const x = this.labelOutlineWidth() / 2;
+            const y = this.labelY();
+            const width = this.bitmapWidth();
+            const height = this.textHeight();
+            this.setupLabelFont();
+            this.bitmap.paintOpacity = this.labelOpacity();
+            //console.log("x, y, width, height: ", x, y, width, height)
+            this.bitmap.drawText(label, x, y, width, height, "left");
+            this.bitmap.paintOpacity = 255;
+        };
 
     }
 
@@ -1454,7 +1671,16 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         if (statusWindowItemClassVisible === true) {
             this.drawActorClass(actor, x, y);
         }
-        this.placeBasicGauges(actor, x2, y + lineHeight + 11);
+        //this.placeBasicGauges(actor, x2, y + lineHeight + 11);
+        if (statusWindowItemHPVisible === true) {
+            console.log("drawActorSimpleStatus placeGauge hp--------------start")
+            this.placeGauge(actor, "hp", x + statusWindowItemHPOffset.x, y + statusWindowItemHPOffset.y);
+            console.log("drawActorSimpleStatus placeGauge hp--------------end")
+        }
+        // this.placeGauge(actor, "mp", x2, y + lineHeight + 11 + this.gaugeLineHeight());
+        // if ($dataSystem.optDisplayTp) {
+        //     this.placeGauge(actor, "tp", x2, y + lineHeight + 11 + this.gaugeLineHeight() * 2);
+        // }
     };
 
     Window_MenuStatus.prototype.drawActorName = function(actor, x, y, width) {
@@ -1510,13 +1736,13 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         this.drawText(actor.currentClass().name, x + statusWindowItemClassOffset.x, y + statusWindowItemClassOffset.y, statusWindowItemClassWidth);
     };
 
-    Window_MenuStatus.prototype.placeBasicGauges = function(actor, x, y) {
-        this.placeGauge(actor, "hp", x, y);
-        this.placeGauge(actor, "mp", x, y + this.gaugeLineHeight());
-        if ($dataSystem.optDisplayTp) {
-            this.placeGauge(actor, "tp", x, y + this.gaugeLineHeight() * 2);
-        }
-    };
+    // Window_MenuStatus.prototype.placeBasicGauges = function(actor, x, y) {
+    //     this.placeGauge(actor, "hp", x, y);
+    //     this.placeGauge(actor, "mp", x, y + this.gaugeLineHeight());
+    //     if ($dataSystem.optDisplayTp) {
+    //         this.placeGauge(actor, "tp", x, y + this.gaugeLineHeight() * 2);
+    //     }
+    // };
 
     Window_MenuStatus.prototype.placeGauge = function(actor, type, x, y) {
         const key = "actor%1-gauge-%2".format(actor.actorId(), type);
@@ -1524,6 +1750,7 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         sprite.setup(actor, type);
         sprite.move(x, y);
         sprite.show();
+        console.log("sprite: ", sprite)
     };
 
 })();
