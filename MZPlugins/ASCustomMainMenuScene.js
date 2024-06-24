@@ -818,9 +818,9 @@
  * @min 0
  * @default 32
  * 
- * @param statusWindowItemHPContainerStyleEnd
- * @text ---------------------
- * @desc Styles for the container of the HP view element
+ * @param statusWindowItemHPLabelStyleStart
+ * @text --------Label--------
+ * @desc Styles for the Label of the HP view element
  * @parent statusWindowItemHPStyle
  * @type string
  * @default
@@ -840,7 +840,7 @@
  * @desc Status Window Item HP Text Label
  * @parent statusWindowItemHPStyle
  * @type struct<Point>
- * @default {"x":"360","y":"11"}
+ * @default {"x":"1","y":"3"}
  * 
  * @param statusWindowItemHPTextLabelWidth
  * @text HP Text Label Width
@@ -848,7 +848,7 @@
  * @parent statusWindowItemHPStyle
  * @type number
  * @min 0
- * @default 168
+ * @default 128
  * 
  * @param statusWindowItemHPTextLabelHeight
  * @text HP Text Label Height
@@ -870,7 +870,7 @@
  * @desc Status Window Item HP Text Label Text Color
  * @parent statusWindowItemHPStyle
  * @type struct<Color>
- * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * @default {"r":"132","g":"170","b":"255","a":"1"}
  * 
  * @param statusWindowItemHPTextLabelTextOutlineColor
  * @text HP Text Label Text Outline Color
@@ -878,6 +878,111 @@
  * @parent statusWindowItemHPStyle
  * @type struct<Color>
  * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param statusWindowItemHPTextLabelTextOutlineWidth
+ * @text HP Text Label Text Outline Width
+ * @desc Status Window Item HP Text Label Text Outline Width
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 2
+ * 
+ * @param statusWindowItemHPIconLabelIndex
+ * @text HP Icon Label Index
+ * @desc Status Window Item HP Icon Label Index (Index of the icon in the IconSet)
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param statusWindowItemHPIconLabelOffset
+ * @text HP Icon Label Offset
+ * @desc Status Window Item HP Icon Label Offset
+ * @parent statusWindowItemHPStyle
+ * @type struct<Point>
+ * @default {"x":"1","y":"3"}
+ * 
+ * @param statusWindowItemHPIconLabelWidth
+ * @text HP Icon Label Width
+ * @desc Status Window Item HP Icon Label Width
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 32
+ * 
+ * @param statusWindowItemHPGaugeStyleEnd
+ * @text --------Gauge--------
+ * @desc Styles for the Gauge of the HP view element
+ * @parent statusWindowItemHPStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemHPGaugeOffset
+ * @text HP Gauge Offset
+ * @desc Status Window Item HP Gauge Offset
+ * @parent statusWindowItemHPStyle
+ * @type struct<Point>
+ * @default {"x":"30","y":"12"}
+ * 
+ * @param statusWindowItemHPGaugeWidth
+ * @text HP Gauge Width
+ * @desc Status Window Item HP Gauge Width
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 98
+ * 
+ * @param statusWindowItemHPGaugeHeight
+ * @text HP Gauge Height
+ * @desc Status Window Item HP Gauge Height
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 12
+ * 
+ * @param statusWindowItemHPGaugeBackColor
+ * @text HP Gauge BackColor
+ * @desc Status Window Item HP Gauge BackColor
+ * @parent statusWindowItemHPStyle
+ * @type struct<Color>
+ * @default {"r":"32","g":"32","b":"64","a":"1.0"}
+ * 
+ * @param statusWindowItemHPGaugeColor1
+ * @text HP Gauge Color1
+ * @desc Status Window Item HP Gauge Color1
+ * @parent statusWindowItemHPStyle
+ * @type struct<Color>
+ * @default {"r":"224","g":"128","b":"64","a":"1.0"}
+ * 
+ * @param statusWindowItemHPGaugeColor2
+ * @text HP Gauge Color2
+ * @desc Status Window Item HP Gauge Color2
+ * @parent statusWindowItemHPStyle
+ * @type struct<Color>
+ * @default {"r":"240","g":"192","b":"64","a":"1.0"}
+ * 
+ * @param statusWindowItemHPGaugeBorderColor
+ * @text HP Gauge Border Color
+ * @desc Status Window Item HP Gauge Border Color
+ * @parent statusWindowItemHPStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1.0"}
+ * 
+ * @param statusWindowItemHPGaugeBorderLineWidth
+ * @text HP Gauge Border Width
+ * @desc Status Window Item HP Gauge Border LineWidth
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param statusWindowItemHPGaugeBorderRadius
+ * @text HP Gauge Border Radius
+ * @desc Status Window Item HP Gauge Border Radius
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 0
  * 
  */
 
@@ -983,6 +1088,10 @@ const ASCustomMainMenuSceneNameSpace = (() => {
 
     const commandWindowCursorSelectNone = "none";
     const commandWindowCursorSelectImage = "images";
+
+    const statusWindowItemLabelFormalitySelectNone = "none";
+    const statusWindowItemLabelFormalitySelectText = "text";
+    const statusWindowItemLabelFormalitySelectIcon = "icon";
     
     const sceneCancelButtonOffsetJsonObject = JSON.parse(parameters.sceneCancelButtonOffset);
     const sceneCancelButtonOffset = new Point(Number(sceneCancelButtonOffsetJsonObject.x) || 0, Number(sceneCancelButtonOffsetJsonObject.y) || 0);
@@ -1106,6 +1215,31 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowItemHPWidth = Number(parameters.statusWindowItemHPWidth);
     const statusWindowItemHPHeight = Number(parameters.statusWindowItemHPHeight);
 
+    const statusWindowItemHPLabelFormality = parameters.statusWindowItemHPLabelFormality;
+    const statusWindowItemHPTextLabelOffsetJsonObject = JSON.parse(parameters.statusWindowItemHPTextLabelOffset);
+    const statusWindowItemHPTextLabelOffset = new Point(Number(statusWindowItemHPTextLabelOffsetJsonObject.x) || 0, Number(statusWindowItemHPTextLabelOffsetJsonObject.y) || 0);
+    const statusWindowItemHPTextLabelWidth = Number(parameters.statusWindowItemHPTextLabelWidth);
+    const statusWindowItemHPTextLabelHeight = Number(parameters.statusWindowItemHPTextLabelHeight);
+    const statusWindowItemHPTextLabelFontSize = Number(parameters.statusWindowItemHPTextLabelFontSize) || 24;
+    const statusWindowItemHPTextLabelTextColorJsonObject = JSON.parse(parameters.statusWindowItemHPTextLabelTextColor);
+    const statusWindowItemHPTextLabelTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemHPTextLabelTextOutlineColor);
+    const statusWindowItemHPTextLabelTextOutlineWidth = Number(parameters.statusWindowItemHPTextLabelTextOutlineWidth);
+    const statusWindowItemHPIconLabelIndex = Number(parameters.statusWindowItemHPIconLabelIndex);
+    const statusWindowItemHPIconLabelOffsetJsonObject = JSON.parse(parameters.statusWindowItemHPIconLabelOffset);
+    const statusWindowItemHPIconLabelOffset = new Point(Number(statusWindowItemHPIconLabelOffsetJsonObject.x) || 0, Number(statusWindowItemHPIconLabelOffsetJsonObject.y) || 0);
+    const statusWindowItemHPIconLabelWidth = Number(parameters.statusWindowItemHPIconLabelWidth);
+
+    const statusWindowItemHPGaugeOffsetJsonObject = JSON.parse(parameters.statusWindowItemHPGaugeOffset);
+    const statusWindowItemHPGaugeOffset = new Point(Number(statusWindowItemHPGaugeOffsetJsonObject.x) || 0, Number(statusWindowItemHPGaugeOffsetJsonObject.y) || 0);
+    const statusWindowItemHPGaugeWidth = Number(parameters.statusWindowItemHPGaugeWidth);
+    const statusWindowItemHPGaugeHeight = Number(parameters.statusWindowItemHPGaugeHeight);
+    const statusWindowItemHPGaugeBackColorJsonObject = JSON.parse(parameters.statusWindowItemHPGaugeBackColor);
+    const statusWindowItemHPGaugeColor1JsonObject = JSON.parse(parameters.statusWindowItemHPGaugeColor1);
+    const statusWindowItemHPGaugeColor2JsonObject = JSON.parse(parameters.statusWindowItemHPGaugeColor2);
+    const statusWindowItemHPGaugeBorderColorJsonObject = JSON.parse(parameters.statusWindowItemHPGaugeBorderColor);
+    const statusWindowItemHPGaugeBorderLineWidth = Number(parameters.statusWindowItemHPGaugeBorderLineWidth);
+    const statusWindowItemHPGaugeBorderRadius = Number(parameters.statusWindowItemHPGaugeBorderRadius);
+
     // Custom Classes
 
     class Sprite_MenuGauge extends Sprite_Gauge {
@@ -1116,6 +1250,7 @@ const ASCustomMainMenuSceneNameSpace = (() => {
 
         // redraw() {
         //     this.bitmap.clear();
+        //     this.bitmap.strokeRect(0, 0, statusWindowItemHPWidth, statusWindowItemHPHeight, colorJsonObjectConvertToColorRGBA(statusWindowItemHPTextLabelTextColorJsonObject));
         //     const currentValue = this.currentValue();
         //     if (!isNaN(currentValue)) {
         //         this.drawGauge();
@@ -1173,16 +1308,194 @@ const ASCustomMainMenuSceneNameSpace = (() => {
             return 12;
         };
 
+        setupLabelFontData(fontSize, textColor, outlineColor, outlineWidth) {
+            this.bitmap.fontFace = this.labelFontFace();
+            this.bitmap.fontSize = fontSize;
+            this.bitmap.textColor = textColor;
+            this.bitmap.outlineColor = outlineColor;
+            this.bitmap.outlineWidth = outlineWidth;
+        }
+
+        setupLabelFont() {
+            switch (this._statusType) {
+                case "hp":
+                    return this.setupLabelFontData(statusWindowItemHPTextLabelFontSize, colorJsonObjectConvertToColorRGBA(statusWindowItemHPTextLabelTextColorJsonObject), colorJsonObjectConvertToColorRGBA(statusWindowItemHPTextLabelTextOutlineColorJsonObject), statusWindowItemHPTextLabelTextOutlineWidth);
+                case "mp":
+                    return this.setupLabelFontData(this.labelFontSize(), this.labelColor(), this.labelOutlineColor(), this.labelOutlineWidth());
+                case "tp":
+                    return this.setupLabelFontData(this.labelFontSize(), this.labelColor(), this.labelOutlineColor(), this.labelOutlineWidth());;
+                default:
+                    return this.setupLabelFontData(this.labelFontSize(), this.labelColor(), this.labelOutlineColor(), this.labelOutlineWidth());;
+            }
+        };
+
+        drawIcon(iconIndex, x, y, width, height) {
+            const bitmap = ImageManager.loadSystem("IconSet");
+            const pw = ImageManager.iconWidth;
+            const ph = ImageManager.iconHeight;
+            const sx = (iconIndex % 16) * pw;
+            const sy = Math.floor(iconIndex / 16) * ph;
+            this.bitmap.blt(bitmap, sx, sy, pw, ph, x, y, width, height);
+        };
+
+        textLabelRect() {
+            switch (this._statusType) {
+                case "hp":
+                    return new Rectangle(statusWindowItemHPTextLabelOffset.x, statusWindowItemHPTextLabelOffset.y, statusWindowItemHPTextLabelWidth, statusWindowItemHPTextLabelHeight);
+                case "mp":
+                    return new Rectangle(statusWindowItemHPTextLabelOffset.x, statusWindowItemHPTextLabelOffset.y, statusWindowItemHPTextLabelWidth, statusWindowItemHPTextLabelHeight);
+                case "tp":
+                    return new Rectangle(statusWindowItemHPTextLabelOffset.x, statusWindowItemHPTextLabelOffset.y, statusWindowItemHPTextLabelWidth, statusWindowItemHPTextLabelHeight);
+                default:
+                    return new Rectangle(0, 0, 0, 0);
+            }
+        }
+
+        iconLabelRect() {
+            switch (this._statusType) {
+                case "hp":
+                    return new Rectangle(statusWindowItemHPIconLabelOffset.x, statusWindowItemHPIconLabelOffset.y, statusWindowItemHPIconLabelWidth, statusWindowItemHPIconLabelWidth);
+                case "mp":
+                    return new Rectangle(statusWindowItemHPIconLabelOffset.x, statusWindowItemHPIconLabelOffset.y, statusWindowItemHPIconLabelWidth, statusWindowItemHPIconLabelWidth);
+                case "tp":
+                    return new Rectangle(statusWindowItemHPIconLabelOffset.x, statusWindowItemHPIconLabelOffset.y, statusWindowItemHPIconLabelWidth, statusWindowItemHPIconLabelWidth);
+                default:
+                    return new Rectangle(0, 0, 0, 0);
+            }
+        }
+
+        iconIndex() {
+            switch (this._statusType) {
+                case "hp":
+                    return statusWindowItemHPIconLabelIndex;
+                case "mp":
+                    return 0;
+                case "tp":
+                    return 0;
+                default:
+                    return 0;
+            }
+        }
+
+        drawLabel() {
+            if (statusWindowItemHPLabelFormality !== statusWindowItemLabelFormalitySelectNone) {
+                if (statusWindowItemHPLabelFormality === statusWindowItemLabelFormalitySelectIcon) {
+                    const index = this.iconIndex();
+                    const rect = this.iconLabelRect();
+                    this.drawIcon(index, rect.x, rect.y, rect.width, rect.height);
+                } else {
+                    const label = this.label();
+                    const rect = this.textLabelRect();
+                    this.setupLabelFont();
+                    this.bitmap.paintOpacity = this.labelOpacity();
+                    this.bitmap.drawText(label, rect.x, rect.y, rect.width, rect.height, "left");
+                    this.bitmap.paintOpacity = 255;
+                }
+            }
+        };
+
+        gaugeBackColor() {
+            switch (this._statusType) {
+                case "hp":
+                    return colorJsonObjectConvertToColorRGBA(statusWindowItemHPGaugeBackColorJsonObject);
+                case "mp":
+                    return ColorManager.gaugeBackColor();
+                case "tp":
+                    return ColorManager.gaugeBackColor();
+                case "time":
+                    return ColorManager.gaugeBackColor();
+                default:
+                    return ColorManager.gaugeBackColor();
+            }
+        };
+        
+        gaugeColor1() {
+            switch (this._statusType) {
+                case "hp":
+                    return colorJsonObjectConvertToColorRGBA(statusWindowItemHPGaugeColor1JsonObject);
+                case "mp":
+                    return ColorManager.mpGaugeColor1();
+                case "tp":
+                    return ColorManager.tpGaugeColor1();
+                case "time":
+                    return ColorManager.ctGaugeColor1();
+                default:
+                    return ColorManager.normalColor();
+            }
+        };
+        
+        gaugeColor2() {
+            switch (this._statusType) {
+                case "hp":
+                    return colorJsonObjectConvertToColorRGBA(statusWindowItemHPGaugeColor2JsonObject);
+                case "mp":
+                    return ColorManager.mpGaugeColor2();
+                case "tp":
+                    return ColorManager.tpGaugeColor2();
+                case "time":
+                    return ColorManager.ctGaugeColor2();
+                default:
+                    return ColorManager.normalColor();
+            }
+        };
+
+        gaugeBorderColor() {
+            switch (this._statusType) {
+                case "hp":
+                    return colorJsonObjectConvertToColorRGBA(statusWindowItemHPGaugeBorderColorJsonObject);
+                case "mp":
+                    return ColorManager.normalColor();
+                case "tp":
+                    return ColorManager.normalColor();
+                case "time":
+                    return ColorManager.normalColor();
+                default:
+                    return ColorManager.normalColor();
+            }
+        };
+
+        gaugeRect() {
+            switch (this._statusType) {
+                case "hp":
+                    return new Rectangle(statusWindowItemHPGaugeOffset.x, statusWindowItemHPGaugeOffset.y, statusWindowItemHPGaugeWidth, statusWindowItemHPGaugeHeight);
+                case "mp":
+                    return new Rectangle(statusWindowItemHPGaugeOffset.x, statusWindowItemHPGaugeOffset.y, statusWindowItemHPGaugeWidth, statusWindowItemHPGaugeHeight);
+                case "tp":
+                    return new Rectangle(statusWindowItemHPGaugeOffset.x, statusWindowItemHPGaugeOffset.y, statusWindowItemHPGaugeWidth, statusWindowItemHPGaugeHeight);
+                default:
+                    return new Rectangle(0, 0, 0, 0);
+            }
+        }
+
+        gaugeBorderLineWidth() {
+            switch (this._statusType) {
+                case "hp":
+                    return statusWindowItemHPGaugeBorderLineWidth;
+                case "mp":
+                    return 0;
+                case "tp":
+                    return 0;
+                default:
+                    return 0;
+            }
+        }
+
+        gaugeBorderRadius() {
+            switch (this._statusType) {
+                case "hp":
+                    return statusWindowItemHPGaugeBorderRadius;
+                case "mp":
+                    return 0;
+                case "tp":
+                    return 0;
+                default:
+                    return 0;
+            }
+        }
+
         drawGauge() {
-            const gaugeX = this.gaugeX();
-            const gaugeY = this.textHeight() - this.gaugeHeight();
-            const gaugewidth = this.bitmapWidth() - gaugeX;
-            const gaugeHeight = this.gaugeHeight();
-            // console.log("this.bitmapWidth(): ", this.bitmapWidth())
-            // console.log("this.gaugeX(): ", this.gaugeX())
-            // console.log("gaugeX, gaugeY, gaugewidth, gaugeHeight: ", gaugeX, gaugeY, gaugewidth, gaugeHeight)
-            // //console.log("this: ", this)
-            this.drawGaugeRect(gaugeX, gaugeY, gaugewidth, gaugeHeight);
+            const rect = this.gaugeRect();
+            this.drawGaugeRect(rect.x, rect.y, rect.width, rect.height);
         };
         
         drawGaugeRect(x, y, width, height) {
@@ -1192,30 +1505,15 @@ const ASCustomMainMenuSceneNameSpace = (() => {
             const color0 = this.gaugeBackColor();
             const color1 = this.gaugeColor1();
             const color2 = this.gaugeColor2();
+            const color3 = this.gaugeBorderColor();
+            const lineWidth = this.gaugeBorderLineWidth();
+            const radius = this.gaugeBorderRadius();
             //console.log("x, y, width, height: ", x, y, width, height)
-            this.bitmap.fillRect(x, y, width, height, color0);
-            this.bitmap.gradientFillRect(x + 1, y + 1, fillW, fillH, color1, color2);
-        };
-
-        setupLabelFont() {
-            this.bitmap.fontFace = this.labelFontFace();
-            this.bitmap.fontSize = this.labelFontSize();
-            this.bitmap.textColor = this.labelColor();
-            this.bitmap.outlineColor = this.labelOutlineColor();
-            this.bitmap.outlineWidth = this.labelOutlineWidth();
-        };
-
-        drawLabel() {
-            const label = this.label();
-            const x = this.labelOutlineWidth() / 2;
-            const y = this.labelY();
-            const width = this.bitmapWidth();
-            const height = this.textHeight();
-            this.setupLabelFont();
-            this.bitmap.paintOpacity = this.labelOpacity();
-            //console.log("x, y, width, height: ", x, y, width, height)
-            this.bitmap.drawText(label, x, y, width, height, "left");
-            this.bitmap.paintOpacity = 255;
+            this.bitmap.fillRoundRect(x, y, width, height, color0, radius);
+            this.bitmap.gradientFillRoundRect(x + 1, y + 1, fillW, fillH, color1, color2, false, radius);
+            if (lineWidth > 0) {
+                this.bitmap.strokeRoundRect(x, y, width, height, color3, lineWidth, radius);
+            }
         };
 
     }
@@ -1750,7 +2048,6 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         sprite.setup(actor, type);
         sprite.move(x, y);
         sprite.show();
-        console.log("sprite: ", sprite)
     };
 
 })();
