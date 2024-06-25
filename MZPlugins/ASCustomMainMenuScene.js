@@ -836,8 +836,8 @@
  * @default text
  * 
  * @param statusWindowItemHPTextLabelOffset
- * @text HP Text Label
- * @desc Status Window Item HP Text Label
+ * @text HP Text Label Offset
+ * @desc Status Window Item HP Text Label Offset
  * @parent statusWindowItemHPStyle
  * @type struct<Point>
  * @default {"x":"1","y":"3"}
@@ -917,6 +917,15 @@
  * @type string
  * @default
  * 
+ * @param statusWindowItemHPGaugeVisible
+ * @text HP Gauge Visible
+ * @desc Status Window Item HP Gauge Visible
+ * @parent statusWindowItemHPStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
  * @param statusWindowItemHPGaugeOffset
  * @text HP Gauge Offset
  * @desc Status Window Item HP Gauge Offset
@@ -990,6 +999,100 @@
  * @parent statusWindowItemHPStyle
  * @type string
  * @default
+ * 
+ * @param statusWindowItemHPValueVisible
+ * @text HP Value Visible
+ * @desc Status Window Item HP Value Visible
+ * @parent statusWindowItemHPStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemHPMaxValueVisible
+ * @text HP Max Value Visible
+ * @desc Status Window Item HP Max Value Visible
+ * @parent statusWindowItemHPStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default false
+ * 
+ * @param statusWindowItemHPValueOffset
+ * @text HP Value Offset
+ * @desc Status Window Item HP Value Offset
+ * @parent statusWindowItemHPStyle
+ * @type struct<Point>
+ * @default {"x":"1","y":"3"}
+ * 
+ * @param statusWindowItemHPValueWidth
+ * @text HP Value Width
+ * @desc Status Window Item HP Value Width
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 128
+ * 
+ * @param statusWindowItemHPValueHeight
+ * @text HP Value Height
+ * @desc Status Window Item HP Value Height
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 24
+ * 
+ * @param statusWindowItemHPValueTextAlign
+ * @text HP Value Text Align
+ * @desc Status Window Item HP Value Text Align
+ * @parent statusWindowItemHPStyle
+ * @type select
+ * @option center
+ * @option left
+ * @option right
+ * @default right
+ * 
+ * @param statusWindowItemHPValueFontSize
+ * @text HP Value Font Size
+ * @desc Status Window Item HP Value Font Size
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @default 20
+ * 
+ * @param statusWindowItemHPNormalValueTextColor
+ * @text HP Normal Value Text Color
+ * @desc Status Window Item HP Normal Value Text Color
+ * @parent statusWindowItemHPStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param statusWindowItemHPDeathValueTextColor
+ * @text HP Death Value Text Color
+ * @desc Status Window Item HP Death Value Text Color
+ * @parent statusWindowItemHPStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"32","b":"32","a":"1"}
+ * 
+ * @param statusWindowItemHPCrisisValueTextColor
+ * @text HP Crisis Value Text Color
+ * @desc Status Window Item HP Crisis Value Text Color
+ * @parent statusWindowItemHPStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"64","a":"1"}
+ * 
+ * @param statusWindowItemHPValueTextOutlineColor
+ * @text HP Value Text Outline Color
+ * @desc Status Window Item HP Value Text Outline Color
+ * @parent statusWindowItemHPStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param statusWindowItemHPValueTextOutlineWidth
+ * @text HP Value Text Outline Width
+ * @desc Status Window Item HP Value Text Outline Width
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 2
  * 
  */
 
@@ -1236,6 +1339,7 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowItemHPIconLabelOffset = new Point(Number(statusWindowItemHPIconLabelOffsetJsonObject.x) || 0, Number(statusWindowItemHPIconLabelOffsetJsonObject.y) || 0);
     const statusWindowItemHPIconLabelWidth = Number(parameters.statusWindowItemHPIconLabelWidth);
 
+    const statusWindowItemHPGaugeVisible = parameters.statusWindowItemHPGaugeVisible !== "false";
     const statusWindowItemHPGaugeOffsetJsonObject = JSON.parse(parameters.statusWindowItemHPGaugeOffset);
     const statusWindowItemHPGaugeOffset = new Point(Number(statusWindowItemHPGaugeOffsetJsonObject.x) || 0, Number(statusWindowItemHPGaugeOffsetJsonObject.y) || 0);
     const statusWindowItemHPGaugeWidth = Number(parameters.statusWindowItemHPGaugeWidth);
@@ -1246,6 +1350,20 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowItemHPGaugeBorderColorJsonObject = JSON.parse(parameters.statusWindowItemHPGaugeBorderColor);
     const statusWindowItemHPGaugeBorderLineWidth = Number(parameters.statusWindowItemHPGaugeBorderLineWidth);
     const statusWindowItemHPGaugeBorderRadius = Number(parameters.statusWindowItemHPGaugeBorderRadius);
+
+    const statusWindowItemHPValueVisible = parameters.statusWindowItemHPValueVisible !== "false";
+    const statusWindowItemHPMaxValueVisible = parameters.statusWindowItemHPMaxValueVisible !== "false";
+    const statusWindowItemHPValueOffsetJsonObject = JSON.parse(parameters.statusWindowItemHPValueOffset);
+    const statusWindowItemHPValueOffset = new Point(Number(statusWindowItemHPValueOffsetJsonObject.x) || 0, Number(statusWindowItemHPValueOffsetJsonObject.y) || 0);
+    const statusWindowItemHPValueWidth = Number(parameters.statusWindowItemHPValueWidth);
+    const statusWindowItemHPValueHeight = Number(parameters.statusWindowItemHPValueHeight);
+    const statusWindowItemHPValueTextAlign = parameters.statusWindowItemHPValueTextAlign;
+    const statusWindowItemHPValueFontSize = Number(parameters.statusWindowItemHPValueFontSize) || 24;
+    const statusWindowItemHPNormalValueTextColorJsonObject = JSON.parse(parameters.statusWindowItemHPNormalValueTextColor);
+    const statusWindowItemHPDeathValueTextColorJsonObject = JSON.parse(parameters.statusWindowItemHPDeathValueTextColor);
+    const statusWindowItemHPCrisisValueTextColorJsonObject = JSON.parse(parameters.statusWindowItemHPCrisisValueTextColor);
+    const statusWindowItemHPValueTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemHPValueTextOutlineColor);
+    const statusWindowItemHPValueTextOutlineWidth = Number(parameters.statusWindowItemHPValueTextOutlineWidth);
 
     // Custom Classes
 
@@ -1270,6 +1388,16 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         //     }
         // };
 
+        determiningHPValueColorJsonObject() {
+            if (this._battler.isDead()) {
+                return statusWindowItemHPDeathValueTextColorJsonObject;
+            } else if (this._battler.isDying()) {
+                return statusWindowItemHPCrisisValueTextColorJsonObject;
+            } else {
+                return statusWindowItemHPNormalValueTextColorJsonObject;
+            }
+        }
+
         setupAllData() {
             switch (this._statusType) {
                 case "hp":
@@ -1281,6 +1409,7 @@ const ASCustomMainMenuSceneNameSpace = (() => {
                     this.textLabelRect = new Rectangle(statusWindowItemHPTextLabelOffset.x, statusWindowItemHPTextLabelOffset.y, statusWindowItemHPTextLabelWidth, statusWindowItemHPTextLabelHeight);
                     this.iconLabelRect = new Rectangle(statusWindowItemHPIconLabelOffset.x, statusWindowItemHPIconLabelOffset.y, statusWindowItemHPIconLabelWidth, statusWindowItemHPIconLabelWidth);
                     this.iconIndex = statusWindowItemHPIconLabelIndex;
+                    this.gaugeVisible = statusWindowItemHPGaugeVisible;
                     this.gaugeBackColorRGBA = colorJsonObjectConvertToColorRGBA(statusWindowItemHPGaugeBackColorJsonObject);
                     this.gaugeColor1RGBA = colorJsonObjectConvertToColorRGBA(statusWindowItemHPGaugeColor1JsonObject);
                     this.gaugeColor2RGBA = colorJsonObjectConvertToColorRGBA(statusWindowItemHPGaugeColor2JsonObject);
@@ -1288,6 +1417,14 @@ const ASCustomMainMenuSceneNameSpace = (() => {
                     this.gaugeRect = new Rectangle(statusWindowItemHPGaugeOffset.x, statusWindowItemHPGaugeOffset.y, statusWindowItemHPGaugeWidth, statusWindowItemHPGaugeHeight);
                     this.gaugeBorderLineWidth = statusWindowItemHPGaugeBorderLineWidth;
                     this.gaugeBorderRadius = statusWindowItemHPGaugeBorderRadius;
+                    this.valueVisible = statusWindowItemHPValueVisible;
+                    this.valueMaxVisible = statusWindowItemHPMaxValueVisible;
+                    this.valueRect = new Rectangle(statusWindowItemHPValueOffset.x, statusWindowItemHPValueOffset.y, statusWindowItemHPValueWidth, statusWindowItemHPValueHeight);
+                    this.bitmapValueTextAlign = statusWindowItemHPValueTextAlign;
+                    this.bitmapValueFontSize = statusWindowItemHPValueFontSize;
+                    this.bitmapValueTextColor = colorJsonObjectConvertToColorRGBA(this.determiningHPValueColorJsonObject());
+                    this.bitmapValueOutlineColor = colorJsonObjectConvertToColorRGBA(statusWindowItemHPValueTextOutlineColorJsonObject);
+                    this.bitmapValueOutlineWidth = statusWindowItemHPValueTextOutlineWidth;
                 case "mp":
                     
                 case "tp":
@@ -1340,8 +1477,10 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         };
 
         drawGauge() {
-            const rect = this.gaugeRect;
-            this.drawGaugeRect(rect.x, rect.y, rect.width, rect.height);
+            if (this.gaugeVisible === true) {
+                const rect = this.gaugeRect;
+                this.drawGaugeRect(rect.x, rect.y, rect.width, rect.height);
+            }
         };
         
         drawGaugeRect(x, y, width, height) {
@@ -1354,11 +1493,30 @@ const ASCustomMainMenuSceneNameSpace = (() => {
             const color3 = this.gaugeBorderColorRGBA;
             const lineWidth = this.gaugeBorderLineWidth;
             const radius = this.gaugeBorderRadius;
-            //console.log("x, y, width, height: ", x, y, width, height)
             this.bitmap.fillRoundRect(x, y, width, height, color0, radius);
             this.bitmap.gradientFillRoundRect(x + 1, y + 1, fillW, fillH, color1, color2, false, radius);
             if (lineWidth > 0) {
                 this.bitmap.strokeRoundRect(x, y, width, height, color3, lineWidth, radius);
+            }
+        };
+
+        drawValue() {
+            if (this.valueVisible === true) {
+                let currentValue = this.currentValue();
+                if (this.valueMaxVisible === true) {
+                    currentValue = currentValue + "/" + this.currentMaxValue();
+                }
+                const x = this.valueRect.x;
+                const y = this.valueRect.y;
+                const width = this.valueRect.width;
+                const height = this.valueRect.height;
+                this.bitmap.fontFace = this.valueFontFace();
+                this.bitmap.fontSize = this.bitmapValueFontSize;
+                this.bitmap.textColor = this.bitmapValueTextColor;
+                this.bitmap.outlineColor = this.bitmapValueOutlineColor;
+                this.bitmap.outlineWidth = this.bitmapValueOutlineWidth;
+                //console.log("x, y, width, height: ", x, y, width, height)
+                this.bitmap.drawText(currentValue, x, y, width, height, this.bitmapValueTextAlign);
             }
         };
 
