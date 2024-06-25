@@ -910,7 +910,7 @@
  * @min 0
  * @default 32
  * 
- * @param statusWindowItemHPGaugeStyleEnd
+ * @param statusWindowItemHPGaugeStyleStart
  * @text --------Gauge--------
  * @desc Styles for the Gauge of the HP view element
  * @parent statusWindowItemHPStyle
@@ -983,6 +983,13 @@
  * @type number
  * @min 0
  * @default 0
+ * 
+ * @param statusWindowItemHPValueStyleStart
+ * @text --------Value--------
+ * @desc Styles for the Value of the HP view element
+ * @parent statusWindowItemHPStyle
+ * @type string
+ * @default
  * 
  */
 
@@ -1263,70 +1270,43 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         //     }
         // };
 
+        setupAllData() {
+            switch (this._statusType) {
+                case "hp":
+                    this.bitmapSize = {width: statusWindowItemHPWidth, height: statusWindowItemHPHeight};
+                    this.bitmapLabelFontSize = statusWindowItemHPTextLabelFontSize;
+                    this.bitmapLabelTextColor = colorJsonObjectConvertToColorRGBA(statusWindowItemHPTextLabelTextColorJsonObject);
+                    this.bitmapLabelOutlineColor = colorJsonObjectConvertToColorRGBA(statusWindowItemHPTextLabelTextOutlineColorJsonObject);
+                    this.bitmapLabelOutlineWidth = statusWindowItemHPTextLabelTextOutlineWidth;
+                    this.textLabelRect = new Rectangle(statusWindowItemHPTextLabelOffset.x, statusWindowItemHPTextLabelOffset.y, statusWindowItemHPTextLabelWidth, statusWindowItemHPTextLabelHeight);
+                    this.iconLabelRect = new Rectangle(statusWindowItemHPIconLabelOffset.x, statusWindowItemHPIconLabelOffset.y, statusWindowItemHPIconLabelWidth, statusWindowItemHPIconLabelWidth);
+                    this.iconIndex = statusWindowItemHPIconLabelIndex;
+                    this.gaugeBackColorRGBA = colorJsonObjectConvertToColorRGBA(statusWindowItemHPGaugeBackColorJsonObject);
+                    this.gaugeColor1RGBA = colorJsonObjectConvertToColorRGBA(statusWindowItemHPGaugeColor1JsonObject);
+                    this.gaugeColor2RGBA = colorJsonObjectConvertToColorRGBA(statusWindowItemHPGaugeColor2JsonObject);
+                    this.gaugeBorderColorRGBA = colorJsonObjectConvertToColorRGBA(statusWindowItemHPGaugeBorderColorJsonObject);
+                    this.gaugeRect = new Rectangle(statusWindowItemHPGaugeOffset.x, statusWindowItemHPGaugeOffset.y, statusWindowItemHPGaugeWidth, statusWindowItemHPGaugeHeight);
+                    this.gaugeBorderLineWidth = statusWindowItemHPGaugeBorderLineWidth;
+                    this.gaugeBorderRadius = statusWindowItemHPGaugeBorderRadius;
+                case "mp":
+                    
+                case "tp":
+                    
+                default:
+                    
+            }
+        }
+
         setup(battler, statusType) {
             this._battler = battler;
             this._statusType = statusType;
             this._value = this.currentValue();
             this._maxValue = this.currentMaxValue();
-            this.width = this.bitmapWidth();
-            this.height = this.bitmapHeight();
-            this.bitmap.resize(this.bitmapWidth(), this.bitmapHeight());
+            this.setupAllData();
+            this.width = this.bitmapSize.width;
+            this.height = this.bitmapSize.height;
+            this.bitmap.resize(this.bitmapSize.width, this.bitmapSize.height);
             this.updateBitmap();
-        };
-
-        bitmapWidth() {
-            switch (this._statusType) {
-                case "hp":
-                    return statusWindowItemHPWidth;
-                case "mp":
-                    return 128;
-                case "tp":
-                    return 128;
-                default:
-                    return 128;
-            }
-        };
-        
-        bitmapHeight() {
-            switch (this._statusType) {
-                case "hp":
-                    return statusWindowItemHPHeight;
-                case "mp":
-                    return 32;
-                case "tp":
-                    return 32;
-                default:
-                    return 32;
-            }
-        };
-
-        textHeight() {
-            return 24;
-        };
-        
-        gaugeHeight() {
-            return 12;
-        };
-
-        setupLabelFontData(fontSize, textColor, outlineColor, outlineWidth) {
-            this.bitmap.fontFace = this.labelFontFace();
-            this.bitmap.fontSize = fontSize;
-            this.bitmap.textColor = textColor;
-            this.bitmap.outlineColor = outlineColor;
-            this.bitmap.outlineWidth = outlineWidth;
-        }
-
-        setupLabelFont() {
-            switch (this._statusType) {
-                case "hp":
-                    return this.setupLabelFontData(statusWindowItemHPTextLabelFontSize, colorJsonObjectConvertToColorRGBA(statusWindowItemHPTextLabelTextColorJsonObject), colorJsonObjectConvertToColorRGBA(statusWindowItemHPTextLabelTextOutlineColorJsonObject), statusWindowItemHPTextLabelTextOutlineWidth);
-                case "mp":
-                    return this.setupLabelFontData(this.labelFontSize(), this.labelColor(), this.labelOutlineColor(), this.labelOutlineWidth());
-                case "tp":
-                    return this.setupLabelFontData(this.labelFontSize(), this.labelColor(), this.labelOutlineColor(), this.labelOutlineWidth());;
-                default:
-                    return this.setupLabelFontData(this.labelFontSize(), this.labelColor(), this.labelOutlineColor(), this.labelOutlineWidth());;
-            }
         };
 
         drawIcon(iconIndex, x, y, width, height) {
@@ -1338,55 +1318,20 @@ const ASCustomMainMenuSceneNameSpace = (() => {
             this.bitmap.blt(bitmap, sx, sy, pw, ph, x, y, width, height);
         };
 
-        textLabelRect() {
-            switch (this._statusType) {
-                case "hp":
-                    return new Rectangle(statusWindowItemHPTextLabelOffset.x, statusWindowItemHPTextLabelOffset.y, statusWindowItemHPTextLabelWidth, statusWindowItemHPTextLabelHeight);
-                case "mp":
-                    return new Rectangle(statusWindowItemHPTextLabelOffset.x, statusWindowItemHPTextLabelOffset.y, statusWindowItemHPTextLabelWidth, statusWindowItemHPTextLabelHeight);
-                case "tp":
-                    return new Rectangle(statusWindowItemHPTextLabelOffset.x, statusWindowItemHPTextLabelOffset.y, statusWindowItemHPTextLabelWidth, statusWindowItemHPTextLabelHeight);
-                default:
-                    return new Rectangle(0, 0, 0, 0);
-            }
-        }
-
-        iconLabelRect() {
-            switch (this._statusType) {
-                case "hp":
-                    return new Rectangle(statusWindowItemHPIconLabelOffset.x, statusWindowItemHPIconLabelOffset.y, statusWindowItemHPIconLabelWidth, statusWindowItemHPIconLabelWidth);
-                case "mp":
-                    return new Rectangle(statusWindowItemHPIconLabelOffset.x, statusWindowItemHPIconLabelOffset.y, statusWindowItemHPIconLabelWidth, statusWindowItemHPIconLabelWidth);
-                case "tp":
-                    return new Rectangle(statusWindowItemHPIconLabelOffset.x, statusWindowItemHPIconLabelOffset.y, statusWindowItemHPIconLabelWidth, statusWindowItemHPIconLabelWidth);
-                default:
-                    return new Rectangle(0, 0, 0, 0);
-            }
-        }
-
-        iconIndex() {
-            switch (this._statusType) {
-                case "hp":
-                    return statusWindowItemHPIconLabelIndex;
-                case "mp":
-                    return 0;
-                case "tp":
-                    return 0;
-                default:
-                    return 0;
-            }
-        }
-
         drawLabel() {
             if (statusWindowItemHPLabelFormality !== statusWindowItemLabelFormalitySelectNone) {
                 if (statusWindowItemHPLabelFormality === statusWindowItemLabelFormalitySelectIcon) {
-                    const index = this.iconIndex();
-                    const rect = this.iconLabelRect();
+                    const index = this.iconIndex;
+                    const rect = this.iconLabelRect;
                     this.drawIcon(index, rect.x, rect.y, rect.width, rect.height);
                 } else {
                     const label = this.label();
-                    const rect = this.textLabelRect();
-                    this.setupLabelFont();
+                    const rect = this.textLabelRect;
+                    this.bitmap.fontFace = this.labelFontFace();
+                    this.bitmap.fontSize = this.bitmapLabelFontSize;
+                    this.bitmap.textColor = this.bitmapLabelTextColor;
+                    this.bitmap.outlineColor = this.bitmapLabelOutlineColor;
+                    this.bitmap.outlineWidth = this.bitmapLabelOutlineWidth;
                     this.bitmap.paintOpacity = this.labelOpacity();
                     this.bitmap.drawText(label, rect.x, rect.y, rect.width, rect.height, "left");
                     this.bitmap.paintOpacity = 255;
@@ -1394,107 +1339,8 @@ const ASCustomMainMenuSceneNameSpace = (() => {
             }
         };
 
-        gaugeBackColor() {
-            switch (this._statusType) {
-                case "hp":
-                    return colorJsonObjectConvertToColorRGBA(statusWindowItemHPGaugeBackColorJsonObject);
-                case "mp":
-                    return ColorManager.gaugeBackColor();
-                case "tp":
-                    return ColorManager.gaugeBackColor();
-                case "time":
-                    return ColorManager.gaugeBackColor();
-                default:
-                    return ColorManager.gaugeBackColor();
-            }
-        };
-        
-        gaugeColor1() {
-            switch (this._statusType) {
-                case "hp":
-                    return colorJsonObjectConvertToColorRGBA(statusWindowItemHPGaugeColor1JsonObject);
-                case "mp":
-                    return ColorManager.mpGaugeColor1();
-                case "tp":
-                    return ColorManager.tpGaugeColor1();
-                case "time":
-                    return ColorManager.ctGaugeColor1();
-                default:
-                    return ColorManager.normalColor();
-            }
-        };
-        
-        gaugeColor2() {
-            switch (this._statusType) {
-                case "hp":
-                    return colorJsonObjectConvertToColorRGBA(statusWindowItemHPGaugeColor2JsonObject);
-                case "mp":
-                    return ColorManager.mpGaugeColor2();
-                case "tp":
-                    return ColorManager.tpGaugeColor2();
-                case "time":
-                    return ColorManager.ctGaugeColor2();
-                default:
-                    return ColorManager.normalColor();
-            }
-        };
-
-        gaugeBorderColor() {
-            switch (this._statusType) {
-                case "hp":
-                    return colorJsonObjectConvertToColorRGBA(statusWindowItemHPGaugeBorderColorJsonObject);
-                case "mp":
-                    return ColorManager.normalColor();
-                case "tp":
-                    return ColorManager.normalColor();
-                case "time":
-                    return ColorManager.normalColor();
-                default:
-                    return ColorManager.normalColor();
-            }
-        };
-
-        gaugeRect() {
-            switch (this._statusType) {
-                case "hp":
-                    return new Rectangle(statusWindowItemHPGaugeOffset.x, statusWindowItemHPGaugeOffset.y, statusWindowItemHPGaugeWidth, statusWindowItemHPGaugeHeight);
-                case "mp":
-                    return new Rectangle(statusWindowItemHPGaugeOffset.x, statusWindowItemHPGaugeOffset.y, statusWindowItemHPGaugeWidth, statusWindowItemHPGaugeHeight);
-                case "tp":
-                    return new Rectangle(statusWindowItemHPGaugeOffset.x, statusWindowItemHPGaugeOffset.y, statusWindowItemHPGaugeWidth, statusWindowItemHPGaugeHeight);
-                default:
-                    return new Rectangle(0, 0, 0, 0);
-            }
-        }
-
-        gaugeBorderLineWidth() {
-            switch (this._statusType) {
-                case "hp":
-                    return statusWindowItemHPGaugeBorderLineWidth;
-                case "mp":
-                    return 0;
-                case "tp":
-                    return 0;
-                default:
-                    return 0;
-            }
-        }
-
-        gaugeBorderRadius() {
-            switch (this._statusType) {
-                case "hp":
-                    return statusWindowItemHPGaugeBorderRadius;
-                case "mp":
-                    return 0;
-                case "tp":
-                    return 0;
-                default:
-                    return 0;
-            }
-        }
-
         drawGauge() {
-            const rect = this.gaugeRect();
+            const rect = this.gaugeRect;
             this.drawGaugeRect(rect.x, rect.y, rect.width, rect.height);
         };
         
@@ -1502,12 +1348,12 @@ const ASCustomMainMenuSceneNameSpace = (() => {
             const rate = this.gaugeRate();
             const fillW = Math.floor((width - 2) * rate);
             const fillH = height - 2;
-            const color0 = this.gaugeBackColor();
-            const color1 = this.gaugeColor1();
-            const color2 = this.gaugeColor2();
-            const color3 = this.gaugeBorderColor();
-            const lineWidth = this.gaugeBorderLineWidth();
-            const radius = this.gaugeBorderRadius();
+            const color0 = this.gaugeBackColorRGBA;
+            const color1 = this.gaugeColor1RGBA;
+            const color2 = this.gaugeColor2RGBA;
+            const color3 = this.gaugeBorderColorRGBA;
+            const lineWidth = this.gaugeBorderLineWidth;
+            const radius = this.gaugeBorderRadius;
             //console.log("x, y, width, height: ", x, y, width, height)
             this.bitmap.fillRoundRect(x, y, width, height, color0, radius);
             this.bitmap.gradientFillRoundRect(x + 1, y + 1, fillW, fillH, color1, color2, false, radius);
