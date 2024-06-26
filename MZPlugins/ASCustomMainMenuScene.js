@@ -376,6 +376,38 @@
  * @option 4
  * @default 1
  * 
+ * @param statusWindowCursor
+ * @text Cursor
+ * @desc Status Window Cursor
+ * @parent statusWindowSet
+ * @type select
+ * @option none
+ * @option images
+ * @default none
+ * 
+ * @param statusWindowCursorImages
+ * @text Cursor Images
+ * @desc Status Window Cursor Images
+ * @parent statusWindowCursor
+ * @type file[]
+ * @dir img/
+ * @default []
+ * 
+ * @param statusWindowCursorOffset
+ * @text Cursor Offset
+ * @desc Status Window Cursor Offset
+ * @parent statusWindowCursor
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
+ * 
+ * @param statusWindowCursorAnimationSpeed
+ * @text Cursor Animation Speed
+ * @desc Status Window Cursor Animation Speed
+ * @parent statusWindowCursor
+ * @type number
+ * @min 1
+ * @default 1
+ * 
  * @param statusWindowItemStyle
  * @text Item Style
  * @desc Status Window Item Style
@@ -496,7 +528,7 @@
  * @default 0
  * 
  * @param statusWindowItemFaceImageStyle
- * @text Face Image Style
+ * @text Item Face Image Style
  * @desc Status Window Item Face Image Style
  * @parent statusWindowItemStyle
  * @type string
@@ -1023,7 +1055,7 @@
  * @desc Status Window Item HP Value Offset
  * @parent statusWindowItemHPStyle
  * @type struct<Point>
- * @default {"x":"1","y":"3"}
+ * @default {"x":"0","y":"0"}
  * 
  * @param statusWindowItemHPValueWidth
  * @text HP Value Width
@@ -1345,7 +1377,7 @@
  * @desc Status Window Item MP Value Offset
  * @parent statusWindowItemMPStyle
  * @type struct<Point>
- * @default {"x":"1","y":"3"}
+ * @default {"x":"0","y":"0"}
  * 
  * @param statusWindowItemMPValueWidth
  * @text MP Value Width
@@ -1653,7 +1685,7 @@
  * @desc Status Window Item TP Value Offset
  * @parent statusWindowItemTPStyle
  * @type struct<Point>
- * @default {"x":"1","y":"3"}
+ * @default {"x":"0","y":"0"}
  * 
  * @param statusWindowItemTPValueWidth
  * @text TP Value Width
@@ -1785,6 +1817,9 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const commandWindowCursorSelectNone = "none";
     const commandWindowCursorSelectImage = "images";
 
+    const statusWindowCursorSelectNone = "none";
+    const statusWindowCursorSelectImage = "images";
+
     const statusWindowItemLabelFormalitySelectNone = "none";
     const statusWindowItemLabelFormalitySelectText = "text";
     const statusWindowItemLabelFormalitySelectIcon = "icon";
@@ -1844,6 +1879,12 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowRowSpacing = Number(parameters.statusWindowRowSpacing);
     const statusWindowColSpacing = Number(parameters.statusWindowColSpacing);
     const statusWindowMaxCols = Number(parameters.statusWindowMaxCols) || 1;
+
+    const statusWindowCursor = parameters.statusWindowCursor;
+    const statusWindowCursorImagesJsonObject = JSON.parse(parameters.statusWindowCursorImages !== undefined ? parameters.statusWindowCursorImages : "[]");
+    const statusWindowCursorOffsetJsonObject = JSON.parse(parameters.statusWindowCursorOffset); 
+    const statusWindowCursorOffset = new Point(Number(statusWindowCursorOffsetJsonObject.x) || 0, Number(statusWindowCursorOffsetJsonObject.y) || 0);
+    const statusWindowCursorAnimationSpeed = Number(parameters.statusWindowCursorAnimationSpeed);
 
     const statusWindowItemBGOffsetJsonObject = JSON.parse(parameters.statusWindowItemBGOffset);
     const statusWindowItemBGOffset = new Point(Number(statusWindowItemBGOffsetJsonObject.x) || 0, Number(statusWindowItemBGOffsetJsonObject.y) || 0);
@@ -2051,21 +2092,6 @@ const ASCustomMainMenuSceneNameSpace = (() => {
             Sprite_Gauge.prototype.initialize.call(this);
         }
 
-        // redraw() {
-        //     this.bitmap.clear();
-        //     this.bitmap.strokeRect(0, 0, statusWindowItemHPWidth, statusWindowItemHPHeight, colorJsonObjectConvertToColorRGBA(statusWindowItemHPTextLabelTextColorJsonObject));
-        //     const currentValue = this.currentValue();
-        //     if (!isNaN(currentValue)) {
-        //         this.drawGauge();
-        //         if (this._statusType !== "time") {
-        //             this.drawLabel();
-        //             if (this.isValid()) {
-        //                 this.drawValue();
-        //             }
-        //         }
-        //     }
-        // };
-
         determiningHPValueColorJsonObject() {
             if (this._battler.isDead()) {
                 return statusWindowItemHPDeathValueTextColorJsonObject;
@@ -2229,22 +2255,6 @@ const ASCustomMainMenuSceneNameSpace = (() => {
             if (lineWidth > 0) {
                 this.bitmap.strokeRoundRect(x, y, width, height, color3, lineWidth, radius);
             }
-        };
-
-        currentValue() {
-            if (this._battler) {
-                switch (this._statusType) {
-                    case "hp":
-                        return this._battler.hp;
-                    case "mp":
-                        return this._battler.mp;
-                    case "tp":
-                        return this._battler.tp;
-                    case "time":
-                        return this._battler.tpbChargeTime();
-                }
-            }
-            return NaN;
         };
 
         drawValue() {
@@ -2536,6 +2546,26 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         }
     }
 
+    const _Window_Menu_Command_Activate = Window_MenuCommand.prototype.activate;
+    Window_MenuCommand.prototype.activate = function() {
+        _Window_Menu_Command_Activate.apply(this, arguments);
+        if (commandWindowCursor === commandWindowCursorSelectImage && commandWindowCursorImagesJsonObject.length > 1) {
+            if (this._cursorSprite.children[0].children[0]._playing === false) {
+                this._cursorSprite.children[0].children[0].gotoAndPlay(0);
+            }
+        }
+    }
+
+    const _Window_Menu_Command_Deactivate = Window_MenuCommand.prototype.deactivate;
+    Window_MenuCommand.prototype.deactivate = function() {
+        _Window_Menu_Command_Deactivate.apply(this, arguments);
+        if (commandWindowCursor === commandWindowCursorSelectImage && commandWindowCursorImagesJsonObject.length > 1) {
+            if (this._cursorSprite.children[0].children[0]._playing === true) {
+                this._cursorSprite.children[0].children[0].gotoAndStop(0);
+            }
+        }
+    }
+
     //const _Window_Menu_Command_Draw_Background_Rect = Window_MenuCommand.prototype.drawBackgroundRect;
     Window_MenuCommand.prototype.drawBackgroundRect = function(rect) {
         //_Window_Menu_Command_Draw_Background_Rect.apply(this, arguments);
@@ -2641,6 +2671,105 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         maxCols = statusWindowMaxCols;
         return maxCols;
     };
+
+    const _Window_Menu_Status_Create_Cursor_Sprite = Window_MenuStatus.prototype._createCursorSprite;
+    Window_MenuStatus.prototype._createCursorSprite = function() {
+        _Window_Menu_Status_Create_Cursor_Sprite.apply(this, arguments);
+        if (statusWindowCursor === statusWindowCursorSelectImage && statusWindowCursorImagesJsonObject.length !== 0) {
+            if (statusWindowCursorImagesJsonObject.length === 1) {
+                this._cursorSprite = new Sprite();
+                this._cursorSprite.addChild(new Sprite());
+                this._cursorSprite.children[0].bitmap = ImageManager.loadBitmap("img/", statusWindowCursorImagesJsonObject[0]);
+                this._cursorSprite.children[0].move(statusWindowCursorOffset.x, statusWindowCursorOffset.y); // 居中微调
+                this._clientArea.addChild(this._cursorSprite);
+            } else {
+                this._cursorSprite = new Sprite();
+
+                const statusWindowCursorImagesPathArray = [];
+                for (const image of statusWindowCursorImagesJsonObject) {
+                    statusWindowCursorImagesPathArray.push("img/" + image + ".png")
+                }
+                const animatedSprite = new PIXI.AnimatedSprite.fromImages(statusWindowCursorImagesPathArray);
+
+                animatedSprite.animationSpeed = statusWindowCursorAnimationSpeed / 10.0;
+                animatedSprite.x = statusWindowCursorOffset.x;
+                animatedSprite.y = statusWindowCursorOffset.y;
+            
+                animatedSprite.gotoAndPlay(0);
+                
+                const animatedSpriteContainer = new PIXI.Container();
+                animatedSpriteContainer.addChild(animatedSprite);
+                
+                this._cursorSprite.addChild(animatedSpriteContainer);
+                this._clientArea.addChild(this._cursorSprite);
+            }
+        }
+    }
+
+    const _Window_Menu_Status_Update_Cursor = Window_MenuStatus.prototype._updateCursor;
+    Window_MenuStatus.prototype._updateCursor = function() {
+        if (statusWindowCursor === statusWindowCursorSelectImage && statusWindowCursorImagesJsonObject.length !== 0) {
+            this._cursorSprite.visible = this.active && this.cursorVisible;
+            this._cursorSprite.x = this._cursorRect.x;
+            this._cursorSprite.y = this._cursorRect.y;
+        } else {
+            _Window_Menu_Status_Update_Cursor.apply(this, arguments);
+        }
+    }
+
+    const _Window_Menu_Status_Refresh_Cursor = Window_MenuStatus.prototype._refreshCursor;
+    Window_MenuStatus.prototype._refreshCursor = function() {
+        if (statusWindowCursor === statusWindowCursorSelectNone || statusWindowCursorImagesJsonObject.length === 0) {
+            _Window_Menu_Status_Refresh_Cursor.apply(this, arguments);
+        }
+    }
+
+    //this._statusWindow._cursorSprite.children[0].children[0].gotoAndPlay(0);
+
+    // Scene_Menu.prototype.onFormationOk = function() {
+    //     console.log("Scene_Menu.prototype.onFormationOk");
+    //     const index = this._statusWindow.index();
+    //     const pendingIndex = this._statusWindow.pendingIndex();
+    //     if (pendingIndex >= 0) {
+    //         $gameParty.swapOrder(index, pendingIndex);
+    //         this._statusWindow.setPendingIndex(-1);
+    //         this._statusWindow.redrawItem(index);
+    //     } else {
+    //         this._statusWindow.setPendingIndex(index);
+    //     }
+    //     this._statusWindow.activate();
+    // };
+    
+    // Scene_Menu.prototype.onFormationCancel = function() {
+    //     console.log("Scene_Menu.prototype.onFormationCancel");
+    //     if (this._statusWindow.pendingIndex() >= 0) {
+    //         this._statusWindow.setPendingIndex(-1);
+    //         this._statusWindow.activate();
+    //     } else {
+    //         this._statusWindow.deselect();
+    //         this._commandWindow.activate();
+    //     }
+    // };
+
+    // const _Window_Menu_Command_Activate = Window_MenuCommand.prototype.activate;
+    // Window_MenuCommand.prototype.activate = function() {
+    //     _Window_Menu_Command_Activate.apply(this, arguments);
+    //     if (commandWindowCursor === commandWindowCursorSelectImage && commandWindowCursorImagesJsonObject.length > 1) {
+    //         if (this._cursorSprite.children[0].children[0]._playing === false) {
+    //             this._cursorSprite.children[0].children[0].gotoAndPlay(0);
+    //         }
+    //     }
+    // }
+
+    // const _Window_Menu_Command_Deactivate = Window_MenuCommand.prototype.deactivate;
+    // Window_MenuCommand.prototype.deactivate = function() {
+    //     _Window_Menu_Command_Deactivate.apply(this, arguments);
+    //     if (commandWindowCursor === commandWindowCursorSelectImage && commandWindowCursorImagesJsonObject.length > 1) {
+    //         if (this._cursorSprite.children[0].children[0]._playing === true) {
+    //             this._cursorSprite.children[0].children[0].gotoAndStop(0);
+    //         }
+    //     }
+    // }
 
     Window_MenuStatus.prototype.drawItemImage = function(index) {
         if (statusWindowItemFaceImageVisible === true) {
