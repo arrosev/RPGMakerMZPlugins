@@ -282,22 +282,6 @@
  * @type struct<Color>
  * @default {"r":"0","g":"0","b":"0","a":"1"}
  * 
- * @param goldWindowSet
- * @text Gold Window Set
- * @desc Gold Window Set
- * @parent mainMenuSceneSet
- * @type string
- * @default
- * 
- * @param goldWindowVisible
- * @text Visible
- * @desc Gold Window Visible
- * @parent goldWindowSet
- * @type boolean
- * @on Show
- * @off Hide
- * @default true
- * 
  * @param statusWindowSet
  * @text Status Window Set
  * @desc Status Window Set
@@ -521,11 +505,35 @@
  * 
  * @param statusWindowPendingItemBGRadius
  * @text Pending BG Radius
- * @desc Status Window Item Background Radius
+ * @desc Status Window Pending Item Background Radius
  * @parent statusWindowPendingItemBGStyle
  * @type number
  * @min 0
  * @default 0
+ * 
+ * @param statusWindowPendingItemNeedBGImage
+ * @text Pending BG Need Background Image
+ * @desc Status Window Pending Item Need Background Image (If you choose to Yes, you must provide the correct image path)
+ * @parent statusWindowPendingItemBGStyle
+ * @type boolean
+ * @on Yes
+ * @off NO
+ * @default false
+ * 
+ * @param statusWindowPendingItemBGImageOffset
+ * @text Pending BG Image Offset
+ * @desc Status Window Pending Item Background Image Offset
+ * @parent statusWindowPendingItemBGStyle
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
+ * 
+ * @param statusWindowPendingItemBGImage
+ * @text Pending BG Image
+ * @desc Status Window Pending Item Background Image
+ * @parent statusWindowPendingItemBGStyle
+ * @type file
+ * @dir img/
+ * @default 
  * 
  * @param statusWindowItemFaceImageStyle
  * @text Item Face Image Style
@@ -1742,6 +1750,22 @@
  * @min 0
  * @default 2
  * 
+ * @param goldWindowSet
+ * @text Gold Window Set
+ * @desc Gold Window Set
+ * @parent mainMenuSceneSet
+ * @type string
+ * @default
+ * 
+ * @param goldWindowVisible
+ * @text Visible
+ * @desc Gold Window Visible
+ * @parent goldWindowSet
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
  */
 
 /*~struct~Color:
@@ -1865,8 +1889,6 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const commandWindowItemTextAlign = parameters.commandWindowItemTextAlign;
     const commandWindowItemTextColorJsonObject = JSON.parse(parameters.commandWindowItemTextColor);
     const commandWindowItemTextOutlineColorJsonObject = JSON.parse(parameters.commandWindowItemTextOutlineColor);
-    
-    const goldWindowVisible = parameters.goldWindowVisible !== "false";
 
 
     const statusWindowVisible = parameters.statusWindowVisible !== "false";
@@ -1902,6 +1924,12 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowPendingItemBGHeight = Number(parameters.statusWindowPendingItemBGHeight);
     const statusWindowPendingItemBGColorJsonObject = JSON.parse(parameters.statusWindowPendingItemBGColor);
     const statusWindowPendingItemBGRadius = Number(parameters.statusWindowPendingItemBGRadius);
+
+    const statusWindowPendingItemNeedBGImage = parameters.statusWindowPendingItemNeedBGImage !== "false";
+    const statusWindowPendingItemBGImageOffsetJsonObject = JSON.parse(parameters.statusWindowPendingItemBGImageOffset);
+    const statusWindowPendingItemBGImageOffset = new Point(Number(statusWindowPendingItemBGImageOffsetJsonObject.x) || 0, Number(statusWindowPendingItemBGImageOffsetJsonObject.y) || 0);
+    const statusWindowPendingItemBGImage = parameters.statusWindowPendingItemBGImage;
+    const statusWindowPendingItemBGImageBitmap = statusWindowPendingItemNeedBGImage === true ? ImageManager.loadBitmap("img/", statusWindowPendingItemBGImage) : undefined;
 
     const statusWindowItemFaceImageVisible = parameters.statusWindowItemFaceImageVisible !== "false";
     const statusWindowItemFaceImageOffsetJsonObject = JSON.parse(parameters.statusWindowItemFaceImageOffset);
@@ -1993,7 +2021,6 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowItemHPValueTextOutlineWidth = Number(parameters.statusWindowItemHPValueTextOutlineWidth);
 
 
-
     const statusWindowItemMPVisible = parameters.statusWindowItemMPVisible !== "false";
     const statusWindowItemMPOffsetJsonObject = JSON.parse(parameters.statusWindowItemMPOffset);
     const statusWindowItemMPOffset = new Point(Number(statusWindowItemMPOffsetJsonObject.x) || 0, Number(statusWindowItemMPOffsetJsonObject.y) || 0);
@@ -2039,7 +2066,6 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowItemMPValueTextOutlineWidth = Number(parameters.statusWindowItemMPValueTextOutlineWidth);
 
 
-
     const statusWindowItemTPVisible = parameters.statusWindowItemTPVisible !== "false";
     const statusWindowItemTPOffsetJsonObject = JSON.parse(parameters.statusWindowItemTPOffset);
     const statusWindowItemTPOffset = new Point(Number(statusWindowItemTPOffsetJsonObject.x) || 0, Number(statusWindowItemTPOffsetJsonObject.y) || 0);
@@ -2083,6 +2109,9 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowItemTPNormalValueTextColorJsonObject = JSON.parse(parameters.statusWindowItemTPNormalValueTextColor);
     const statusWindowItemTPValueTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemTPValueTextOutlineColor);
     const statusWindowItemTPValueTextOutlineWidth = Number(parameters.statusWindowItemTPValueTextOutlineWidth);
+
+
+    const goldWindowVisible = parameters.goldWindowVisible !== "false";
 
     // Custom Classes
 
@@ -2606,14 +2635,7 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         this.contents.fontSize = commandWindowItemFontSize;
         _Window_Menu_Command_Draw_Item.apply(this, arguments);
     };
-    
 
-    //GoldWindow
-    const _Scene_Menu_Create_Gold_Window = Scene_Menu.prototype.createGoldWindow;
-    Scene_Menu.prototype.createGoldWindow = function() {
-        _Scene_Menu_Create_Gold_Window.apply(this, arguments);
-        this._goldWindow.visible = goldWindowVisible;
-    };
 
     //StatusWindow
     const _Scene_Menu_Create_Status_Window = Scene_Menu.prototype.createStatusWindow;
@@ -2724,33 +2746,6 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         }
     }
 
-    //this._statusWindow._cursorSprite.children[0].children[0].gotoAndPlay(0);
-
-    // Scene_Menu.prototype.onFormationOk = function() {
-    //     console.log("Scene_Menu.prototype.onFormationOk");
-    //     const index = this._statusWindow.index();
-    //     const pendingIndex = this._statusWindow.pendingIndex();
-    //     if (pendingIndex >= 0) {
-    //         $gameParty.swapOrder(index, pendingIndex);
-    //         this._statusWindow.setPendingIndex(-1);
-    //         this._statusWindow.redrawItem(index);
-    //     } else {
-    //         this._statusWindow.setPendingIndex(index);
-    //     }
-    //     this._statusWindow.activate();
-    // };
-    
-    // Scene_Menu.prototype.onFormationCancel = function() {
-    //     console.log("Scene_Menu.prototype.onFormationCancel");
-    //     if (this._statusWindow.pendingIndex() >= 0) {
-    //         this._statusWindow.setPendingIndex(-1);
-    //         this._statusWindow.activate();
-    //     } else {
-    //         this._statusWindow.deselect();
-    //         this._commandWindow.activate();
-    //     }
-    // };
-
     // const _Window_Menu_Command_Activate = Window_MenuCommand.prototype.activate;
     // Window_MenuCommand.prototype.activate = function() {
     //     _Window_Menu_Command_Activate.apply(this, arguments);
@@ -2823,6 +2818,9 @@ const ASCustomMainMenuSceneNameSpace = (() => {
             this.changePaintOpacity(false);
             this.contents.fillRoundRect(x, y, w, h, c1, statusWindowPendingItemBGRadius);
             this.changePaintOpacity(true);
+            if (statusWindowPendingItemBGImageBitmap) {
+                this.contents.blt(statusWindowPendingItemBGImageBitmap, 0, 0, statusWindowPendingItemBGImageBitmap.width, statusWindowPendingItemBGImageBitmap.height, rect.x + statusWindowPendingItemBGImageOffset.x, rect.y + statusWindowPendingItemBGImageOffset.y, statusWindowPendingItemBGImageBitmap.width, statusWindowPendingItemBGImageBitmap.height);
+            }
         }
     };
 
@@ -2835,8 +2833,6 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     };
 
     Window_MenuStatus.prototype.drawActorSimpleStatus = function(actor, x, y) {
-        const lineHeight = this.lineHeight();
-        const x2 = x + statusWindowItemNameOffset.x + 180;
         if (statusWindowItemNameVisible === true) {
             this.drawActorName(actor, x, y);
         }
@@ -2928,6 +2924,14 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         sprite.setup(actor, type);
         sprite.move(x, y);
         sprite.show();
+    };
+
+
+    //GoldWindow
+    const _Scene_Menu_Create_Gold_Window = Scene_Menu.prototype.createGoldWindow;
+    Scene_Menu.prototype.createGoldWindow = function() {
+        _Scene_Menu_Create_Gold_Window.apply(this, arguments);
+        this._goldWindow.visible = goldWindowVisible;
     };
 
 })();
