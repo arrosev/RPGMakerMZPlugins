@@ -908,7 +908,7 @@
  * @parent statusWindowItemHPStyle
  * @type number
  * @min 0
- * @default 32
+ * @default 24
  * 
  * @param statusWindowItemHPGaugeStyleStart
  * @text --------Gauge--------
@@ -1230,7 +1230,7 @@
  * @parent statusWindowItemMPStyle
  * @type number
  * @min 0
- * @default 32
+ * @default 24
  * 
  * @param statusWindowItemMPGaugeStyleStart
  * @text --------Gauge--------
@@ -1402,6 +1402,314 @@
  * @min 0
  * @default 2
  * 
+ * @param statusWindowItemTPStyle
+ * @text Item TP Style
+ * @desc Status Window Item TP Style
+ * @parent statusWindowItemStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemTPContainerStyleStart
+ * @text ------Container------
+ * @desc Styles for the container of the TP view element
+ * @parent statusWindowItemTPStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemTPVisible
+ * @text TP Visible
+ * @desc Status Window Item TP Visible
+ * @parent statusWindowItemTPStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemTPOffset
+ * @text TP Offset
+ * @desc Status Window Item TP Offset
+ * @parent statusWindowItemTPStyle
+ * @type struct<Point>
+ * @default {"x":"360","y":"95"}
+ * 
+ * @param statusWindowItemTPWidth
+ * @text TP Width
+ * @desc Status Window Item TP Width
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 128
+ * 
+ * @param statusWindowItemTPHeight
+ * @text TP Height
+ * @desc Status Window Item TP Height
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 32
+ * 
+ * @param statusWindowItemTPLabelStyleStart
+ * @text --------Label--------
+ * @desc Styles for the Label of the TP view element
+ * @parent statusWindowItemTPStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemTPLabelFormality
+ * @text TP Label Formality
+ * @desc Status Window Item TP Label Formality
+ * @parent statusWindowItemTPStyle
+ * @type select
+ * @option none
+ * @option text
+ * @option icon
+ * @default text
+ * 
+ * @param statusWindowItemTPTextLabelOffset
+ * @text TP Text Label Offset
+ * @desc Status Window Item TP Text Label Offset
+ * @parent statusWindowItemTPStyle
+ * @type struct<Point>
+ * @default {"x":"1","y":"3"}
+ * 
+ * @param statusWindowItemTPTextLabelWidth
+ * @text TP Text Label Width
+ * @desc Status Window Item TP Text Label Width
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 128
+ * 
+ * @param statusWindowItemTPTextLabelHeight
+ * @text TP Text Label Height
+ * @desc Status Window Item TP Text Label Height
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 24
+ * 
+ * @param statusWindowItemTPTextLabelFontSize
+ * @text TP Text Label Font Size
+ * @desc Status Window Item TP Text Label Font Size
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @default 24
+ * 
+ * @param statusWindowItemTPTextLabelTextColor
+ * @text TP Text Label Text Color
+ * @desc Status Window Item TP Text Label Text Color
+ * @parent statusWindowItemTPStyle
+ * @type struct<Color>
+ * @default {"r":"132","g":"170","b":"255","a":"1"}
+ * 
+ * @param statusWindowItemTPTextLabelTextOutlineColor
+ * @text TP Text Label Text Outline Color
+ * @desc Status Window Item TP Text Label Text Outline Color
+ * @parent statusWindowItemTPStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param statusWindowItemTPTextLabelTextOutlineWidth
+ * @text TP Text Label Text Outline Width
+ * @desc Status Window Item TP Text Label Text Outline Width
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 2
+ * 
+ * @param statusWindowItemTPIconLabelIndex
+ * @text TP Icon Label Index
+ * @desc Status Window Item TP Icon Label Index (Index of the icon in the IconSet)
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param statusWindowItemTPIconLabelOffset
+ * @text TP Icon Label Offset
+ * @desc Status Window Item TP Icon Label Offset
+ * @parent statusWindowItemTPStyle
+ * @type struct<Point>
+ * @default {"x":"1","y":"3"}
+ * 
+ * @param statusWindowItemTPIconLabelWidth
+ * @text TP Icon Label Width
+ * @desc Status Window Item TP Icon Label Width
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 24
+ * 
+ * @param statusWindowItemTPGaugeStyleStart
+ * @text --------Gauge--------
+ * @desc Styles for the Gauge of the TP view element
+ * @parent statusWindowItemTPStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemTPGaugeVisible
+ * @text TP Gauge Visible
+ * @desc Status Window Item TP Gauge Visible
+ * @parent statusWindowItemTPStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemTPGaugeOffset
+ * @text TP Gauge Offset
+ * @desc Status Window Item TP Gauge Offset
+ * @parent statusWindowItemTPStyle
+ * @type struct<Point>
+ * @default {"x":"30","y":"12"}
+ * 
+ * @param statusWindowItemTPGaugeWidth
+ * @text TP Gauge Width
+ * @desc Status Window Item TP Gauge Width
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 98
+ * 
+ * @param statusWindowItemTPGaugeHeight
+ * @text TP Gauge Height
+ * @desc Status Window Item TP Gauge Height
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 12
+ * 
+ * @param statusWindowItemTPGaugeBackColor
+ * @text TP Gauge BackColor
+ * @desc Status Window Item TP Gauge BackColor
+ * @parent statusWindowItemTPStyle
+ * @type struct<Color>
+ * @default {"r":"32","g":"32","b":"64","a":"1.0"}
+ * 
+ * @param statusWindowItemTPGaugeColor1
+ * @text TP Gauge Color1
+ * @desc Status Window Item TP Gauge Color1
+ * @parent statusWindowItemTPStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"160","b":"64","a":"1.0"}
+ * 
+ * @param statusWindowItemTPGaugeColor2
+ * @text TP Gauge Color2
+ * @desc Status Window Item TP Gauge Color2
+ * @parent statusWindowItemTPStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"224","b":"96","a":"1.0"}
+ * 
+ * @param statusWindowItemTPGaugeBorderColor
+ * @text TP Gauge Border Color
+ * @desc Status Window Item TP Gauge Border Color
+ * @parent statusWindowItemTPStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1.0"}
+ * 
+ * @param statusWindowItemTPGaugeBorderLineWidth
+ * @text TP Gauge Border Width
+ * @desc Status Window Item TP Gauge Border LineWidth
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param statusWindowItemTPGaugeBorderRadius
+ * @text TP Gauge Border Radius
+ * @desc Status Window Item TP Gauge Border Radius
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param statusWindowItemTPValueStyleStart
+ * @text --------Value--------
+ * @desc Styles for the Value of the TP view element
+ * @parent statusWindowItemTPStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemTPValueVisible
+ * @text TP Value Visible
+ * @desc Status Window Item TP Value Visible
+ * @parent statusWindowItemTPStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemTPMaxValueVisible
+ * @text TP Max Value Visible
+ * @desc Status Window Item TP Max Value Visible
+ * @parent statusWindowItemTPStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default false
+ * 
+ * @param statusWindowItemTPValueOffset
+ * @text TP Value Offset
+ * @desc Status Window Item TP Value Offset
+ * @parent statusWindowItemTPStyle
+ * @type struct<Point>
+ * @default {"x":"1","y":"3"}
+ * 
+ * @param statusWindowItemTPValueWidth
+ * @text TP Value Width
+ * @desc Status Window Item TP Value Width
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 128
+ * 
+ * @param statusWindowItemTPValueHeight
+ * @text TP Value Height
+ * @desc Status Window Item TP Value Height
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 24
+ * 
+ * @param statusWindowItemTPValueTextAlign
+ * @text TP Value Text Align
+ * @desc Status Window Item TP Value Text Align
+ * @parent statusWindowItemTPStyle
+ * @type select
+ * @option center
+ * @option left
+ * @option right
+ * @default right
+ * 
+ * @param statusWindowItemTPValueFontSize
+ * @text TP Value Font Size
+ * @desc Status Window Item TP Value Font Size
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @default 20
+ * 
+ * @param statusWindowItemTPNormalValueTextColor
+ * @text TP Normal Value Text Color
+ * @desc Status Window Item TP Normal Value Text Color
+ * @parent statusWindowItemTPStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param statusWindowItemTPValueTextOutlineColor
+ * @text TP Value Text Outline Color
+ * @desc Status Window Item TP Value Text Outline Color
+ * @parent statusWindowItemTPStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param statusWindowItemTPValueTextOutlineWidth
+ * @text TP Value Text Outline Width
+ * @desc Status Window Item TP Value Text Outline Width
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 2
+ * 
  */
 
 /*~struct~Color:
@@ -1452,36 +1760,6 @@
  * @text Y
  * @desc Y
  * @type number
- * @default 0
- * 
- */
-
-/*~struct~Rect:
- * 
- * @param x
- * @text X
- * @desc X
- * @type number
- * @default 0
- * 
- * @param y
- * @text Y
- * @desc Y
- * @type number
- * @default 0
- * 
- * @param width
- * @text Width
- * @desc Width
- * @type number
- * @min 0
- * @default 0
- * 
- * @param height
- * @text Height
- * @desc Height
- * @type number
- * @min 0
  * @default 0
  * 
  */
@@ -1719,6 +1997,52 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowItemMPValueTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemMPValueTextOutlineColor);
     const statusWindowItemMPValueTextOutlineWidth = Number(parameters.statusWindowItemMPValueTextOutlineWidth);
 
+
+
+    const statusWindowItemTPVisible = parameters.statusWindowItemTPVisible !== "false";
+    const statusWindowItemTPOffsetJsonObject = JSON.parse(parameters.statusWindowItemTPOffset);
+    const statusWindowItemTPOffset = new Point(Number(statusWindowItemTPOffsetJsonObject.x) || 0, Number(statusWindowItemTPOffsetJsonObject.y) || 0);
+    const statusWindowItemTPWidth = Number(parameters.statusWindowItemTPWidth);
+    const statusWindowItemTPHeight = Number(parameters.statusWindowItemTPHeight);
+
+    const statusWindowItemTPLabelFormality = parameters.statusWindowItemTPLabelFormality;
+    const statusWindowItemTPTextLabelOffsetJsonObject = JSON.parse(parameters.statusWindowItemTPTextLabelOffset);
+    const statusWindowItemTPTextLabelOffset = new Point(Number(statusWindowItemTPTextLabelOffsetJsonObject.x) || 0, Number(statusWindowItemTPTextLabelOffsetJsonObject.y) || 0);
+    const statusWindowItemTPTextLabelWidth = Number(parameters.statusWindowItemTPTextLabelWidth);
+    const statusWindowItemTPTextLabelHeight = Number(parameters.statusWindowItemTPTextLabelHeight);
+    const statusWindowItemTPTextLabelFontSize = Number(parameters.statusWindowItemTPTextLabelFontSize) || 24;
+    const statusWindowItemTPTextLabelTextColorJsonObject = JSON.parse(parameters.statusWindowItemTPTextLabelTextColor);
+    const statusWindowItemTPTextLabelTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemTPTextLabelTextOutlineColor);
+    const statusWindowItemTPTextLabelTextOutlineWidth = Number(parameters.statusWindowItemTPTextLabelTextOutlineWidth);
+    const statusWindowItemTPIconLabelIndex = Number(parameters.statusWindowItemTPIconLabelIndex);
+    const statusWindowItemTPIconLabelOffsetJsonObject = JSON.parse(parameters.statusWindowItemTPIconLabelOffset);
+    const statusWindowItemTPIconLabelOffset = new Point(Number(statusWindowItemTPIconLabelOffsetJsonObject.x) || 0, Number(statusWindowItemTPIconLabelOffsetJsonObject.y) || 0);
+    const statusWindowItemTPIconLabelWidth = Number(parameters.statusWindowItemTPIconLabelWidth);
+
+    const statusWindowItemTPGaugeVisible = parameters.statusWindowItemTPGaugeVisible !== "false";
+    const statusWindowItemTPGaugeOffsetJsonObject = JSON.parse(parameters.statusWindowItemTPGaugeOffset);
+    const statusWindowItemTPGaugeOffset = new Point(Number(statusWindowItemTPGaugeOffsetJsonObject.x) || 0, Number(statusWindowItemTPGaugeOffsetJsonObject.y) || 0);
+    const statusWindowItemTPGaugeWidth = Number(parameters.statusWindowItemTPGaugeWidth);
+    const statusWindowItemTPGaugeHeight = Number(parameters.statusWindowItemTPGaugeHeight);
+    const statusWindowItemTPGaugeBackColorJsonObject = JSON.parse(parameters.statusWindowItemTPGaugeBackColor);
+    const statusWindowItemTPGaugeColor1JsonObject = JSON.parse(parameters.statusWindowItemTPGaugeColor1);
+    const statusWindowItemTPGaugeColor2JsonObject = JSON.parse(parameters.statusWindowItemTPGaugeColor2);
+    const statusWindowItemTPGaugeBorderColorJsonObject = JSON.parse(parameters.statusWindowItemTPGaugeBorderColor);
+    const statusWindowItemTPGaugeBorderLineWidth = Number(parameters.statusWindowItemTPGaugeBorderLineWidth);
+    const statusWindowItemTPGaugeBorderRadius = Number(parameters.statusWindowItemTPGaugeBorderRadius);
+
+    const statusWindowItemTPValueVisible = parameters.statusWindowItemTPValueVisible !== "false";
+    const statusWindowItemTPMaxValueVisible = parameters.statusWindowItemTPMaxValueVisible !== "false";
+    const statusWindowItemTPValueOffsetJsonObject = JSON.parse(parameters.statusWindowItemTPValueOffset);
+    const statusWindowItemTPValueOffset = new Point(Number(statusWindowItemTPValueOffsetJsonObject.x) || 0, Number(statusWindowItemTPValueOffsetJsonObject.y) || 0);
+    const statusWindowItemTPValueWidth = Number(parameters.statusWindowItemTPValueWidth);
+    const statusWindowItemTPValueHeight = Number(parameters.statusWindowItemTPValueHeight);
+    const statusWindowItemTPValueTextAlign = parameters.statusWindowItemTPValueTextAlign;
+    const statusWindowItemTPValueFontSize = Number(parameters.statusWindowItemTPValueFontSize) || 24;
+    const statusWindowItemTPNormalValueTextColorJsonObject = JSON.parse(parameters.statusWindowItemTPNormalValueTextColor);
+    const statusWindowItemTPValueTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemTPValueTextOutlineColor);
+    const statusWindowItemTPValueTextOutlineWidth = Number(parameters.statusWindowItemTPValueTextOutlineWidth);
+
     // Custom Classes
 
     class Sprite_MenuGauge extends Sprite_Gauge {
@@ -1809,6 +2133,31 @@ const ASCustomMainMenuSceneNameSpace = (() => {
                     this.bitmapValueOutlineWidth = statusWindowItemMPValueTextOutlineWidth;
                     break;
                 case "tp":
+                    this.bitmapSize = {width: statusWindowItemTPWidth, height: statusWindowItemTPHeight};
+                    this.bitmapLabelFontSize = statusWindowItemTPTextLabelFontSize;
+                    this.bitmapLabelTextColor = colorJsonObjectConvertToColorRGBA(statusWindowItemTPTextLabelTextColorJsonObject);
+                    this.bitmapLabelOutlineColor = colorJsonObjectConvertToColorRGBA(statusWindowItemTPTextLabelTextOutlineColorJsonObject);
+                    this.bitmapLabelOutlineWidth = statusWindowItemTPTextLabelTextOutlineWidth;
+                    this.labelFormality = statusWindowItemTPLabelFormality;
+                    this.textLabelRect = new Rectangle(statusWindowItemTPTextLabelOffset.x, statusWindowItemTPTextLabelOffset.y, statusWindowItemTPTextLabelWidth, statusWindowItemTPTextLabelHeight);
+                    this.iconLabelRect = new Rectangle(statusWindowItemTPIconLabelOffset.x, statusWindowItemTPIconLabelOffset.y, statusWindowItemTPIconLabelWidth, statusWindowItemTPIconLabelWidth);
+                    this.iconIndex = statusWindowItemTPIconLabelIndex;
+                    this.gaugeVisible = statusWindowItemTPGaugeVisible;
+                    this.gaugeBackColorRGBA = colorJsonObjectConvertToColorRGBA(statusWindowItemTPGaugeBackColorJsonObject);
+                    this.gaugeColor1RGBA = colorJsonObjectConvertToColorRGBA(statusWindowItemTPGaugeColor1JsonObject);
+                    this.gaugeColor2RGBA = colorJsonObjectConvertToColorRGBA(statusWindowItemTPGaugeColor2JsonObject);
+                    this.gaugeBorderColorRGBA = colorJsonObjectConvertToColorRGBA(statusWindowItemTPGaugeBorderColorJsonObject);
+                    this.gaugeRect = new Rectangle(statusWindowItemTPGaugeOffset.x, statusWindowItemTPGaugeOffset.y, statusWindowItemTPGaugeWidth, statusWindowItemTPGaugeHeight);
+                    this.gaugeBorderLineWidth = statusWindowItemTPGaugeBorderLineWidth;
+                    this.gaugeBorderRadius = statusWindowItemTPGaugeBorderRadius;
+                    this.valueVisible = statusWindowItemTPValueVisible;
+                    this.valueMaxVisible = statusWindowItemTPMaxValueVisible;
+                    this.valueRect = new Rectangle(statusWindowItemTPValueOffset.x, statusWindowItemTPValueOffset.y, statusWindowItemTPValueWidth, statusWindowItemTPValueHeight);
+                    this.bitmapValueTextAlign = statusWindowItemTPValueTextAlign;
+                    this.bitmapValueFontSize = statusWindowItemTPValueFontSize;
+                    this.bitmapValueTextColor = colorJsonObjectConvertToColorRGBA(statusWindowItemTPNormalValueTextColorJsonObject);
+                    this.bitmapValueOutlineColor = colorJsonObjectConvertToColorRGBA(statusWindowItemTPValueTextOutlineColorJsonObject);
+                    this.bitmapValueOutlineWidth = statusWindowItemTPValueTextOutlineWidth;
                     break;
                 default:
                     break;
@@ -1880,6 +2229,22 @@ const ASCustomMainMenuSceneNameSpace = (() => {
             if (lineWidth > 0) {
                 this.bitmap.strokeRoundRect(x, y, width, height, color3, lineWidth, radius);
             }
+        };
+
+        currentValue() {
+            if (this._battler) {
+                switch (this._statusType) {
+                    case "hp":
+                        return this._battler.hp;
+                    case "mp":
+                        return this._battler.mp;
+                    case "tp":
+                        return this._battler.tp;
+                    case "time":
+                        return this._battler.tpbChargeTime();
+                }
+            }
+            return NaN;
         };
 
         drawValue() {
@@ -2370,6 +2735,9 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         // if ($dataSystem.optDisplayTp) {
         //     this.placeGauge(actor, "tp", x2, y + lineHeight + 11 + this.gaugeLineHeight() * 2);
         // }
+        if (statusWindowItemTPVisible === true) {
+            this.placeGauge(actor, "tp", x + statusWindowItemTPOffset.x, y + statusWindowItemTPOffset.y);
+        }
     };
 
     Window_MenuStatus.prototype.drawActorName = function(actor, x, y, width) {
@@ -2424,14 +2792,6 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemClassTextOutlineColorJsonObject));
         this.drawText(actor.currentClass().name, x + statusWindowItemClassOffset.x, y + statusWindowItemClassOffset.y, statusWindowItemClassWidth);
     };
-
-    // Window_MenuStatus.prototype.placeBasicGauges = function(actor, x, y) {
-    //     this.placeGauge(actor, "hp", x, y);
-    //     this.placeGauge(actor, "mp", x, y + this.gaugeLineHeight());
-    //     if ($dataSystem.optDisplayTp) {
-    //         this.placeGauge(actor, "tp", x, y + this.gaugeLineHeight() * 2);
-    //     }
-    // };
 
     Window_MenuStatus.prototype.placeGauge = function(actor, type, x, y) {
         const key = "actor%1-gauge-%2".format(actor.actorId(), type);
