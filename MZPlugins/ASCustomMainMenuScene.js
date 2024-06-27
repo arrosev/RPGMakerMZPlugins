@@ -9,6 +9,7 @@
  * 
  * this._windowLayer(808, 616)
  * 
+ * 
  * This plugin is released under the MIT license.
 
  * Copyright (c) 2024 Arrose
@@ -1766,6 +1767,113 @@
  * @off Hide
  * @default true
  * 
+ * @param goldWindowWindowSkin
+ * @text Window Skin
+ * @desc Gold Window WindowSkin
+ * @parent goldWindowSet
+ * @type file
+ * @dir img/system/
+ * @default Window
+ * 
+ * @param goldWindowOffset
+ * @text Offset
+ * @desc Gold Window Offset
+ * @parent goldWindowSet
+ * @type struct<Point>
+ * @default {"x":"568","y":"548"}
+ * 
+ * @param goldWindowWidth
+ * @text Width
+ * @desc Gold Window Width
+ * @parent goldWindowSet
+ * @type number
+ * @min 0
+ * @default 240
+ * 
+ * @param goldWindowHeight
+ * @text Height
+ * @desc Gold Window Height
+ * @parent goldWindowSet
+ * @type number
+ * @min 0
+ * @default 68
+ * 
+ * @param goldWindowBackgroundStyle
+ * @text Background Style
+ * @desc Gold Window Background Style
+ * @parent goldWindowSet
+ * @type string
+ * @default
+ * 
+ * @param goldWindowBGVisible
+ * @text BG Visible
+ * @desc Gold Window Background Visible
+ * @parent goldWindowBackgroundStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default false
+ * 
+ * @param goldWindowBGOffset
+ * @text BG Offset
+ * @desc Gold Window Background Offset
+ * @parent goldWindowBackgroundStyle
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
+ * 
+ * @param goldWindowBGWidth
+ * @text BG Width
+ * @desc Gold Window Background Width
+ * @parent goldWindowBackgroundStyle
+ * @type number
+ * @min 0
+ * @default 240
+ * 
+ * @param goldWindowBGHeight
+ * @text BG Height
+ * @desc Gold Window Background Height
+ * @parent goldWindowBackgroundStyle
+ * @type number
+ * @min 0
+ * @default 68
+ * 
+ * @param goldWindowBGColor1
+ * @text BG Color1
+ * @desc Gold Window Background Color1
+ * @parent goldWindowBackgroundStyle
+ * @type struct<Color>
+ * @default {"r":"32","g":"32","b":"32","a":"0.5"}
+ * 
+ * @param goldWindowBGColor2
+ * @text BG Color2
+ * @desc Gold Window Background Color2
+ * @parent goldWindowBackgroundStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"0.5"}
+ * 
+ * @param goldWindowBGBorderColor
+ * @text BG Border Color
+ * @desc Gold Window Background Border Color
+ * @parent goldWindowBackgroundStyle
+ * @type struct<Color>
+ * @default {"r":"32","g":"32","b":"32","a":"0.5"}
+ * 
+ * @param goldWindowBGBorderLineWidth
+ * @text BG Border Width
+ * @desc Gold Window Background Border LineWidth
+ * @parent goldWindowBackgroundStyle
+ * @type number
+ * @min 0
+ * @default 1
+ * 
+ * @param goldWindowBGBorderRadius
+ * @text BG Border Radius
+ * @desc Gold Window Background Border Radius
+ * @parent goldWindowBackgroundStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
  */
 
 /*~struct~Color:
@@ -2112,6 +2220,22 @@ const ASCustomMainMenuSceneNameSpace = (() => {
 
 
     const goldWindowVisible = parameters.goldWindowVisible !== "false";
+    const goldWindowWindowSkin = parameters.goldWindowWindowSkin;
+    const goldWindowOffsetJsonObject = JSON.parse(parameters.goldWindowOffset);
+    const goldWindowOffset = new Point(Number(goldWindowOffsetJsonObject.x) || 0, Number(goldWindowOffsetJsonObject.y) || 0);
+    const goldWindowWidth = Number(parameters.goldWindowWidth);
+    const goldWindowHeight = Number(parameters.goldWindowHeight);
+
+    const goldWindowBGVisible = parameters.goldWindowBGVisible !== "false";
+    const goldWindowBGOffsetJsonObject = JSON.parse(parameters.goldWindowBGOffset);
+    const goldWindowBGOffset = new Point(Number(goldWindowBGOffsetJsonObject.x) || 0, Number(goldWindowBGOffsetJsonObject.y) || 0);
+    const goldWindowBGWidth = Number(parameters.goldWindowBGWidth);
+    const goldWindowBGHeight = Number(parameters.goldWindowBGHeight);
+    const goldWindowBGColor1JsonObject = JSON.parse(parameters.goldWindowBGColor1);
+    const goldWindowBGColor2JsonObject = JSON.parse(parameters.goldWindowBGColor2);
+    const goldWindowBGBorderColorJsonObject = JSON.parse(parameters.goldWindowBGBorderColor);
+    const goldWindowBGBorderLineWidth = Number(parameters.goldWindowBGBorderLineWidth);
+    const goldWindowBGBorderRadius = Number(parameters.goldWindowBGBorderRadius);
 
     // Custom Classes
 
@@ -2305,6 +2429,55 @@ const ASCustomMainMenuSceneNameSpace = (() => {
                 this.bitmap.drawText(currentValue, x, y, width, height, this.bitmapValueTextAlign);
             }
         };
+
+    }
+
+    class Window_MenuGold extends Window_Gold {
+
+        initialize(rect) {
+            Window_Gold.prototype.initialize.call(this, rect);
+            //_clientArea
+            // this.backgroundSpriteBitmap = new Bitmap(goldWindowBGWidth, goldWindowBGHeight);
+            // console.log("this.backgroundSpriteBitmap: ", this.backgroundSpriteBitmap)
+            // this.backgroundSprite = new Sprite(this.backgroundSpriteBitmap);
+            // this.backgroundSprite.move(goldWindowBGOffset.x, goldWindowBGOffset.y);
+            // this.addChildToBack(this.backgroundSprite);
+            // this.refresh();
+        };
+
+        // refresh() {
+
+        //     console.log("this._clientArea: ", this._clientArea);
+        //     console.log("this.contents: ", this.contents);
+        //     console.log("this.contentsBack: ", this.contentsBack);
+
+        //     // console.log("this.backgroundSpriteBitmap: ", this.backgroundSpriteBitmap)
+
+        //     const rect = this.itemLineRect(0);
+        //     const x = rect.x;
+        //     const y = rect.y;
+        //     const width = rect.width;
+        //     this.contents.clear();
+        //     this.drawCurrencyValue(this.value(), this.currencyUnit(), x, y, width);
+
+        //     if (goldWindowBGVisible === true && this.backgroundSpriteBitmap) {
+        //         const x = goldWindowBGOffset.x;
+        //         const y = goldWindowBGOffset.y;
+        //         const w = goldWindowBGWidth;
+        //         const h = goldWindowBGHeight;
+        //         const c1 = colorJsonObjectConvertToColorRGBA(goldWindowBGColor1JsonObject);
+        //         const c2 = colorJsonObjectConvertToColorRGBA(goldWindowBGColor2JsonObject);
+        //         const c3 = colorJsonObjectConvertToColorRGBA(goldWindowBGBorderColorJsonObject);
+        //         // this.backgroundSpriteBitmap.gradientFillRoundRect(x, y, w, h, c1, c2, true, goldWindowBGBorderRadius);
+        //         // if (goldWindowBGBorderLineWidth > 0) {
+        //         //     this.backgroundSpriteBitmap.strokeRoundRect(x, y, w, h, c3, goldWindowBGBorderLineWidth, goldWindowBGBorderRadius);
+        //         // }
+        //         this.backgroundSpriteBitmap.gradientFillRect(x, y, w, h, c1, c2, true, goldWindowBGBorderRadius);
+        //         if (goldWindowBGBorderLineWidth > 0) {
+        //             this.backgroundSpriteBitmap.strokeRect(x, y, w, h, c3, goldWindowBGBorderLineWidth, goldWindowBGBorderRadius);
+        //         }
+        //     }
+        // };
 
     }
 
@@ -2746,26 +2919,6 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         }
     }
 
-    // const _Window_Menu_Command_Activate = Window_MenuCommand.prototype.activate;
-    // Window_MenuCommand.prototype.activate = function() {
-    //     _Window_Menu_Command_Activate.apply(this, arguments);
-    //     if (commandWindowCursor === commandWindowCursorSelectImage && commandWindowCursorImagesJsonObject.length > 1) {
-    //         if (this._cursorSprite.children[0].children[0]._playing === false) {
-    //             this._cursorSprite.children[0].children[0].gotoAndPlay(0);
-    //         }
-    //     }
-    // }
-
-    // const _Window_Menu_Command_Deactivate = Window_MenuCommand.prototype.deactivate;
-    // Window_MenuCommand.prototype.deactivate = function() {
-    //     _Window_Menu_Command_Deactivate.apply(this, arguments);
-    //     if (commandWindowCursor === commandWindowCursorSelectImage && commandWindowCursorImagesJsonObject.length > 1) {
-    //         if (this._cursorSprite.children[0].children[0]._playing === true) {
-    //             this._cursorSprite.children[0].children[0].gotoAndStop(0);
-    //         }
-    //     }
-    // }
-
     Window_MenuStatus.prototype.drawItemImage = function(index) {
         if (statusWindowItemFaceImageVisible === true) {
             const actor = this.actor(index);
@@ -2928,10 +3081,20 @@ const ASCustomMainMenuSceneNameSpace = (() => {
 
 
     //GoldWindow
-    const _Scene_Menu_Create_Gold_Window = Scene_Menu.prototype.createGoldWindow;
+    // const _Scene_Menu_Create_Gold_Window = Scene_Menu.prototype.createGoldWindow;
+    // Scene_Menu.prototype.createGoldWindow = function() {
+    //     _Scene_Menu_Create_Gold_Window.apply(this, arguments);
+    //     this._goldWindow.visible = goldWindowVisible;
+    // };
+
     Scene_Menu.prototype.createGoldWindow = function() {
-        _Scene_Menu_Create_Gold_Window.apply(this, arguments);
+        // const rect = this.goldWindowRect();
+        // console.log("rect: ", rect) //568 548 240 68
+        const rect = new Rectangle(goldWindowOffset.x, goldWindowOffset.y, goldWindowWidth, goldWindowHeight);
+        this._goldWindow = new Window_MenuGold(rect);
+        this.addWindow(this._goldWindow);
         this._goldWindow.visible = goldWindowVisible;
+        this._goldWindow.windowskin = ImageManager.loadSystem(goldWindowWindowSkin);
     };
 
 })();
