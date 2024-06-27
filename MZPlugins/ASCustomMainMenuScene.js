@@ -1874,6 +1874,128 @@
  * @min 0
  * @default 0
  * 
+ * @param goldWindowValueStyle
+ * @text Value Style
+ * @desc Gold Window Value Style
+ * @parent goldWindowSet
+ * @type string
+ * @default
+ * 
+ * @param goldWindowValueFontSize
+ * @text Font Size
+ * @desc Gold Window Value Font Size
+ * @parent goldWindowValueStyle
+ * @type number
+ * @default 26
+ * 
+ * @param goldWindowValueTextOffsetX
+ * @text Text OffsetX
+ * @desc Gold Window Value Text OffsetX
+ * @parent goldWindowValueStyle
+ * @type number
+ * @default 0
+ * 
+ * @param goldWindowValueTextAlign
+ * @text Text Align
+ * @desc Gold Window Value Text Align
+ * @parent goldWindowValueStyle
+ * @type select
+ * @option center
+ * @option left
+ * @option right
+ * @default right
+ * 
+ * @param goldWindowValueTextColor
+ * @text Text Color
+ * @desc Gold Window Value Text Color
+ * @parent goldWindowValueStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param goldWindowValueTextOutlineColor
+ * @text Text Outline Color
+ * @desc Gold Window Value Text Outline Color
+ * @parent goldWindowValueStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param goldWindowUnitStyle
+ * @text Unit Style
+ * @desc Gold Window Unit Style
+ * @parent goldWindowSet
+ * @type string
+ * @default
+ * 
+ * @param goldWindowUnitFormality
+ * @text Unit Formality
+ * @desc Gold Window Unit Formality
+ * @parent goldWindowUnitStyle
+ * @type select
+ * @option text
+ * @option icon
+ * @default text
+ * 
+ * @param goldWindowUnitFontSize
+ * @text Font Size
+ * @desc Gold Window Unit Font Size
+ * @parent goldWindowUnitStyle
+ * @type number
+ * @default 26
+ * 
+ * @param goldWindowUnitTextOffsetX
+ * @text Text OffsetX
+ * @desc Gold Window Unit Text OffsetX
+ * @parent goldWindowUnitStyle
+ * @type number
+ * @default 0
+ * 
+ * @param goldWindowUnitTextAlign
+ * @text Text Align
+ * @desc Gold Window Unit Text Align
+ * @parent goldWindowUnitStyle
+ * @type select
+ * @option center
+ * @option left
+ * @option right
+ * @default right
+ * 
+ * @param goldWindowUnitTextColor
+ * @text Text Color
+ * @desc Gold Window Unit Text Color
+ * @parent goldWindowUnitStyle
+ * @type struct<Color>
+ * @default {"r":"132","g":"170","b":"255","a":"1"}
+ * 
+ * @param goldWindowUnitTextOutlineColor
+ * @text Text Outline Color
+ * @desc Gold Window Unit Text Outline Color
+ * @parent goldWindowUnitStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param goldWindowUnitIconIndex
+ * @text Unit Icon Index
+ * @desc Gold Window Unit Icon Index (Index of the icon in the IconSet)
+ * @parent goldWindowUnitStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param goldWindowUnitIconOffset
+ * @text Unit Icon Offset
+ * @desc Gold Window Unit Icon Offset
+ * @parent goldWindowUnitStyle
+ * @type struct<Point>
+ * @default {"x":"195","y":"4"}
+ * 
+ * @param goldWindowUnitIconWidth
+ * @text Unit Icon Width
+ * @desc Gold Window Unit Icon Width
+ * @parent goldWindowUnitStyle
+ * @type number
+ * @min 0
+ * @default 26
+ * 
  */
 
 /*~struct~Color:
@@ -1955,6 +2077,9 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowItemLabelFormalitySelectNone = "none";
     const statusWindowItemLabelFormalitySelectText = "text";
     const statusWindowItemLabelFormalitySelectIcon = "icon";
+
+    const goldWindowUnitFormalitySelectText = "text";
+    const goldWindowUnitFormalitySelectIcon = "icon";
     
     const sceneCancelButtonOffsetJsonObject = JSON.parse(parameters.sceneCancelButtonOffset);
     const sceneCancelButtonOffset = new Point(Number(sceneCancelButtonOffsetJsonObject.x) || 0, Number(sceneCancelButtonOffsetJsonObject.y) || 0);
@@ -1993,7 +2118,7 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const commandWindowItemBGBorderRadius = Number(parameters.commandWindowItemBGBorderRadius);
 
     const commandWindowItemFontSize = Number(parameters.commandWindowItemFontSize) || 26;
-    const commandWindowItemTextOffsetX = Number(parameters.commandWindowItemTextOffsetX) || 0;
+    const commandWindowItemTextOffsetX = Number(parameters.commandWindowItemTextOffsetX);
     const commandWindowItemTextAlign = parameters.commandWindowItemTextAlign;
     const commandWindowItemTextColorJsonObject = JSON.parse(parameters.commandWindowItemTextColor);
     const commandWindowItemTextOutlineColorJsonObject = JSON.parse(parameters.commandWindowItemTextOutlineColor);
@@ -2237,6 +2362,23 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const goldWindowBGBorderLineWidth = Number(parameters.goldWindowBGBorderLineWidth);
     const goldWindowBGBorderRadius = Number(parameters.goldWindowBGBorderRadius);
 
+    const goldWindowValueFontSize = Number(parameters.goldWindowValueFontSize) || 26;
+    const goldWindowValueTextOffsetX = Number(parameters.goldWindowValueTextOffsetX);
+    const goldWindowValueTextAlign = parameters.goldWindowValueTextAlign;
+    const goldWindowValueTextColorJsonObject = JSON.parse(parameters.goldWindowValueTextColor);
+    const goldWindowValueTextOutlineColorJsonObject = JSON.parse(parameters.goldWindowValueTextOutlineColor);
+
+    const goldWindowUnitFormality = parameters.goldWindowUnitFormality;
+    const goldWindowUnitFontSize = Number(parameters.goldWindowUnitFontSize) || 26;
+    const goldWindowUnitTextOffsetX = Number(parameters.goldWindowUnitTextOffsetX);
+    const goldWindowUnitTextAlign = parameters.goldWindowUnitTextAlign;
+    const goldWindowUnitTextColorJsonObject = JSON.parse(parameters.goldWindowUnitTextColor);
+    const goldWindowUnitTextOutlineColorJsonObject = JSON.parse(parameters.goldWindowUnitTextOutlineColor);
+    const goldWindowUnitIconIndex = Number(parameters.goldWindowUnitIconIndex);
+    const goldWindowUnitIconOffsetJsonObject = JSON.parse(parameters.goldWindowUnitIconOffset);
+    const goldWindowUnitIconOffset = new Point(Number(goldWindowUnitIconOffsetJsonObject.x) || 0, Number(goldWindowUnitIconOffsetJsonObject.y) || 0);
+    const goldWindowUnitIconWidth = Number(parameters.goldWindowUnitIconWidth);
+
     // Custom Classes
 
     class Sprite_MenuGauge extends Sprite_Gauge {
@@ -2425,7 +2567,6 @@ const ASCustomMainMenuSceneNameSpace = (() => {
                 this.bitmap.textColor = this.bitmapValueTextColor;
                 this.bitmap.outlineColor = this.bitmapValueOutlineColor;
                 this.bitmap.outlineWidth = this.bitmapValueOutlineWidth;
-                //console.log("x, y, width, height: ", x, y, width, height)
                 this.bitmap.drawText(currentValue, x, y, width, height, this.bitmapValueTextAlign);
             }
         };
@@ -2436,48 +2577,68 @@ const ASCustomMainMenuSceneNameSpace = (() => {
 
         initialize(rect) {
             Window_Gold.prototype.initialize.call(this, rect);
-            //_clientArea
-            // this.backgroundSpriteBitmap = new Bitmap(goldWindowBGWidth, goldWindowBGHeight);
-            // console.log("this.backgroundSpriteBitmap: ", this.backgroundSpriteBitmap)
-            // this.backgroundSprite = new Sprite(this.backgroundSpriteBitmap);
-            // this.backgroundSprite.move(goldWindowBGOffset.x, goldWindowBGOffset.y);
-            // this.addChildToBack(this.backgroundSprite);
-            // this.refresh();
+            
+            this.backgroundSpriteBitmap = new Bitmap(goldWindowWidth, goldWindowHeight);
+            this.backgroundSprite = new Sprite(this.backgroundSpriteBitmap);
+            this.backgroundSprite.move(0, 0);
+            this.addChildToBack(this.backgroundSprite);
+            
+            if (goldWindowBGVisible === true && this.backgroundSpriteBitmap) {
+                const x = goldWindowBGOffset.x;
+                const y = goldWindowBGOffset.y;
+                const w = goldWindowBGWidth;
+                const h = goldWindowBGHeight;
+                const c1 = colorJsonObjectConvertToColorRGBA(goldWindowBGColor1JsonObject);
+                const c2 = colorJsonObjectConvertToColorRGBA(goldWindowBGColor2JsonObject);
+                const c3 = colorJsonObjectConvertToColorRGBA(goldWindowBGBorderColorJsonObject);
+                this.backgroundSpriteBitmap.gradientFillRoundRect(x, y, w, h, c1, c2, true, goldWindowBGBorderRadius);
+                if (goldWindowBGBorderLineWidth > 0) {
+                    this.backgroundSpriteBitmap.strokeRoundRect(x, y, w, h, c3, goldWindowBGBorderLineWidth, goldWindowBGBorderRadius);
+                }
+            }
         };
 
-        // refresh() {
+        refresh() {
+            const rect = this.itemLineRect(0);
+            const x = rect.x;
+            const y = rect.y;
+            const width = rect.width;
+            this.contents.clear();
+            this.drawCurrencyValue(this.value(), this.currencyUnit(), x, y, width);
+        };
 
-        //     console.log("this._clientArea: ", this._clientArea);
-        //     console.log("this.contents: ", this.contents);
-        //     console.log("this.contentsBack: ", this.contentsBack);
+        changeContentsTextStyle(fontSize, textColor, textOutlineColor) {
+            this.contents.fontSize = fontSize;
+            this.contents.textColor = textColor;
+            this.contents.outlineColor = textOutlineColor;
+        }
 
-        //     // console.log("this.backgroundSpriteBitmap: ", this.backgroundSpriteBitmap)
+        drawIcon(iconIndex, x, y, width, height) {
+            const bitmap = ImageManager.loadSystem("IconSet");
+            const pw = ImageManager.iconWidth;
+            const ph = ImageManager.iconHeight;
+            const sx = (iconIndex % 16) * pw;
+            const sy = Math.floor(iconIndex / 16) * ph;
+            this.contents.blt(bitmap, sx, sy, pw, ph, x, y, width, height);
+        };
 
-        //     const rect = this.itemLineRect(0);
-        //     const x = rect.x;
-        //     const y = rect.y;
-        //     const width = rect.width;
-        //     this.contents.clear();
-        //     this.drawCurrencyValue(this.value(), this.currencyUnit(), x, y, width);
+        drawCurrencyValue(value, unit, x, y, width) {
+            const unitWidth = Math.min(80, this.textWidth(unit));
+            const valueTextColor = colorJsonObjectConvertToColorRGBA(goldWindowValueTextColorJsonObject);
+            const valueTextOutlineColor = colorJsonObjectConvertToColorRGBA(goldWindowValueTextOutlineColorJsonObject);
+            this.changeContentsTextStyle(goldWindowValueFontSize, valueTextColor, valueTextOutlineColor);
+            this.drawText(value, x + goldWindowValueTextOffsetX, y, width - unitWidth - 6, goldWindowValueTextAlign);
 
-        //     if (goldWindowBGVisible === true && this.backgroundSpriteBitmap) {
-        //         const x = goldWindowBGOffset.x;
-        //         const y = goldWindowBGOffset.y;
-        //         const w = goldWindowBGWidth;
-        //         const h = goldWindowBGHeight;
-        //         const c1 = colorJsonObjectConvertToColorRGBA(goldWindowBGColor1JsonObject);
-        //         const c2 = colorJsonObjectConvertToColorRGBA(goldWindowBGColor2JsonObject);
-        //         const c3 = colorJsonObjectConvertToColorRGBA(goldWindowBGBorderColorJsonObject);
-        //         // this.backgroundSpriteBitmap.gradientFillRoundRect(x, y, w, h, c1, c2, true, goldWindowBGBorderRadius);
-        //         // if (goldWindowBGBorderLineWidth > 0) {
-        //         //     this.backgroundSpriteBitmap.strokeRoundRect(x, y, w, h, c3, goldWindowBGBorderLineWidth, goldWindowBGBorderRadius);
-        //         // }
-        //         this.backgroundSpriteBitmap.gradientFillRect(x, y, w, h, c1, c2, true, goldWindowBGBorderRadius);
-        //         if (goldWindowBGBorderLineWidth > 0) {
-        //             this.backgroundSpriteBitmap.strokeRect(x, y, w, h, c3, goldWindowBGBorderLineWidth, goldWindowBGBorderRadius);
-        //         }
-        //     }
-        // };
+            if (goldWindowUnitFormality === goldWindowUnitFormalitySelectText) {
+                const unitTextColor = colorJsonObjectConvertToColorRGBA(goldWindowUnitTextColorJsonObject);
+                const unitTextOutlineColor = colorJsonObjectConvertToColorRGBA(goldWindowUnitTextOutlineColorJsonObject);
+                this.changeContentsTextStyle(goldWindowUnitFontSize, unitTextColor, unitTextOutlineColor);
+                this.drawText(unit, x + goldWindowUnitTextOffsetX, y, width, goldWindowUnitTextAlign);
+            } else {
+                const rect = new Rectangle(goldWindowUnitIconOffset.x, goldWindowUnitIconOffset.y, goldWindowUnitIconWidth, goldWindowUnitIconWidth);
+                this.drawIcon(goldWindowUnitIconIndex, rect.x, rect.y, rect.width, rect.height);
+            }
+        };
 
     }
 
@@ -3081,11 +3242,6 @@ const ASCustomMainMenuSceneNameSpace = (() => {
 
 
     //GoldWindow
-    // const _Scene_Menu_Create_Gold_Window = Scene_Menu.prototype.createGoldWindow;
-    // Scene_Menu.prototype.createGoldWindow = function() {
-    //     _Scene_Menu_Create_Gold_Window.apply(this, arguments);
-    //     this._goldWindow.visible = goldWindowVisible;
-    // };
 
     Scene_Menu.prototype.createGoldWindow = function() {
         // const rect = this.goldWindowRect();
