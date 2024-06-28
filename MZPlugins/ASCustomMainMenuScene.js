@@ -239,7 +239,7 @@
  * 
  * @param commandWindowItemBGBorderRadius
  * @text BG Border Radius
- * @desc Command Window Item Background Border Radius
+ * @desc Command Window Item Background Border Radius (for setting rounded borders)
  * @parent commandWindowItemStyle
  * @type number
  * @min 0
@@ -716,8 +716,8 @@
  * @default {"r":"0","g":"0","b":"0","a":"1"}
  * 
  * @param statusWindowItemIconsStyle
- * @text Item Icons Style
- * @desc Status Window Item Icons Style
+ * @text Item Status Icons Style
+ * @desc Status Window Item Status Icons Style
  * @parent statusWindowItemStyle
  * @type string
  * @default
@@ -739,7 +739,7 @@
  * @default {"x":"180","y":"85"}
  * 
  * @param statusWindowItemAllIconsWidth
- * @text All Icons Width
+ * @text All Icons Width (column spacing included)
  * @desc Status Window Item Icons Width
  * @parent statusWindowItemIconsStyle
  * @type number
@@ -1115,7 +1115,7 @@
  * 
  * @param statusWindowItemHPCrisisValueTextColor
  * @text HP Crisis Value Text Color
- * @desc Status Window Item HP Crisis Value Text Color
+ * @desc Status Window Item HP Crisis Value Text Color (value less than 1/4 of mhp value)
  * @parent statusWindowItemHPStyle
  * @type struct<Color>
  * @default {"r":"255","g":"255","b":"64","a":"1"}
@@ -1991,6 +1991,2006 @@
  * @param goldWindowUnitIconWidth
  * @text Unit Icon Width
  * @desc Gold Window Unit Icon Width
+ * @parent goldWindowUnitStyle
+ * @type number
+ * @min 0
+ * @default 26
+ * 
+ */
+
+/*:zh
+ * @target MZ
+ * @plugindesc [V1.0.0] Customized Main Menu Plugin
+ * @author Arrose
+ * 
+ * @url https://github.com/arrosev/RPGMakerMZPlugins
+ * 
+ * @help
+ * 
+ * this._windowLayer(808, 616)
+ * 
+ * 
+ * This plugin is released under the MIT license.
+
+ * Copyright (c) 2024 Arrose
+
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ * 
+ * @param mainMenuSceneSet
+ * @text 主菜单场景设置
+ * @desc 主菜单场景设置
+ * @type string
+ * @default
+ * 
+ * @param sceneCancelButtonOffset
+ * @text 取消（返回）按钮偏移
+ * @desc 场景取消（返回）按钮偏移
+ * @parent mainMenuSceneSet
+ * @type struct<Point>
+ * @default {"x":"708","y":"2"}
+ * 
+ * @param sceneCancelButtonVisible
+ * @text 取消（返回）按钮可见性
+ * @desc 场景取消（返回）按钮可见性
+ * @parent mainMenuSceneSet
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param sceneBackGround
+ * @text 场景背景
+ * @desc 场景背景
+ * @parent mainMenuSceneSet
+ * @type select
+ * @option none
+ * @option image
+ * @option video
+ * @default none
+ * 
+ * @param sceneBackGroundImage
+ * @text 场景背景图片
+ * @desc 场景背景图片
+ * @parent sceneBackGround
+ * @type file
+ * @dir img/titles1
+ * @default
+ * 
+ * @param sceneBackGroundVideo
+ * @text 场景背景视频
+ * @desc 无需视频文件扩展名，需要 mp4 和 webm 文件（MZ 使用的视频格式），视频将循环播放  
+ * @parent sceneBackGround
+ * @type string
+ * @default 
+ * 
+ * @param commandWindowSet
+ * @text 命令窗口设置
+ * @desc 命令窗口设置
+ * @parent mainMenuSceneSet
+ * @type string
+ * @default
+ * 
+ * @param commandWindowWindowSkin
+ * @text 窗口皮肤
+ * @desc 命令窗口皮肤
+ * @parent commandWindowSet
+ * @type file
+ * @dir img/system/
+ * @default Window
+ * 
+ * @param commandWindowOffset
+ * @text 偏移
+ * @desc 命令窗口偏移
+ * @parent commandWindowSet
+ * @type struct<Point>
+ * @default {"x":"568","y":"52"}
+ * 
+ * @param commandWindowItemWidth
+ * @text 选项宽度
+ * @desc 命令窗口选项宽度
+ * @parent commandWindowSet
+ * @type number
+ * @min 0
+ * @default 208
+ * 
+ * @param commandWindowItemHeight
+ * @text 选项高度
+ * @desc 命令窗口选项高度
+ * @parent commandWindowSet
+ * @type number
+ * @min 0
+ * @default 40
+ * 
+ * @param commandWindowPadding
+ * @text 内边距
+ * @desc 命令窗口内边距
+ * @parent commandWindowSet
+ * @type number
+ * @default 12
+ * 
+ * @param commandWindowRowSpacing
+ * @text 行间距
+ * @desc 命令窗口行间距
+ * @parent commandWindowSet
+ * @type number
+ * @default 4
+ * 
+ * @param commandWindowColSpacing
+ * @text 列间距
+ * @desc 命令窗口列间距
+ * @parent commandWindowSet
+ * @type number
+ * @default 8
+ * 
+ * @param commandWindowMaxCols
+ * @text 最大列数
+ * @desc 命令窗口最大列数
+ * @parent commandWindowSet
+ * @type number
+ * @min 1
+ * @default 1
+ * 
+ * @param commandWindowCursor
+ * @text 光标
+ * @desc 命令窗口光标
+ * @parent commandWindowSet
+ * @type select
+ * @option none
+ * @option images
+ * @default none
+ * 
+ * @param commandWindowCursorImages
+ * @text 光标图片
+ * @desc 命令窗口光标图片
+ * @parent commandWindowCursor
+ * @type file[]
+ * @dir img/
+ * @default []
+ * 
+ * @param commandWindowCursorOffset
+ * @text 光标偏移
+ * @desc 命令窗口光标偏移
+ * @parent commandWindowCursor
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
+ * 
+ * @param commandWindowCursorAnimationSpeed
+ * @text 光标动画速度
+ * @desc 命令窗口光标动画速度
+ * @parent commandWindowCursor
+ * @type number
+ * @min 1
+ * @default 1
+ * 
+ * @param commandWindowItemStyle
+ * @text 选项样式
+ * @desc 命令窗口选项样式
+ * @parent commandWindowSet
+ * @type string
+ * @default
+ * 
+ * @param commandWindowItemBGOffset
+ * @text 背景偏移
+ * @desc 命令窗口选项背景偏移
+ * @parent commandWindowItemStyle
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
+ * 
+ * @param commandWindowItemBGWidth
+ * @text 背景宽度
+ * @desc 命令窗口选项背景宽度
+ * @parent commandWindowItemStyle
+ * @type number
+ * @min 0
+ * @default 208
+ * 
+ * @param commandWindowItemBGHeight
+ * @text 背景高度
+ * @desc 命令窗口选项背景高度
+ * @parent commandWindowItemStyle
+ * @type number
+ * @min 0
+ * @default 40
+ * 
+ * @param commandWindowItemBGColor1
+ * @text 背景颜色1
+ * @desc 命令窗口选项背景颜色1
+ * @parent commandWindowItemStyle
+ * @type struct<Color>
+ * @default {"r":"32","g":"32","b":"32","a":"0.5"}
+ * 
+ * @param commandWindowItemBGColor2
+ * @text 背景颜色2
+ * @desc 命令窗口选项背景颜色2
+ * @parent commandWindowItemStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"0.5"}
+ * 
+ * @param commandWindowItemBGBorderColor
+ * @text 背景边框颜色
+ * @desc 命令窗口选项背景边框颜色
+ * @parent commandWindowItemStyle
+ * @type struct<Color>
+ * @default {"r":"32","g":"32","b":"32","a":"0.5"}
+ * 
+ * @param commandWindowItemBGBorderLineWidth
+ * @text 背景边框厚度
+ * @desc 命令窗口选项背景边框厚度
+ * @parent commandWindowItemStyle
+ * @type number
+ * @min 0
+ * @default 1
+ * 
+ * @param commandWindowItemBGBorderRadius
+ * @text 背景边框半径
+ * @desc 命令窗口选项背景边框半径（用于设置圆角边框）
+ * @parent commandWindowItemStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param commandWindowItemFontSize
+ * @text 字体大小
+ * @desc 命令窗口选项字体大小
+ * @parent commandWindowItemStyle
+ * @type number
+ * @default 26
+ * 
+ * @param commandWindowItemTextOffsetX
+ * @text 文本横向偏移
+ * @desc 命令窗口选项文本横向偏移
+ * @parent commandWindowItemStyle
+ * @type number
+ * @default 0
+ * 
+ * @param commandWindowItemTextAlign
+ * @text 文本对齐
+ * @desc 命令窗口选项文本对齐
+ * @parent commandWindowItemStyle
+ * @type select
+ * @option center
+ * @option left
+ * @option right
+ * @default center
+ * 
+ * @param commandWindowItemTextColor
+ * @text 文本颜色
+ * @desc 命令窗口选项文本颜色
+ * @parent commandWindowItemStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param commandWindowItemTextOutlineColor
+ * @text 文本描边颜色
+ * @desc 命令窗口选项文本描边颜色
+ * @parent commandWindowItemStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param statusWindowSet
+ * @text 状态窗口设置
+ * @desc 状态窗口设置
+ * @parent mainMenuSceneSet
+ * @type string
+ * @default
+ * 
+ * @param statusWindowVisible
+ * @text 可见性
+ * @desc 状态窗口可见性
+ * @parent statusWindowSet
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowWindowSkin
+ * @text 窗口皮肤
+ * @desc 状态窗口皮肤
+ * @parent statusWindowSet
+ * @type file
+ * @dir img/system/
+ * @default Window
+ * 
+ * @param statusWindowOffset
+ * @text 偏移
+ * @desc 状态窗口偏移
+ * @parent statusWindowSet
+ * @type struct<Point>
+ * @default {"x":"0","y":"52"}
+ * 
+ * @param statusWindowItemWidth
+ * @text 选项宽度
+ * @desc 状态窗口选项宽度
+ * @parent statusWindowSet
+ * @type number
+ * @min 0
+ * @default 536
+ * 
+ * @param statusWindowItemHeight
+ * @text 选项高度
+ * @desc 状态窗口选项高度
+ * @parent statusWindowSet
+ * @type number
+ * @min 0
+ * @default 131
+ * 
+ * @param statusWindowPadding
+ * @text 内边距
+ * @desc 状态窗口内边距
+ * @parent statusWindowSet
+ * @type number
+ * @default 12
+ * 
+ * @param statusWindowRowSpacing
+ * @text 行间距
+ * @desc 状态窗口行间距
+ * @parent statusWindowSet
+ * @type number
+ * @default 4
+ * 
+ * @param statusWindowColSpacing
+ * @text 列间距
+ * @desc 状态窗口列间距
+ * @parent statusWindowSet
+ * @type number
+ * @default 8
+ * 
+ * @param statusWindowMaxCols
+ * @text 最大列数
+ * @desc 状态窗口最大列数
+ * @parent statusWindowSet
+ * @type select
+ * @option 1
+ * @option 2
+ * @option 4
+ * @default 1
+ * 
+ * @param statusWindowCursor
+ * @text 光标
+ * @desc 状态窗口光标
+ * @parent statusWindowSet
+ * @type select
+ * @option none
+ * @option images
+ * @default none
+ * 
+ * @param statusWindowCursorImages
+ * @text 光标图片
+ * @desc 状态窗口光标图片
+ * @parent statusWindowCursor
+ * @type file[]
+ * @dir img/
+ * @default []
+ * 
+ * @param statusWindowCursorOffset
+ * @text 光标偏移
+ * @desc 状态窗口光标偏移
+ * @parent statusWindowCursor
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
+ * 
+ * @param statusWindowCursorAnimationSpeed
+ * @text 光标动画速度
+ * @desc 状态窗口光标动画速度
+ * @parent statusWindowCursor
+ * @type number
+ * @min 1
+ * @default 1
+ * 
+ * @param statusWindowItemStyle
+ * @text 选项样式
+ * @desc 状态窗口选项样式
+ * @parent statusWindowSet
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemBGStyle
+ * @text 选项背景样式
+ * @desc 状态窗口选项背景样式
+ * @parent statusWindowItemStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemBGOffset
+ * @text 背景偏移
+ * @desc 状态窗口选项背景偏移
+ * @parent statusWindowItemBGStyle
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
+ * 
+ * @param statusWindowItemBGWidth
+ * @text 背景宽度
+ * @desc 状态窗口选项背景宽度
+ * @parent statusWindowItemBGStyle
+ * @type number
+ * @min 0
+ * @default 536
+ * 
+ * @param statusWindowItemBGHeight
+ * @text 背景高度
+ * @desc 状态窗口选项背景高度
+ * @parent statusWindowItemBGStyle
+ * @type number
+ * @min 0
+ * @default 131
+ * 
+ * @param statusWindowItemBGColor1
+ * @text 背景颜色1
+ * @desc 状态窗口选项背景颜色1
+ * @parent statusWindowItemBGStyle
+ * @type struct<Color>
+ * @default {"r":"32","g":"32","b":"32","a":"0.5"}
+ * 
+ * @param statusWindowItemBGColor2
+ * @text 背景颜色2
+ * @desc 状态窗口选项背景颜色2
+ * @parent statusWindowItemBGStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"0.5"}
+ * 
+ * @param statusWindowItemBGBorderColor
+ * @text 背景边框颜色
+ * @desc 状态窗口选项背景边框颜色
+ * @parent statusWindowItemBGStyle
+ * @type struct<Color>
+ * @default {"r":"32","g":"32","b":"32","a":"0.5"}
+ * 
+ * @param statusWindowItemBGBorderLineWidth
+ * @text 背景边框厚度
+ * @desc 状态窗口选项背景边框厚度
+ * @parent statusWindowItemBGStyle
+ * @type number
+ * @min 0
+ * @default 1
+ * 
+ * @param statusWindowItemBGBorderRadius
+ * @text 背景边框半径
+ * @desc 状态窗口选项背景边框半径
+ * @parent statusWindowItemBGStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param statusWindowPendingItemBGStyle
+ * @text 选中选项背景样式
+ * @desc 状态窗口选中选项背景样式
+ * @parent statusWindowItemStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowPendingItemBGOffset
+ * @text 选中选项背景偏移
+ * @desc 状态窗口选中选项背景偏移
+ * @parent statusWindowPendingItemBGStyle
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
+ * 
+ * @param statusWindowPendingItemBGWidth
+ * @text 选中选项背景宽度
+ * @desc 状态窗口选中选项背景宽度
+ * @parent statusWindowPendingItemBGStyle
+ * @type number
+ * @min 0
+ * @default 536
+ * 
+ * @param statusWindowPendingItemBGHeight
+ * @text 选中选项背景高度
+ * @desc 状态窗口选中选项背景高度
+ * @parent statusWindowPendingItemBGStyle
+ * @type number
+ * @min 0
+ * @default 131
+ * 
+ * @param statusWindowPendingItemBGColor
+ * @text 选中选项背景颜色
+ * @desc 状态窗口选中选项背景颜色
+ * @parent statusWindowPendingItemBGStyle
+ * @type struct<Color>
+ * @default {"r":"163","g":"255","b":"224","a":"1.0"}
+ * 
+ * @param statusWindowPendingItemBGRadius
+ * @text 选中选项背景半径
+ * @desc 状态窗口选中选项背景半径
+ * @parent statusWindowPendingItemBGStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param statusWindowPendingItemNeedBGImage
+ * @text 选中选项背景是否需要背景图片
+ * @desc 状态窗口选中选项背景是否需要背景图片  (如果选择 "Yes"，则必须提供正确的图像路径）
+ * @parent statusWindowPendingItemBGStyle
+ * @type boolean
+ * @on Yes
+ * @off NO
+ * @default false
+ * 
+ * @param statusWindowPendingItemBGImageOffset
+ * @text 选中选项背景图片偏移
+ * @desc 状态窗口选中选项背景图片偏移
+ * @parent statusWindowPendingItemBGStyle
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
+ * 
+ * @param statusWindowPendingItemBGImage
+ * @text 选中选项背景图片
+ * @desc 状态窗口选中选项背景图片
+ * @parent statusWindowPendingItemBGStyle
+ * @type file
+ * @dir img/
+ * @default 
+ * 
+ * @param statusWindowItemFaceImageStyle
+ * @text 选项脸图样式
+ * @desc 状态窗口选项脸图样式
+ * @parent statusWindowItemStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemFaceImageVisible
+ * @text 脸图可见性
+ * @desc 状态窗口选项脸图可见性
+ * @parent statusWindowItemFaceImageStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemFaceImageOffset
+ * @text 脸图偏移
+ * @desc 状态窗口选项脸图偏移
+ * @parent statusWindowItemFaceImageStyle
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
+ * 
+ * @param statusWindowItemFaceImageWidth
+ * @text 脸图宽度
+ * @desc 状态窗口选项脸图宽度
+ * @parent statusWindowItemFaceImageStyle
+ * @type number
+ * @min 0
+ * @default 131
+ * 
+ * @param statusWindowItemFaceImageHeight
+ * @text 脸图高度
+ * @desc 状态窗口选项脸图高度
+ * @parent statusWindowItemFaceImageStyle
+ * @type number
+ * @min 0
+ * @default 131
+ * 
+ * @param statusWindowItemNameStyle
+ * @text 选项姓名样式
+ * @desc 状态窗口选项姓名样式
+ * @parent statusWindowItemStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemNameVisible
+ * @text 姓名可见性
+ * @desc 状态窗口选项姓名可见性
+ * @parent statusWindowItemNameStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemNameOffset
+ * @text 姓名偏移
+ * @desc 状态窗口选项姓名偏移
+ * @parent statusWindowItemNameStyle
+ * @type struct<Point>
+ * @default {"x":"180","y":"11"}
+ * 
+ * @param statusWindowItemNameWidth
+ * @text 姓名宽度
+ * @desc 状态窗口选项姓名宽度
+ * @parent statusWindowItemNameStyle
+ * @type number
+ * @min 0
+ * @default 168
+ * 
+ * @param statusWindowItemNameFontSize
+ * @text 姓名字体大小
+ * @desc 状态窗口选项姓名字体大小
+ * @parent statusWindowItemNameStyle
+ * @type number
+ * @default 26
+ * 
+ * @param statusWindowItemNameTextColor
+ * @text 姓名文本颜色
+ * @desc 状态窗口选项姓名文本颜色
+ * @parent statusWindowItemNameStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param statusWindowItemNameTextOutlineColor
+ * @text 姓名文本描边颜色
+ * @desc 状态窗口选项姓名文本描边颜色
+ * @parent statusWindowItemNameStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param statusWindowItemLevelStyle
+ * @text 选项等级样式
+ * @desc 状态窗口选项等级样式
+ * @parent statusWindowItemStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemLevelVisible
+ * @text 等级可见性
+ * @desc 状态窗口选项等级可见性
+ * @parent statusWindowItemLevelStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemLevelLabelOffset
+ * @text 等级标签偏移
+ * @desc 状态窗口选项等级标签偏移
+ * @parent statusWindowItemLevelStyle
+ * @type struct<Point>
+ * @default {"x":"180","y":"47"}
+ * 
+ * @param statusWindowItemLevelLabelWidth
+ * @text 等级标签宽度
+ * @desc 状态窗口选项等级标签宽度
+ * @parent statusWindowItemLevelStyle
+ * @type number
+ * @min 0
+ * @default 48
+ * 
+ * @param statusWindowItemLevelLabelFontSize
+ * @text 等级标签字体大小
+ * @desc 状态窗口选项等级标签字体大小
+ * @parent statusWindowItemLevelStyle
+ * @type number
+ * @default 26
+ * 
+ * @param statusWindowItemLevelLabelTextColor
+ * @text 等级标签文本颜色
+ * @desc 状态窗口选项等级标签文本颜色
+ * @parent statusWindowItemLevelStyle
+ * @type struct<Color>
+ * @default {"r":"132","g":"170","b":"255","a":"1"}
+ * 
+ * @param statusWindowItemLevelLabelTextOutlineColor
+ * @text 等级标签文本描边颜色
+ * @desc 状态窗口选项等级标签文本描边颜色
+ * @parent statusWindowItemLevelStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param statusWindowItemLevelValueOffset
+ * @text 等级数值偏移
+ * @desc 状态窗口选项等级数值偏移
+ * @parent statusWindowItemLevelStyle
+ * @type struct<Point>
+ * @default {"x":"264","y":"47"}
+ * 
+ * @param statusWindowItemLevelValueWidth
+ * @text 等级数值宽度
+ * @desc 状态窗口选项等级数值宽度
+ * @parent statusWindowItemLevelStyle
+ * @type number
+ * @min 0
+ * @default 36
+ * 
+ * @param statusWindowItemLevelValueFontSize
+ * @text 等级数值字体大小
+ * @desc 状态窗口选项等级数值字体大小
+ * @parent statusWindowItemLevelStyle
+ * @type number
+ * @default 26
+ * 
+ * @param statusWindowItemLevelValueTextColor
+ * @text 等级数值文本颜色
+ * @desc 状态窗口选项等级数值文本颜色
+ * @parent statusWindowItemLevelStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param statusWindowItemLevelValueTextOutlineColor
+ * @text 等级数值文本描边颜色
+ * @desc 状态窗口选项等级数值文本描边颜色
+ * @parent statusWindowItemLevelStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param statusWindowItemIconsStyle
+ * @text 选项状态图标样式
+ * @desc 状态窗口选项状态图标样式
+ * @parent statusWindowItemStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemIconsVisible
+ * @text 图标可见性
+ * @desc 状态窗口选项图标可见性
+ * @parent statusWindowItemIconsStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemIconsOffset
+ * @text 图标偏移
+ * @desc 状态窗口选项图标偏移
+ * @parent statusWindowItemIconsStyle
+ * @type struct<Point>
+ * @default {"x":"180","y":"85"}
+ * 
+ * @param statusWindowItemAllIconsWidth
+ * @text 所有图标宽度总和（包扩列间距）
+ * @desc 状态窗口选项所有图标宽度总和（包扩列间距）
+ * @parent statusWindowItemIconsStyle
+ * @type number
+ * @min 0
+ * @default 144
+ * 
+ * @param statusWindowItemIconWidth
+ * @text 图标宽度
+ * @desc 状态窗口选项图标宽度
+ * @parent statusWindowItemIconsStyle
+ * @type number
+ * @min 0
+ * @default 32
+ * 
+ * @param statusWindowItemIconColSpacing
+ * @text 图标列间距
+ * @desc 状态窗口选项图标列间距
+ * @parent statusWindowItemIconsStyle
+ * @type number
+ * @default 0
+ * 
+ * @param statusWindowItemClassStyle
+ * @text 选项职业样式
+ * @desc 状态窗口选项职业样式
+ * @parent statusWindowItemStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemClassVisible
+ * @text 职业可见性
+ * @desc 状态窗口选项职业可见性
+ * @parent statusWindowItemClassStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemClassOffset
+ * @text 职业偏移
+ * @desc 状态窗口选项职业偏移
+ * @parent statusWindowItemClassStyle
+ * @type struct<Point>
+ * @default {"x":"360","y":"11"}
+ * 
+ * @param statusWindowItemClassWidth
+ * @text 职业宽度
+ * @desc 状态窗口选项职业宽度
+ * @parent statusWindowItemClassStyle
+ * @type number
+ * @min 0
+ * @default 168
+ * 
+ * @param statusWindowItemClassFontSize
+ * @text 职业字体大小
+ * @desc 状态窗口选项职业字体大小
+ * @parent statusWindowItemClassStyle
+ * @type number
+ * @default 26
+ * 
+ * @param statusWindowItemClassTextColor
+ * @text 职业文本颜色
+ * @desc 状态窗口选项职业文本颜色
+ * @parent statusWindowItemClassStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param statusWindowItemClassTextOutlineColor
+ * @text 职业文本描边颜色
+ * @desc 状态窗口选项职业文本描边颜色
+ * @parent statusWindowItemClassStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param statusWindowItemHPStyle
+ * @text 选项生命值样式
+ * @desc 状态窗口选项生命值样式
+ * @parent statusWindowItemStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemHPContainerStyleStart
+ * @text ------容器------
+ * @desc 生命值视图元素（生命值标签 + 生命值条 + 生命值数值）的容器样式
+ * @parent statusWindowItemHPStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemHPVisible
+ * @text 生命值可见性
+ * @desc 状态窗口选项生命值可见性
+ * @parent statusWindowItemHPStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemHPOffset
+ * @text 生命值偏移
+ * @desc 状态窗口选项生命值偏移
+ * @parent statusWindowItemHPStyle
+ * @type struct<Point>
+ * @default {"x":"360","y":"47"}
+ * 
+ * @param statusWindowItemHPWidth
+ * @text 生命值宽度
+ * @desc 状态窗口选项生命值宽度
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 128
+ * 
+ * @param statusWindowItemHPHeight
+ * @text 生命值高度
+ * @desc 状态窗口选项生命值高度
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 32
+ * 
+ * @param statusWindowItemHPLabelStyleStart
+ * @text -----生命值标签-----
+ * @desc 生命值标签的样式
+ * @parent statusWindowItemHPStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemHPLabelFormality
+ * @text 生命值标签形式
+ * @desc 状态窗口选项生命值标签形式
+ * @parent statusWindowItemHPStyle
+ * @type select
+ * @option none
+ * @option text
+ * @option icon
+ * @default text
+ * 
+ * @param statusWindowItemHPTextLabelOffset
+ * @text 生命值文本标签偏移
+ * @desc 状态窗口选项生命值文本标签偏移
+ * @parent statusWindowItemHPStyle
+ * @type struct<Point>
+ * @default {"x":"1","y":"3"}
+ * 
+ * @param statusWindowItemHPTextLabelWidth
+ * @text 生命值文本标签宽度
+ * @desc 状态窗口选项生命值文本标签宽度
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 128
+ * 
+ * @param statusWindowItemHPTextLabelHeight
+ * @text 生命值文本标签高度
+ * @desc 状态窗口选项生命值文本标签高度
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 24
+ * 
+ * @param statusWindowItemHPTextLabelFontSize
+ * @text 生命值文本标签字体大小
+ * @desc 状态窗口选项生命值文本标签字体大小
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @default 24
+ * 
+ * @param statusWindowItemHPTextLabelTextColor
+ * @text 生命值文本标签文本颜色
+ * @desc 状态窗口选项生命值文本标签文本颜色
+ * @parent statusWindowItemHPStyle
+ * @type struct<Color>
+ * @default {"r":"132","g":"170","b":"255","a":"1"}
+ * 
+ * @param statusWindowItemHPTextLabelTextOutlineColor
+ * @text 生命值文本标签文本描边颜色
+ * @desc 状态窗口选项生命值文本标签文本描边颜色
+ * @parent statusWindowItemHPStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param statusWindowItemHPTextLabelTextOutlineWidth
+ * @text 生命值文本标签文本描边宽度
+ * @desc 状态窗口选项生命值文本标签文本描边宽度
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 2
+ * 
+ * @param statusWindowItemHPIconLabelIndex
+ * @text 生命值图标标签索引
+ * @desc 状态窗口选项生命值图标标签索引（IconSet中图标的索引）
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param statusWindowItemHPIconLabelOffset
+ * @text 生命值图标标签偏移
+ * @desc 状态窗口选项生命值图标标签偏移
+ * @parent statusWindowItemHPStyle
+ * @type struct<Point>
+ * @default {"x":"1","y":"3"}
+ * 
+ * @param statusWindowItemHPIconLabelWidth
+ * @text 生命值图标标签宽度
+ * @desc 状态窗口选项生命值图标标签宽度
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 24
+ * 
+ * @param statusWindowItemHPGaugeStyleStart
+ * @text -----生命值条-----
+ * @desc 生命值条样式
+ * @parent statusWindowItemHPStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemHPGaugeVisible
+ * @text 生命值条可见性
+ * @desc 状态窗口选项生命值条可见性
+ * @parent statusWindowItemHPStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemHPGaugeOffset
+ * @text 生命值条偏移
+ * @desc 状态窗口选项生命值条偏移
+ * @parent statusWindowItemHPStyle
+ * @type struct<Point>
+ * @default {"x":"30","y":"12"}
+ * 
+ * @param statusWindowItemHPGaugeWidth
+ * @text 生命值条宽度
+ * @desc 状态窗口选项生命值条宽度
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 98
+ * 
+ * @param statusWindowItemHPGaugeHeight
+ * @text 生命值条高度
+ * @desc 状态窗口选项生命值条高度
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 12
+ * 
+ * @param statusWindowItemHPGaugeBackColor
+ * @text 生命值条背景颜色
+ * @desc 状态窗口选项生命值条背景颜色
+ * @parent statusWindowItemHPStyle
+ * @type struct<Color>
+ * @default {"r":"32","g":"32","b":"64","a":"1.0"}
+ * 
+ * @param statusWindowItemHPGaugeColor1
+ * @text 生命值条颜色1
+ * @desc 状态窗口选项生命值条颜色1
+ * @parent statusWindowItemHPStyle
+ * @type struct<Color>
+ * @default {"r":"224","g":"128","b":"64","a":"1.0"}
+ * 
+ * @param statusWindowItemHPGaugeColor2
+ * @text 生命值条颜色2
+ * @desc 状态窗口选项生命值条颜色2
+ * @parent statusWindowItemHPStyle
+ * @type struct<Color>
+ * @default {"r":"240","g":"192","b":"64","a":"1.0"}
+ * 
+ * @param statusWindowItemHPGaugeBorderColor
+ * @text 生命值条边框颜色
+ * @desc 状态窗口选项生命值条边框颜色
+ * @parent statusWindowItemHPStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1.0"}
+ * 
+ * @param statusWindowItemHPGaugeBorderLineWidth
+ * @text 生命值条边框厚度
+ * @desc 状态窗口选项生命值条边框厚度
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param statusWindowItemHPGaugeBorderRadius
+ * @text 生命值条边框半径
+ * @desc 状态窗口选项生命值条边框半径
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param statusWindowItemHPValueStyleStart
+ * @text -----生命值数值-----
+ * @desc 生命值数值样式
+ * @parent statusWindowItemHPStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemHPValueVisible
+ * @text 生命值数值可见性
+ * @desc 状态窗口选项生命值数值可见性
+ * @parent statusWindowItemHPStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemHPMaxValueVisible
+ * @text 最大生命值数值可见性
+ * @desc 状态窗口选项最大生命值数值可见性
+ * @parent statusWindowItemHPStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default false
+ * 
+ * @param statusWindowItemHPValueOffset
+ * @text 生命值数值偏移
+ * @desc 状态窗口选项生命值数值偏移
+ * @parent statusWindowItemHPStyle
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
+ * 
+ * @param statusWindowItemHPValueWidth
+ * @text 生命值数值宽度
+ * @desc 状态窗口选项生命值数值宽度
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 128
+ * 
+ * @param statusWindowItemHPValueHeight
+ * @text 生命值数值高度
+ * @desc 状态窗口选项生命值数值高度
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 24
+ * 
+ * @param statusWindowItemHPValueTextAlign
+ * @text 生命值数值文本对齐
+ * @desc 状态窗口选项生命值数值文本对齐
+ * @parent statusWindowItemHPStyle
+ * @type select
+ * @option center
+ * @option left
+ * @option right
+ * @default right
+ * 
+ * @param statusWindowItemHPValueFontSize
+ * @text 生命值数值字体大小
+ * @desc 状态窗口选项生命值数值字体大小
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @default 20
+ * 
+ * @param statusWindowItemHPNormalValueTextColor
+ * @text 正常生命值数值文本颜色
+ * @desc 状态窗口选项正常生命值数值文本颜色
+ * @parent statusWindowItemHPStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param statusWindowItemHPDeathValueTextColor
+ * @text 死亡生命值数值文本颜色
+ * @desc 状态窗口选项死亡生命值数值文本颜色
+ * @parent statusWindowItemHPStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"32","b":"32","a":"1"}
+ * 
+ * @param statusWindowItemHPCrisisValueTextColor
+ * @text 危机生命值数值文本颜色
+ * @desc 状态窗口选项危机生命值数值文本颜色（生命值小于最大生命值的1/4）
+ * @parent statusWindowItemHPStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"64","a":"1"}
+ * 
+ * @param statusWindowItemHPValueTextOutlineColor
+ * @text 生命值数值文本描边颜色
+ * @desc 状态窗口选项危机生命值数值文本描边颜色
+ * @parent statusWindowItemHPStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param statusWindowItemHPValueTextOutlineWidth
+ * @text 生命值数值文本描边宽度
+ * @desc 状态窗口选项危机生命值数值文本描边宽度
+ * @parent statusWindowItemHPStyle
+ * @type number
+ * @min 0
+ * @default 2
+ * 
+ * @param statusWindowItemMPStyle
+ * @text 选项魔法值样式
+ * @desc 状态窗口选项魔法值样式
+ * @parent statusWindowItemStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemMPContainerStyleStart
+ * @text ------容器------
+ * @desc 魔法值视图元素（魔法值标签 + 魔法值条 + 魔法值数值）的容器样式
+ * @parent statusWindowItemMPStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemMPVisible
+ * @text 魔法值可见性
+ * @desc 状态窗口选项魔法值可见性
+ * @parent statusWindowItemMPStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemMPOffset
+ * @text 魔法值偏移
+ * @desc 状态窗口选项魔法值偏移
+ * @parent statusWindowItemMPStyle
+ * @type struct<Point>
+ * @default {"x":"360","y":"71"}
+ * 
+ * @param statusWindowItemMPWidth
+ * @text 魔法值宽度
+ * @desc 状态窗口选项魔法值宽度
+ * @parent statusWindowItemMPStyle
+ * @type number
+ * @min 0
+ * @default 128
+ * 
+ * @param statusWindowItemMPHeight
+ * @text 魔法值高度
+ * @desc 状态窗口选项魔法值高度
+ * @parent statusWindowItemMPStyle
+ * @type number
+ * @min 0
+ * @default 32
+ * 
+ * @param statusWindowItemMPLabelStyleStart
+ * @text -----魔法值标签-----
+ * @desc 魔法值标签样式
+ * @parent statusWindowItemMPStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemMPLabelFormality
+ * @text 魔法值标签形式
+ * @desc 状态窗口选项魔法值标签形式
+ * @parent statusWindowItemMPStyle
+ * @type select
+ * @option none
+ * @option text
+ * @option icon
+ * @default text
+ * 
+ * @param statusWindowItemMPTextLabelOffset
+ * @text 魔法值文本标签偏移
+ * @desc 状态窗口选项魔法值文本标签偏移
+ * @parent statusWindowItemMPStyle
+ * @type struct<Point>
+ * @default {"x":"1","y":"3"}
+ * 
+ * @param statusWindowItemMPTextLabelWidth
+ * @text 魔法值文本标签宽度
+ * @desc 状态窗口选项魔法值文本标签宽度
+ * @parent statusWindowItemMPStyle
+ * @type number
+ * @min 0
+ * @default 128
+ * 
+ * @param statusWindowItemMPTextLabelHeight
+ * @text 魔法值文本标签高度
+ * @desc 状态窗口选项魔法值文本标签高度
+ * @parent statusWindowItemMPStyle
+ * @type number
+ * @min 0
+ * @default 24
+ * 
+ * @param statusWindowItemMPTextLabelFontSize
+ * @text 魔法值文本标签字体大小
+ * @desc 状态窗口选项魔法值文本标签字体大小
+ * @parent statusWindowItemMPStyle
+ * @type number
+ * @default 24
+ * 
+ * @param statusWindowItemMPTextLabelTextColor
+ * @text 魔法值文本标签文本颜色
+ * @desc 状态窗口选项魔法值文本标签文本颜色
+ * @parent statusWindowItemMPStyle
+ * @type struct<Color>
+ * @default {"r":"132","g":"170","b":"255","a":"1"}
+ * 
+ * @param statusWindowItemMPTextLabelTextOutlineColor
+ * @text 魔法值文本标签文本描边颜色
+ * @desc 状态窗口选项魔法值文本标签文本描边颜色
+ * @parent statusWindowItemMPStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param statusWindowItemMPTextLabelTextOutlineWidth
+ * @text 魔法值文本标签文本描边宽度
+ * @desc 状态窗口选项魔法值文本标签文本描边宽度
+ * @parent statusWindowItemMPStyle
+ * @type number
+ * @min 0
+ * @default 2
+ * 
+ * @param statusWindowItemMPIconLabelIndex
+ * @text 魔法值图标标签索引
+ * @desc 状态窗口选项魔法值图标标签索引（IconSet中图标的索引）
+ * @parent statusWindowItemMPStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param statusWindowItemMPIconLabelOffset
+ * @text 魔法值图标标签偏移
+ * @desc 状态窗口选项魔法值图标标签偏移
+ * @parent statusWindowItemMPStyle
+ * @type struct<Point>
+ * @default {"x":"1","y":"3"}
+ * 
+ * @param statusWindowItemMPIconLabelWidth
+ * @text 魔法值图标标签宽度
+ * @desc 状态窗口选项魔法值图标标签宽度
+ * @parent statusWindowItemMPStyle
+ * @type number
+ * @min 0
+ * @default 24
+ * 
+ * @param statusWindowItemMPGaugeStyleStart
+ * @text -----魔法值条-----
+ * @desc 魔法值条样式
+ * @parent statusWindowItemMPStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemMPGaugeVisible
+ * @text 魔法值条可见性
+ * @desc 状态窗口选项魔法值条可见性
+ * @parent statusWindowItemMPStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemMPGaugeOffset
+ * @text 魔法值条偏移
+ * @desc 状态窗口选项魔法值条偏移
+ * @parent statusWindowItemMPStyle
+ * @type struct<Point>
+ * @default {"x":"30","y":"12"}
+ * 
+ * @param statusWindowItemMPGaugeWidth
+ * @text 魔法值条宽度
+ * @desc 状态窗口选项魔法值条宽度
+ * @parent statusWindowItemMPStyle
+ * @type number
+ * @min 0
+ * @default 98
+ * 
+ * @param statusWindowItemMPGaugeHeight
+ * @text 魔法值条高度
+ * @desc 状态窗口选项魔法值条高度
+ * @parent statusWindowItemMPStyle
+ * @type number
+ * @min 0
+ * @default 12
+ * 
+ * @param statusWindowItemMPGaugeBackColor
+ * @text 魔法值条背景颜色
+ * @desc 状态窗口选项魔法值条背景颜色
+ * @parent statusWindowItemMPStyle
+ * @type struct<Color>
+ * @default {"r":"32","g":"32","b":"64","a":"1.0"}
+ * 
+ * @param statusWindowItemMPGaugeColor1
+ * @text 魔法值条颜色1
+ * @desc 状态窗口选项魔法值条颜色1
+ * @parent statusWindowItemMPStyle
+ * @type struct<Color>
+ * @default {"r":"64","g":"128","b":"192","a":"1.0"}
+ * 
+ * @param statusWindowItemMPGaugeColor2
+ * @text 魔法值条颜色2
+ * @desc 状态窗口选项魔法值条颜色2
+ * @parent statusWindowItemMPStyle
+ * @type struct<Color>
+ * @default {"r":"64","g":"192","b":"240","a":"1.0"}
+ * 
+ * @param statusWindowItemMPGaugeBorderColor
+ * @text 魔法值条边框颜色
+ * @desc 状态窗口选项魔法值条边框颜色
+ * @parent statusWindowItemMPStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1.0"}
+ * 
+ * @param statusWindowItemMPGaugeBorderLineWidth
+ * @text 魔法值条边框厚度
+ * @desc 状态窗口选项魔法值条边框厚度
+ * @parent statusWindowItemMPStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param statusWindowItemMPGaugeBorderRadius
+ * @text 魔法值条边框半径
+ * @desc 状态窗口选项魔法值条边框半径
+ * @parent statusWindowItemMPStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param statusWindowItemMPValueStyleStart
+ * @text -----魔法值数值-----
+ * @desc 魔法值数值样式
+ * @parent statusWindowItemMPStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemMPValueVisible
+ * @text 魔法值数值可见性
+ * @desc 状态窗口选项魔法值数值可见性
+ * @parent statusWindowItemMPStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemMPMaxValueVisible
+ * @text 最大魔法值数值可见性
+ * @desc 状态窗口选项最大魔法值数值可见性
+ * @parent statusWindowItemMPStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default false
+ * 
+ * @param statusWindowItemMPValueOffset
+ * @text 魔法值数值偏移
+ * @desc 状态窗口选项魔法值数值偏移
+ * @parent statusWindowItemMPStyle
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
+ * 
+ * @param statusWindowItemMPValueWidth
+ * @text 魔法值数值宽度
+ * @desc 状态窗口选项魔法值数值宽度
+ * @parent statusWindowItemMPStyle
+ * @type number
+ * @min 0
+ * @default 128
+ * 
+ * @param statusWindowItemMPValueHeight
+ * @text 魔法值数值高度
+ * @desc 状态窗口选项魔法值数值高度
+ * @parent statusWindowItemMPStyle
+ * @type number
+ * @min 0
+ * @default 24
+ * 
+ * @param statusWindowItemMPValueTextAlign
+ * @text 魔法值数值文本对齐
+ * @desc 状态窗口选项魔法值数值文本对齐
+ * @parent statusWindowItemMPStyle
+ * @type select
+ * @option center
+ * @option left
+ * @option right
+ * @default right
+ * 
+ * @param statusWindowItemMPValueFontSize
+ * @text 魔法值数值字体大小
+ * @desc 状态窗口选项魔法值数值字体大小
+ * @parent statusWindowItemMPStyle
+ * @type number
+ * @default 20
+ * 
+ * @param statusWindowItemMPNormalValueTextColor
+ * @text 魔法值数值文本颜色
+ * @desc 状态窗口选项正常魔法值数值文本颜色
+ * @parent statusWindowItemMPStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param statusWindowItemMPValueTextOutlineColor
+ * @text 魔法值数值文本描边颜色
+ * @desc 状态窗口选项魔法值数值文本描边颜色
+ * @parent statusWindowItemMPStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param statusWindowItemMPValueTextOutlineWidth
+ * @text 魔法值数值文本描边宽度
+ * @desc 状态窗口选项魔法值数值文本描边宽度
+ * @parent statusWindowItemMPStyle
+ * @type number
+ * @min 0
+ * @default 2
+ * 
+ * @param statusWindowItemTPStyle
+ * @text 选项特技值样式
+ * @desc 状态窗口选项特技值样式
+ * @parent statusWindowItemStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemTPContainerStyleStart
+ * @text ------容器------
+ * @desc 特技值视图元素（特技值标签 + 特技值条 + 特技值数值）的容器样式
+ * @parent statusWindowItemTPStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemTPVisible
+ * @text 特技值可见性
+ * @desc 状态窗口选项特技值可见性
+ * @parent statusWindowItemTPStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemTPOffset
+ * @text 特技值偏移
+ * @desc 状态窗口选项特技值偏移
+ * @parent statusWindowItemTPStyle
+ * @type struct<Point>
+ * @default {"x":"360","y":"95"}
+ * 
+ * @param statusWindowItemTPWidth
+ * @text 特技值宽度
+ * @desc 状态窗口选项特技值宽度
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 128
+ * 
+ * @param statusWindowItemTPHeight
+ * @text 特技值高度
+ * @desc 状态窗口选项特技值高度
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 32
+ * 
+ * @param statusWindowItemTPLabelStyleStart
+ * @text ------特技值标签-----
+ * @desc 特技值标签样式
+ * @parent statusWindowItemTPStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemTPLabelFormality
+ * @text 特技值标签形式
+ * @desc 状态窗口选项特技值标签形式
+ * @parent statusWindowItemTPStyle
+ * @type select
+ * @option none
+ * @option text
+ * @option icon
+ * @default text
+ * 
+ * @param statusWindowItemTPTextLabelOffset
+ * @text 特技值文本标签偏移
+ * @desc 状态窗口选项特技值文本标签偏移
+ * @parent statusWindowItemTPStyle
+ * @type struct<Point>
+ * @default {"x":"1","y":"3"}
+ * 
+ * @param statusWindowItemTPTextLabelWidth
+ * @text 特技值文本标签宽度
+ * @desc 状态窗口选项特技值文本标签宽度
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 128
+ * 
+ * @param statusWindowItemTPTextLabelHeight
+ * @text 特技值文本标签高度
+ * @desc 状态窗口选项特技值文本标签高度
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 24
+ * 
+ * @param statusWindowItemTPTextLabelFontSize
+ * @text 特技值文本标签字体大小
+ * @desc 状态窗口选项特技值文本标签字体大小
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @default 24
+ * 
+ * @param statusWindowItemTPTextLabelTextColor
+ * @text 特技值文本标签文本颜色
+ * @desc 状态窗口选项特技值文本标签文本颜色
+ * @parent statusWindowItemTPStyle
+ * @type struct<Color>
+ * @default {"r":"132","g":"170","b":"255","a":"1"}
+ * 
+ * @param statusWindowItemTPTextLabelTextOutlineColor
+ * @text 特技值文本标签文本描边颜色
+ * @desc 状态窗口选项特技值文本标签文本描边颜色
+ * @parent statusWindowItemTPStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param statusWindowItemTPTextLabelTextOutlineWidth
+ * @text 特技值文本标签文本描边宽度
+ * @desc 状态窗口选项特技值文本标签文本描边宽度
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 2
+ * 
+ * @param statusWindowItemTPIconLabelIndex
+ * @text 特技值图标标签索引
+ * @desc 状态窗口选项特技值图标标签索引（IconSet中图标的索引）
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param statusWindowItemTPIconLabelOffset
+ * @text 特技值图标标签偏移
+ * @desc 状态窗口选项特技值图标标签偏移
+ * @parent statusWindowItemTPStyle
+ * @type struct<Point>
+ * @default {"x":"1","y":"3"}
+ * 
+ * @param statusWindowItemTPIconLabelWidth
+ * @text 特技值图标标签宽度
+ * @desc 状态窗口选项特技值图标标签宽度
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 24
+ * 
+ * @param statusWindowItemTPGaugeStyleStart
+ * @text -----特技值条-----
+ * @desc 特技值条样式
+ * @parent statusWindowItemTPStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemTPGaugeVisible
+ * @text 特技值条可见性
+ * @desc 状态窗口选项特技值条可见性
+ * @parent statusWindowItemTPStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemTPGaugeOffset
+ * @text 特技值条偏移
+ * @desc 状态窗口选项特技值条偏移
+ * @parent statusWindowItemTPStyle
+ * @type struct<Point>
+ * @default {"x":"30","y":"12"}
+ * 
+ * @param statusWindowItemTPGaugeWidth
+ * @text 特技值条宽度
+ * @desc 状态窗口选项特技值条宽度
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 98
+ * 
+ * @param statusWindowItemTPGaugeHeight
+ * @text 特技值条高度
+ * @desc 状态窗口选项特技值条高度
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 12
+ * 
+ * @param statusWindowItemTPGaugeBackColor
+ * @text 特技值条背景颜色
+ * @desc 状态窗口选项特技值条背景颜色
+ * @parent statusWindowItemTPStyle
+ * @type struct<Color>
+ * @default {"r":"32","g":"32","b":"64","a":"1.0"}
+ * 
+ * @param statusWindowItemTPGaugeColor1
+ * @text 特技值条颜色1
+ * @desc 状态窗口选项特技值条颜色1
+ * @parent statusWindowItemTPStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"160","b":"64","a":"1.0"}
+ * 
+ * @param statusWindowItemTPGaugeColor2
+ * @text 特技值条颜色2
+ * @desc 状态窗口选项特技值条颜色2
+ * @parent statusWindowItemTPStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"224","b":"96","a":"1.0"}
+ * 
+ * @param statusWindowItemTPGaugeBorderColor
+ * @text 特技值条边框颜色
+ * @desc 状态窗口选项特技值条边框颜色
+ * @parent statusWindowItemTPStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1.0"}
+ * 
+ * @param statusWindowItemTPGaugeBorderLineWidth
+ * @text 特技值条边框厚度
+ * @desc 状态窗口选项特技值条边框厚度
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param statusWindowItemTPGaugeBorderRadius
+ * @text 特技值条边框半径
+ * @desc 状态窗口选项特技值条边框半径
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param statusWindowItemTPValueStyleStart
+ * @text -----特技值数值-----
+ * @desc 特技值数值样式
+ * @parent statusWindowItemTPStyle
+ * @type string
+ * @default
+ * 
+ * @param statusWindowItemTPValueVisible
+ * @text 特技值数值可见性
+ * @desc 状态窗口选项特技值数值可见性
+ * @parent statusWindowItemTPStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param statusWindowItemTPMaxValueVisible
+ * @text 最大特技值数值可见性
+ * @desc 状态窗口选项最大特技值数值可见性
+ * @parent statusWindowItemTPStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default false
+ * 
+ * @param statusWindowItemTPValueOffset
+ * @text 特技值数值偏移
+ * @desc 状态窗口选项特技值数值偏移
+ * @parent statusWindowItemTPStyle
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
+ * 
+ * @param statusWindowItemTPValueWidth
+ * @text 特技值数值宽度
+ * @desc 状态窗口选项特技值数值宽度
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 128
+ * 
+ * @param statusWindowItemTPValueHeight
+ * @text 特技值数值高度
+ * @desc 状态窗口选项特技值数值高度
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 24
+ * 
+ * @param statusWindowItemTPValueTextAlign
+ * @text 特技值数值文本对齐
+ * @desc 状态窗口选项特技值数值文本对齐
+ * @parent statusWindowItemTPStyle
+ * @type select
+ * @option center
+ * @option left
+ * @option right
+ * @default right
+ * 
+ * @param statusWindowItemTPValueFontSize
+ * @text 特技值数值字体大小
+ * @desc 状态窗口选项特技值数值字体大小
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @default 20
+ * 
+ * @param statusWindowItemTPNormalValueTextColor
+ * @text 特技值数值文本颜色
+ * @desc 状态窗口选项特技值数值文本颜色
+ * @parent statusWindowItemTPStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param statusWindowItemTPValueTextOutlineColor
+ * @text 特技值数值文本描边颜色
+ * @desc 状态窗口选项特技值数值文本描边颜色
+ * @parent statusWindowItemTPStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param statusWindowItemTPValueTextOutlineWidth
+ * @text 特技值数值文本描边宽度
+ * @desc 状态窗口选项特技值数值文本描边宽度
+ * @parent statusWindowItemTPStyle
+ * @type number
+ * @min 0
+ * @default 2
+ * 
+ * @param goldWindowSet
+ * @text 金币窗口设置
+ * @desc 金币窗口设置
+ * @parent mainMenuSceneSet
+ * @type string
+ * @default
+ * 
+ * @param goldWindowVisible
+ * @text 可见性
+ * @desc 金币窗口可见性
+ * @parent goldWindowSet
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param goldWindowWindowSkin
+ * @text 窗口皮肤
+ * @desc 金币窗口皮肤
+ * @parent goldWindowSet
+ * @type file
+ * @dir img/system/
+ * @default Window
+ * 
+ * @param goldWindowOffset
+ * @text 偏移
+ * @desc 金币窗口偏移
+ * @parent goldWindowSet
+ * @type struct<Point>
+ * @default {"x":"568","y":"548"}
+ * 
+ * @param goldWindowWidth
+ * @text 宽度
+ * @desc 金币窗口宽度
+ * @parent goldWindowSet
+ * @type number
+ * @min 0
+ * @default 240
+ * 
+ * @param goldWindowHeight
+ * @text 高度
+ * @desc 金币窗口高度
+ * @parent goldWindowSet
+ * @type number
+ * @min 0
+ * @default 68
+ * 
+ * @param goldWindowBackgroundStyle
+ * @text 背景样式
+ * @desc 金币窗口背景样式
+ * @parent goldWindowSet
+ * @type string
+ * @default
+ * 
+ * @param goldWindowBGVisible
+ * @text 背景可见性
+ * @desc 金币窗口背景可见性
+ * @parent goldWindowBackgroundStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default false
+ * 
+ * @param goldWindowBGOffset
+ * @text 背景偏移
+ * @desc 金币窗口背景偏移
+ * @parent goldWindowBackgroundStyle
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
+ * 
+ * @param goldWindowBGWidth
+ * @text 背景宽度
+ * @desc 金币窗口背景宽度
+ * @parent goldWindowBackgroundStyle
+ * @type number
+ * @min 0
+ * @default 240
+ * 
+ * @param goldWindowBGHeight
+ * @text 背景高度
+ * @desc 金币窗口背景高度
+ * @parent goldWindowBackgroundStyle
+ * @type number
+ * @min 0
+ * @default 68
+ * 
+ * @param goldWindowBGColor1
+ * @text 背景颜色1
+ * @desc 金币窗口背景颜色1
+ * @parent goldWindowBackgroundStyle
+ * @type struct<Color>
+ * @default {"r":"32","g":"32","b":"32","a":"0.5"}
+ * 
+ * @param goldWindowBGColor2
+ * @text 背景颜色2
+ * @desc 金币窗口背景颜色2
+ * @parent goldWindowBackgroundStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"0.5"}
+ * 
+ * @param goldWindowBGBorderColor
+ * @text 背景边框颜色
+ * @desc 金币窗口背景边框颜色
+ * @parent goldWindowBackgroundStyle
+ * @type struct<Color>
+ * @default {"r":"32","g":"32","b":"32","a":"0.5"}
+ * 
+ * @param goldWindowBGBorderLineWidth
+ * @text 背景边框厚度
+ * @desc 金币窗口背景边框厚度
+ * @parent goldWindowBackgroundStyle
+ * @type number
+ * @min 0
+ * @default 1
+ * 
+ * @param goldWindowBGBorderRadius
+ * @text 背景边框半径
+ * @desc 金币窗口背景边框半径
+ * @parent goldWindowBackgroundStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param goldWindowValueStyle
+ * @text 数值样式
+ * @desc 金币窗口数值样式
+ * @parent goldWindowSet
+ * @type string
+ * @default
+ * 
+ * @param goldWindowValueFontSize
+ * @text 字体大小
+ * @desc 金币窗口数值字体大小
+ * @parent goldWindowValueStyle
+ * @type number
+ * @default 26
+ * 
+ * @param goldWindowValueTextOffsetX
+ * @text 文本横向偏移
+ * @desc 金币窗口数值文本横向偏移
+ * @parent goldWindowValueStyle
+ * @type number
+ * @default 0
+ * 
+ * @param goldWindowValueTextAlign
+ * @text 文本对齐
+ * @desc 金币窗口数值文本对齐
+ * @parent goldWindowValueStyle
+ * @type select
+ * @option center
+ * @option left
+ * @option right
+ * @default right
+ * 
+ * @param goldWindowValueTextColor
+ * @text 文本颜色
+ * @desc 金币窗口数值文本颜色
+ * @parent goldWindowValueStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param goldWindowValueTextOutlineColor
+ * @text 文本描边颜色
+ * @desc 金币窗口数值文本描边颜色
+ * @parent goldWindowValueStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param goldWindowUnitStyle
+ * @text 单位样式
+ * @desc 金币窗口单位样式
+ * @parent goldWindowSet
+ * @type string
+ * @default
+ * 
+ * @param goldWindowUnitFormality
+ * @text 单位形式
+ * @desc 金币窗口单位形式
+ * @parent goldWindowUnitStyle
+ * @type select
+ * @option text
+ * @option icon
+ * @default text
+ * 
+ * @param goldWindowUnitFontSize
+ * @text 字体大小
+ * @desc 金币窗口单位字体大小
+ * @parent goldWindowUnitStyle
+ * @type number
+ * @default 26
+ * 
+ * @param goldWindowUnitTextOffsetX
+ * @text 文本横向偏移
+ * @desc 金币窗口单位文本横向偏移
+ * @parent goldWindowUnitStyle
+ * @type number
+ * @default 0
+ * 
+ * @param goldWindowUnitTextAlign
+ * @text 文本对齐
+ * @desc 金币窗口单位文本对齐
+ * @parent goldWindowUnitStyle
+ * @type select
+ * @option center
+ * @option left
+ * @option right
+ * @default right
+ * 
+ * @param goldWindowUnitTextColor
+ * @text 文本颜色
+ * @desc 金币窗口单位文本颜色
+ * @parent goldWindowUnitStyle
+ * @type struct<Color>
+ * @default {"r":"132","g":"170","b":"255","a":"1"}
+ * 
+ * @param goldWindowUnitTextOutlineColor
+ * @text 文本描边颜色
+ * @desc 金币窗口单位文本描边颜色
+ * @parent goldWindowUnitStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param goldWindowUnitIconIndex
+ * @text 单位图标索引
+ * @desc 金币窗口单位图标索引（IconSet中图标的索引）
+ * @parent goldWindowUnitStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param goldWindowUnitIconOffset
+ * @text 单位图标偏移
+ * @desc 金币窗口单位图标偏移
+ * @parent goldWindowUnitStyle
+ * @type struct<Point>
+ * @default {"x":"195","y":"4"}
+ * 
+ * @param goldWindowUnitIconWidth
+ * @text 单位图标宽度
+ * @desc 金币窗口单位图标宽度
  * @parent goldWindowUnitStyle
  * @type number
  * @min 0
