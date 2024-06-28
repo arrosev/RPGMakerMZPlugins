@@ -7,9 +7,6 @@
  * 
  * @help
  * 
- * this._windowLayer(808, 616)
- * 
- * 
  * This plugin is released under the MIT license.
 
  * Copyright (c) 2024 Arrose
@@ -606,6 +603,16 @@
  * @min 0
  * @default 168
  * 
+ * @param statusWindowItemNameTextAlign
+ * @text Name Text Align
+ * @desc Status Window Item Name Text Align
+ * @parent statusWindowItemNameStyle
+ * @type select
+ * @option center
+ * @option left
+ * @option right
+ * @default left
+ * 
  * @param statusWindowItemNameFontSize
  * @text Name Font Size
  * @desc Status Window Item Name Font Size
@@ -658,6 +665,16 @@
  * @min 0
  * @default 48
  * 
+ * @param statusWindowItemLevelLabelTextAlign
+ * @text Level Label Text Align
+ * @desc Status Window Item Level Label Text Align
+ * @parent statusWindowItemLevelStyle
+ * @type select
+ * @option center
+ * @option left
+ * @option right
+ * @default left
+ * 
  * @param statusWindowItemLevelLabelFontSize
  * @text Level Label Font Size
  * @desc Status Window Item Level Label Font Size
@@ -693,6 +710,16 @@
  * @type number
  * @min 0
  * @default 36
+ * 
+ * @param statusWindowItemLevelValueTextAlign
+ * @text Level Value Text Align
+ * @desc Status Window Item Level Value Text Align
+ * @parent statusWindowItemLevelStyle
+ * @type select
+ * @option center
+ * @option left
+ * @option right
+ * @default left
  * 
  * @param statusWindowItemLevelValueFontSize
  * @text Level Value Font Size
@@ -791,6 +818,16 @@
  * @type number
  * @min 0
  * @default 168
+ * 
+ * @param statusWindowItemClassTextAlign
+ * @text Class Text Align
+ * @desc Status Window Item Class Text Align
+ * @parent statusWindowItemClassStyle
+ * @type select
+ * @option center
+ * @option left
+ * @option right
+ * @default left
  * 
  * @param statusWindowItemClassFontSize
  * @text Class Font Size
@@ -2007,9 +2044,6 @@
  * 
  * @help
  * 
- * this._windowLayer(808, 616)
- * 
- * 
  * This plugin is released under the MIT license.
 
  * Copyright (c) 2024 Arrose
@@ -2031,6 +2065,15 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
+ * 
+ * 这个插件主要用于自定义主菜单场景
+ * 
+ * 【V1.0.0】
+ *     1. 使用视频或者图片作为主菜单场景的背景
+ *     2. 对主菜单的各种视图元素进行位置和尺寸等样式的修改
+ *     3. 对主菜单增加了一些视觉上的功能补充，比如光标，图标标签等
+ * 
+ * this._windowLayer(808, 616)
  * 
  * @param mainMenuSceneSet
  * @text 主菜单场景设置
@@ -2606,6 +2649,16 @@
  * @min 0
  * @default 168
  * 
+ * @param statusWindowItemNameTextAlign
+ * @text 姓名文本对齐
+ * @desc 状态窗口选项姓名文本对齐
+ * @parent statusWindowItemNameStyle
+ * @type select
+ * @option center
+ * @option left
+ * @option right
+ * @default left
+ * 
  * @param statusWindowItemNameFontSize
  * @text 姓名字体大小
  * @desc 状态窗口选项姓名字体大小
@@ -2658,6 +2711,16 @@
  * @min 0
  * @default 48
  * 
+ * @param statusWindowItemLevelLabelTextAlign
+ * @text 等级标签文本对齐
+ * @desc 状态窗口选项等级标签文本对齐
+ * @parent statusWindowItemLevelStyle
+ * @type select
+ * @option center
+ * @option left
+ * @option right
+ * @default left
+ * 
  * @param statusWindowItemLevelLabelFontSize
  * @text 等级标签字体大小
  * @desc 状态窗口选项等级标签字体大小
@@ -2693,6 +2756,16 @@
  * @type number
  * @min 0
  * @default 36
+ * 
+ * @param statusWindowItemLevelValueTextAlign
+ * @text 等级数值文本对齐
+ * @desc 状态窗口选项等级数值文本对齐
+ * @parent statusWindowItemLevelStyle
+ * @type select
+ * @option center
+ * @option left
+ * @option right
+ * @default left
  * 
  * @param statusWindowItemLevelValueFontSize
  * @text 等级数值字体大小
@@ -2791,6 +2864,16 @@
  * @type number
  * @min 0
  * @default 168
+ * 
+ * @param statusWindowItemClassTextAlign
+ * @text 职业文本对齐
+ * @desc 状态窗口选项职业文本对齐
+ * @parent statusWindowItemClassStyle
+ * @type select
+ * @option center
+ * @option left
+ * @option right
+ * @default left
  * 
  * @param statusWindowItemClassFontSize
  * @text 职业字体大小
@@ -4174,6 +4257,7 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowItemNameOffsetJsonObject = JSON.parse(parameters.statusWindowItemNameOffset);
     const statusWindowItemNameOffset = new Point(Number(statusWindowItemNameOffsetJsonObject.x) || 0, Number(statusWindowItemNameOffsetJsonObject.y) || 0);
     const statusWindowItemNameWidth = Number(parameters.statusWindowItemNameWidth);
+    const statusWindowItemNameTextAlign = parameters.statusWindowItemNameTextAlign;
     const statusWindowItemNameFontSize = Number(parameters.statusWindowItemNameFontSize) || 26;
     const statusWindowItemNameTextColorJsonObject = JSON.parse(parameters.statusWindowItemNameTextColor);
     const statusWindowItemNameTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemNameTextOutlineColor);
@@ -4182,12 +4266,14 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowItemLevelLabelOffsetJsonObject = JSON.parse(parameters.statusWindowItemLevelLabelOffset);
     const statusWindowItemLevelLabelOffset = new Point(Number(statusWindowItemLevelLabelOffsetJsonObject.x) || 0, Number(statusWindowItemLevelLabelOffsetJsonObject.y) || 0);
     const statusWindowItemLevelLabelWidth = Number(parameters.statusWindowItemLevelLabelWidth);
+    const statusWindowItemLevelLabelTextAlign = parameters.statusWindowItemLevelLabelTextAlign;
     const statusWindowItemLevelLabelFontSize = Number(parameters.statusWindowItemLevelLabelFontSize) || 26;
     const statusWindowItemLevelLabelTextColorJsonObject = JSON.parse(parameters.statusWindowItemLevelLabelTextColor);
     const statusWindowItemLevelLabelTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemLevelLabelTextOutlineColor);
     const statusWindowItemLevelValueOffsetJsonObject = JSON.parse(parameters.statusWindowItemLevelValueOffset);
     const statusWindowItemLevelValueOffset = new Point(Number(statusWindowItemLevelValueOffsetJsonObject.x) || 0, Number(statusWindowItemLevelValueOffsetJsonObject.y) || 0);
     const statusWindowItemLevelValueWidth = Number(parameters.statusWindowItemLevelValueWidth);
+    const statusWindowItemLevelValueTextAlign = parameters.statusWindowItemLevelValueTextAlign;
     const statusWindowItemLevelValueFontSize = Number(parameters.statusWindowItemLevelValueFontSize) || 26;
     const statusWindowItemLevelValueTextColorJsonObject = JSON.parse(parameters.statusWindowItemLevelValueTextColor);
     const statusWindowItemLevelValueTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemLevelValueTextOutlineColor);
@@ -4203,6 +4289,7 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const statusWindowItemClassOffsetJsonObject = JSON.parse(parameters.statusWindowItemClassOffset);
     const statusWindowItemClassOffset = new Point(Number(statusWindowItemClassOffsetJsonObject.x) || 0, Number(statusWindowItemClassOffsetJsonObject.y) || 0);
     const statusWindowItemClassWidth = Number(parameters.statusWindowItemClassWidth);
+    const statusWindowItemClassTextAlign = parameters.statusWindowItemClassTextAlign;
     const statusWindowItemClassFontSize = Number(parameters.statusWindowItemClassFontSize) || 26;
     const statusWindowItemClassTextColorJsonObject = JSON.parse(parameters.statusWindowItemClassTextColor);
     const statusWindowItemClassTextOutlineColorJsonObject = JSON.parse(parameters.statusWindowItemClassTextOutlineColor);
@@ -5080,6 +5167,26 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         }
     }
 
+    const _Window_Menu_Status_Activate = Window_MenuStatus.prototype.activate;
+    Window_MenuStatus.prototype.activate = function() {
+        _Window_Menu_Status_Activate.apply(this, arguments);
+        if (statusWindowCursor === statusWindowCursorSelectImage && statusWindowCursorImagesJsonObject.length > 1) {
+            if (this._cursorSprite.children[0].children[0]._playing === false) {
+                this._cursorSprite.children[0].children[0].gotoAndPlay(0);
+            }
+        }
+    }
+
+    const _Window_Menu_Status_Deactivate = Window_MenuStatus.prototype.deactivate;
+    Window_MenuStatus.prototype.deactivate = function() {
+        _Window_Menu_Status_Deactivate.apply(this, arguments);
+        if (statusWindowCursor === statusWindowCursorSelectImage && statusWindowCursorImagesJsonObject.length > 1) {
+            if (this._cursorSprite.children[0].children[0]._playing === true) {
+                this._cursorSprite.children[0].children[0].gotoAndStop(0);
+            }
+        }
+    }
+
     Window_MenuStatus.prototype.drawItemImage = function(index) {
         if (statusWindowItemFaceImageVisible === true) {
             const actor = this.actor(index);
@@ -5187,19 +5294,19 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         // console.log("x: ", x)//184
         // console.log("y: ", y)//13
         // console.log("width: ", width)//168
-        this.drawText(actor.name(), x + statusWindowItemNameOffset.x, y + statusWindowItemNameOffset.y, statusWindowItemNameWidth);
+        this.drawText(actor.name(), x + statusWindowItemNameOffset.x, y + statusWindowItemNameOffset.y, statusWindowItemNameWidth, statusWindowItemNameTextAlign);
     };
 
     Window_MenuStatus.prototype.drawActorLevel = function(actor, x, y) {
         this.contents.fontSize = statusWindowItemLevelLabelFontSize;
         this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelLabelTextColorJsonObject));
         this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelLabelTextOutlineColorJsonObject));
-        this.drawText(TextManager.levelA, x + statusWindowItemLevelLabelOffset.x, y + statusWindowItemLevelLabelOffset.y, statusWindowItemLevelLabelWidth);
+        this.drawText(TextManager.levelA, x + statusWindowItemLevelLabelOffset.x, y + statusWindowItemLevelLabelOffset.y, statusWindowItemLevelLabelWidth, statusWindowItemLevelLabelTextAlign);
 
         this.contents.fontSize = statusWindowItemLevelValueFontSize;
         this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelValueTextColorJsonObject));
         this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelValueTextOutlineColorJsonObject));
-        this.drawText(actor.level, x + statusWindowItemLevelValueOffset.x, y + statusWindowItemLevelValueOffset.y, statusWindowItemLevelValueWidth);
+        this.drawText(actor.level, x + statusWindowItemLevelValueOffset.x, y + statusWindowItemLevelValueOffset.y, statusWindowItemLevelValueWidth, statusWindowItemLevelValueTextAlign);
     };
 
     Window_MenuStatus.prototype.drawActorIcons = function(actor, x, y, width) {
@@ -5229,7 +5336,7 @@ const ASCustomMainMenuSceneNameSpace = (() => {
         this.contents.fontSize = statusWindowItemClassFontSize;
         this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemClassTextColorJsonObject));
         this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemClassTextOutlineColorJsonObject));
-        this.drawText(actor.currentClass().name, x + statusWindowItemClassOffset.x, y + statusWindowItemClassOffset.y, statusWindowItemClassWidth);
+        this.drawText(actor.currentClass().name, x + statusWindowItemClassOffset.x, y + statusWindowItemClassOffset.y, statusWindowItemClassWidth, statusWindowItemClassTextAlign);
     };
 
     Window_MenuStatus.prototype.placeGauge = function(actor, type, x, y) {
