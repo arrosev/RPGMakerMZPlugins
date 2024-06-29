@@ -4681,6 +4681,269 @@ const ASCustomMainMenuSceneNameSpace = (() => {
 
     }
 
+    class Window_MainMenuStatus extends Window_MenuStatus {
+
+        initialize(rect){
+            Window_MenuStatus.prototype.initialize.call(this, rect);
+        }
+
+        itemWidth() {
+            return statusWindowItemWidth + this.colSpacing();
+        }
+    
+        itemHeight() {
+            return statusWindowItemHeight + this.rowSpacing();
+        }
+    
+        rowSpacing() {
+            return statusWindowRowSpacing;
+        };
+    
+        colSpacing() {
+            return statusWindowColSpacing;
+        };
+        
+        maxCols() {
+            return statusWindowMaxCols;
+        };
+    
+        _createCursorSprite() {
+            this._cursorSprite = new Sprite();
+            for (let i = 0; i < 9; i++) {
+                this._cursorSprite.addChild(new Sprite());
+            }
+            this._clientArea.addChild(this._cursorSprite);
+            if (statusWindowCursor === statusWindowCursorSelectImage && statusWindowCursorImagesJsonObject.length !== 0) {
+                if (statusWindowCursorImagesJsonObject.length === 1) {
+                    this._cursorSprite = new Sprite();
+                    this._cursorSprite.addChild(new Sprite());
+                    this._cursorSprite.children[0].bitmap = ImageManager.loadBitmap("img/", statusWindowCursorImagesJsonObject[0]);
+                    this._cursorSprite.children[0].move(statusWindowCursorOffset.x, statusWindowCursorOffset.y); // 居中微调
+                    this._clientArea.addChild(this._cursorSprite);
+                } else {
+                    this._cursorSprite = new Sprite();
+    
+                    const statusWindowCursorImagesPathArray = [];
+                    for (const image of statusWindowCursorImagesJsonObject) {
+                        statusWindowCursorImagesPathArray.push("img/" + image + ".png")
+                    }
+                    const animatedSprite = new PIXI.AnimatedSprite.fromImages(statusWindowCursorImagesPathArray);
+    
+                    animatedSprite.animationSpeed = statusWindowCursorAnimationSpeed / 10.0;
+                    animatedSprite.x = statusWindowCursorOffset.x;
+                    animatedSprite.y = statusWindowCursorOffset.y;
+                
+                    animatedSprite.gotoAndPlay(0);
+                    
+                    const animatedSpriteContainer = new PIXI.Container();
+                    animatedSpriteContainer.addChild(animatedSprite);
+                    
+                    this._cursorSprite.addChild(animatedSpriteContainer);
+                    this._clientArea.addChild(this._cursorSprite);
+                }
+            }
+        }
+    
+        _updateCursor() {
+            if (statusWindowCursor === statusWindowCursorSelectImage && statusWindowCursorImagesJsonObject.length !== 0) {
+                this._cursorSprite.visible = this.active && this.cursorVisible;
+                this._cursorSprite.x = this._cursorRect.x;
+                this._cursorSprite.y = this._cursorRect.y;
+            } else {
+                this._cursorSprite.alpha = this._makeCursorAlpha();
+                this._cursorSprite.visible = this.isOpen() && this.cursorVisible;
+                this._cursorSprite.x = this._cursorRect.x;
+                this._cursorSprite.y = this._cursorRect.y;
+            }
+        }
+    
+        _refreshCursor() {
+            if (statusWindowCursor === statusWindowCursorSelectNone || statusWindowCursorImagesJsonObject.length === 0) {
+                const drect = this._cursorRect.clone();
+                const srect = { x: 96, y: 96, width: 48, height: 48 };
+                const m = 4;
+                for (const child of this._cursorSprite.children) {
+                    child.bitmap = this._windowskin;
+                }
+                this._setRectPartsGeometry(this._cursorSprite, srect, drect, m);
+            }
+        }
+    
+        activate() {
+            this.active = true;
+            if (statusWindowCursor === statusWindowCursorSelectImage && statusWindowCursorImagesJsonObject.length > 1) {
+                if (this._cursorSprite.children[0].children[0]._playing === false) {
+                    this._cursorSprite.children[0].children[0].gotoAndPlay(0);
+                }
+            }
+        }
+    
+        deactivate() {
+            this.active = false;
+            if (statusWindowCursor === statusWindowCursorSelectImage && statusWindowCursorImagesJsonObject.length > 1) {
+                if (this._cursorSprite.children[0].children[0]._playing === true) {
+                    this._cursorSprite.children[0].children[0].gotoAndStop(0);
+                }
+            }
+        }
+    
+        drawItemImage(index) {
+            if (statusWindowItemFaceImageVisible === true) {
+                const actor = this.actor(index);
+                const rect = this.itemRect(index);
+                const width = statusWindowItemFaceImageWidth;
+                const height = statusWindowItemFaceImageHeight;
+                this.changePaintOpacity(actor.isBattleMember());
+                this.drawActorFace(actor, rect.x + statusWindowItemFaceImageOffset.x, rect.y + statusWindowItemFaceImageOffset.y, width, height);
+                this.changePaintOpacity(true);
+            }
+        };
+    
+        drawFace = function(faceName, faceIndex, x, y, width, height) {
+            width = width || ImageManager.faceWidth;
+            height = height || ImageManager.faceHeight;
+            const bitmap = ImageManager.loadFace(faceName);
+            const pw = ImageManager.faceWidth;
+            const ph = ImageManager.faceHeight;
+            const dx = Math.floor(x);
+            const dy = Math.floor(y);
+            const sx = Math.floor((faceIndex % 4) * pw);
+            const sy = Math.floor(Math.floor(faceIndex / 4) * ph);
+            this.contents.blt(bitmap, sx, sy, pw, ph, dx, dy, width, height);
+        };
+    
+        drawBackgroundRect(rect) {
+            const c1 = colorJsonObjectConvertToColorRGBA(statusWindowItemBGColor1JsonObject);
+            const c2 = colorJsonObjectConvertToColorRGBA(statusWindowItemBGColor2JsonObject);
+            const c3 = colorJsonObjectConvertToColorRGBA(statusWindowItemBGBorderColorJsonObject);
+            const x = rect.x + statusWindowItemBGOffset.x;
+            const y = rect.y + statusWindowItemBGOffset.y;
+            const w = statusWindowItemBGWidth;
+            const h = statusWindowItemBGHeight;
+            this.contentsBack.gradientFillRoundRect(x, y, w, h, c1, c2, true, statusWindowItemBGBorderRadius);
+            if (statusWindowItemBGBorderLineWidth > 0) {
+                this.contentsBack.strokeRoundRect(x, y, w, h, c3, statusWindowItemBGBorderLineWidth, statusWindowItemBGBorderRadius);
+            }
+        };
+    
+        drawPendingItemBackground(index) {
+            if (index === this._pendingIndex) {
+                const rect = this.itemRect(index);
+                const c1 = colorJsonObjectConvertToColorRGBA(statusWindowPendingItemBGColorJsonObject);
+                const x = rect.x + statusWindowPendingItemBGOffset.x;
+                const y = rect.y + statusWindowPendingItemBGOffset.y;
+                const w = statusWindowPendingItemBGWidth;
+                const h = statusWindowPendingItemBGHeight;
+                this.changePaintOpacity(false);
+                this.contents.fillRoundRect(x, y, w, h, c1, statusWindowPendingItemBGRadius);
+                this.changePaintOpacity(true);
+                if (statusWindowPendingItemBGImageBitmap) {
+                    this.contents.blt(statusWindowPendingItemBGImageBitmap, 0, 0, statusWindowPendingItemBGImageBitmap.width, statusWindowPendingItemBGImageBitmap.height, rect.x + statusWindowPendingItemBGImageOffset.x, rect.y + statusWindowPendingItemBGImageOffset.y, statusWindowPendingItemBGImageBitmap.width, statusWindowPendingItemBGImageBitmap.height);
+                }
+            }
+        };
+    
+        drawItemStatus(index) {
+            const actor = this.actor(index);
+            const rect = this.itemRect(index);
+            const x = rect.x;
+            const y = rect.y;
+            this.drawActorSimpleStatus(actor, x, y);
+        };
+    
+        drawActorSimpleStatus(actor, x, y) {
+            if (statusWindowItemNameVisible === true) {
+                this.drawActorName(actor, x, y);
+            }
+            if (statusWindowItemLevelVisible === true) {
+                this.drawActorLevel(actor, x, y);
+            }
+            if (statusWindowItemIconsVisible === true) {
+                this.drawActorIcons(actor, x, y);
+            }
+            if (statusWindowItemClassVisible === true) {
+                this.drawActorClass(actor, x, y);
+            }
+            //this.placeBasicGauges(actor, x2, y + lineHeight + 11);
+            if (statusWindowItemHPVisible === true) {
+                //console.log("drawActorSimpleStatus placeGauge hp--------------start")
+                this.placeGauge(actor, "hp", x + statusWindowItemHPOffset.x, y + statusWindowItemHPOffset.y);
+                //console.log("drawActorSimpleStatus placeGauge hp--------------end")
+            }
+            // this.placeGauge(actor, "mp", x2, y + lineHeight + 11 + this.gaugeLineHeight());
+            if (statusWindowItemMPVisible === true) {
+                //console.log("drawActorSimpleStatus placeGauge mp--------------start")
+                this.placeGauge(actor, "mp", x + statusWindowItemMPOffset.x, y + statusWindowItemMPOffset.y);
+                //console.log("drawActorSimpleStatus placeGauge mp--------------end")
+            }
+            // if ($dataSystem.optDisplayTp) {
+            //     this.placeGauge(actor, "tp", x2, y + lineHeight + 11 + this.gaugeLineHeight() * 2);
+            // }
+            if (statusWindowItemTPVisible === true) {
+                this.placeGauge(actor, "tp", x + statusWindowItemTPOffset.x, y + statusWindowItemTPOffset.y);
+            }
+        };
+    
+        drawActorName(actor, x, y, width) {
+            width = width || 168;
+            this.contents.fontSize = statusWindowItemNameFontSize;
+            this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemNameTextColorJsonObject));
+            this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemNameTextOutlineColorJsonObject));
+            this.drawText(actor.name(), x + statusWindowItemNameOffset.x, y + statusWindowItemNameOffset.y, statusWindowItemNameWidth, statusWindowItemNameTextAlign);
+        };
+    
+        drawActorLevel(actor, x, y) {
+            this.contents.fontSize = statusWindowItemLevelLabelFontSize;
+            this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelLabelTextColorJsonObject));
+            this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelLabelTextOutlineColorJsonObject));
+            this.drawText(TextManager.levelA, x + statusWindowItemLevelLabelOffset.x, y + statusWindowItemLevelLabelOffset.y, statusWindowItemLevelLabelWidth, statusWindowItemLevelLabelTextAlign);
+    
+            this.contents.fontSize = statusWindowItemLevelValueFontSize;
+            this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelValueTextColorJsonObject));
+            this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelValueTextOutlineColorJsonObject));
+            this.drawText(actor.level, x + statusWindowItemLevelValueOffset.x, y + statusWindowItemLevelValueOffset.y, statusWindowItemLevelValueWidth, statusWindowItemLevelValueTextAlign);
+        };
+    
+        drawActorIcons(actor, x, y, width) {
+            width = width || 144;
+            const iconWidth = statusWindowItemIconWidth;
+            const icons = actor.allIcons().slice(0, Math.floor(statusWindowItemAllIconsWidth / (iconWidth + statusWindowItemIconColSpacing)));
+            let iconX = x + statusWindowItemIconsOffset.x;
+            let iconY = y + statusWindowItemIconsOffset.y;
+            let nextX = iconWidth + statusWindowItemIconColSpacing;
+            for (const icon of icons) {
+                this.drawIcon(icon, iconX, iconY);
+                iconX += nextX;
+            }
+        };
+    
+        drawIcon(iconIndex, x, y) {
+            const bitmap = ImageManager.loadSystem("IconSet");
+            const pw = ImageManager.iconWidth;
+            const ph = ImageManager.iconHeight;
+            const sx = (iconIndex % 16) * pw;
+            const sy = Math.floor(iconIndex / 16) * ph;
+            this.contents.blt(bitmap, sx, sy, pw, ph, x, y, statusWindowItemIconWidth, statusWindowItemIconWidth);
+        };
+    
+        drawActorClass(actor, x, y, width) {
+            width = width || 168;
+            this.contents.fontSize = statusWindowItemClassFontSize;
+            this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemClassTextColorJsonObject));
+            this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemClassTextOutlineColorJsonObject));
+            this.drawText(actor.currentClass().name, x + statusWindowItemClassOffset.x, y + statusWindowItemClassOffset.y, statusWindowItemClassWidth, statusWindowItemClassTextAlign);
+        };
+    
+        placeGauge(actor, type, x, y) {
+            const key = "actor%1-gauge-%2".format(actor.actorId(), type);
+            const sprite = this.createInnerSprite(key, Sprite_MenuGauge);
+            sprite.setup(actor, type);
+            sprite.move(x, y);
+            sprite.show();
+        };
+
+    }
+
     class Window_MenuGold extends Window_Gold {
 
         initialize(rect) {
@@ -5085,9 +5348,10 @@ const ASCustomMainMenuSceneNameSpace = (() => {
 
 
     //StatusWindow
-    const _Scene_Menu_Create_Status_Window = Scene_Menu.prototype.createStatusWindow;
     Scene_Menu.prototype.createStatusWindow = function() {
-        _Scene_Menu_Create_Status_Window.apply(this, arguments);
+        const rect = this.statusWindowRect();
+        this._statusWindow = new Window_MainMenuStatus(rect);
+        this.addWindow(this._statusWindow);
         this._statusWindow.visible = statusWindowVisible;
         this._statusWindow.windowskin = ImageManager.loadSystem(statusWindowWindowSkin);
         this._statusWindow._padding = statusWindowPadding;
@@ -5104,273 +5368,6 @@ const ASCustomMainMenuSceneNameSpace = (() => {
             rect = new Rectangle(statusWindowOffset.x, statusWindowOffset.y, statusWindowItemWidth * 4 + 2 * statusWindowPadding + statusWindowColSpacing * 4, statusWindowItemHeight + 2 * statusWindowPadding + statusWindowRowSpacing);
         }
         return rect;
-    };
-
-    const _Window_Menu_Status_Item_Width = Window_MenuStatus.prototype.itemWidth;
-    Window_MenuStatus.prototype.itemWidth = function() {
-        let width = _Window_Menu_Status_Item_Width.apply(this, arguments);
-        width = statusWindowItemWidth + this.colSpacing();
-        return width;
-    }
-
-    const _Window_Menu_Status_Item_Height = Window_MenuStatus.prototype.itemHeight;
-    Window_MenuStatus.prototype.itemHeight = function() {
-        let height = _Window_Menu_Status_Item_Height.apply(this, arguments);
-        height = statusWindowItemHeight + this.rowSpacing();
-        return height;
-    }
-
-    const _Window_Menu_Status_RowSpacing = Window_MenuStatus.prototype.rowSpacing;
-    Window_MenuStatus.prototype.rowSpacing = function() {
-        let rowSpacing = _Window_Menu_Status_RowSpacing.apply(this, arguments);
-        rowSpacing = statusWindowRowSpacing;
-        return rowSpacing;
-    };
-
-    const _Window_Menu_Status_ColSpacing = Window_MenuStatus.prototype.colSpacing;
-    Window_MenuStatus.prototype.colSpacing = function() {
-        let colSpacing = _Window_Menu_Status_ColSpacing.apply(this, arguments);
-        colSpacing = statusWindowColSpacing;
-        return colSpacing;
-    };
-    
-    const _Window_Menu_Status_MaxCols = Window_MenuStatus.prototype.maxCols;
-    Window_MenuStatus.prototype.maxCols = function() {
-        let maxCols = _Window_Menu_Status_MaxCols.apply(this, arguments);
-        maxCols = statusWindowMaxCols;
-        return maxCols;
-    };
-
-    const _Window_Menu_Status_Create_Cursor_Sprite = Window_MenuStatus.prototype._createCursorSprite;
-    Window_MenuStatus.prototype._createCursorSprite = function() {
-        _Window_Menu_Status_Create_Cursor_Sprite.apply(this, arguments);
-        if (statusWindowCursor === statusWindowCursorSelectImage && statusWindowCursorImagesJsonObject.length !== 0) {
-            if (statusWindowCursorImagesJsonObject.length === 1) {
-                this._cursorSprite = new Sprite();
-                this._cursorSprite.addChild(new Sprite());
-                this._cursorSprite.children[0].bitmap = ImageManager.loadBitmap("img/", statusWindowCursorImagesJsonObject[0]);
-                this._cursorSprite.children[0].move(statusWindowCursorOffset.x, statusWindowCursorOffset.y); // 居中微调
-                this._clientArea.addChild(this._cursorSprite);
-            } else {
-                this._cursorSprite = new Sprite();
-
-                const statusWindowCursorImagesPathArray = [];
-                for (const image of statusWindowCursorImagesJsonObject) {
-                    statusWindowCursorImagesPathArray.push("img/" + image + ".png")
-                }
-                const animatedSprite = new PIXI.AnimatedSprite.fromImages(statusWindowCursorImagesPathArray);
-
-                animatedSprite.animationSpeed = statusWindowCursorAnimationSpeed / 10.0;
-                animatedSprite.x = statusWindowCursorOffset.x;
-                animatedSprite.y = statusWindowCursorOffset.y;
-            
-                animatedSprite.gotoAndPlay(0);
-                
-                const animatedSpriteContainer = new PIXI.Container();
-                animatedSpriteContainer.addChild(animatedSprite);
-                
-                this._cursorSprite.addChild(animatedSpriteContainer);
-                this._clientArea.addChild(this._cursorSprite);
-            }
-        }
-    }
-
-    const _Window_Menu_Status_Update_Cursor = Window_MenuStatus.prototype._updateCursor;
-    Window_MenuStatus.prototype._updateCursor = function() {
-        if (statusWindowCursor === statusWindowCursorSelectImage && statusWindowCursorImagesJsonObject.length !== 0) {
-            this._cursorSprite.visible = this.active && this.cursorVisible;
-            this._cursorSprite.x = this._cursorRect.x;
-            this._cursorSprite.y = this._cursorRect.y;
-        } else {
-            _Window_Menu_Status_Update_Cursor.apply(this, arguments);
-        }
-    }
-
-    const _Window_Menu_Status_Refresh_Cursor = Window_MenuStatus.prototype._refreshCursor;
-    Window_MenuStatus.prototype._refreshCursor = function() {
-        if (statusWindowCursor === statusWindowCursorSelectNone || statusWindowCursorImagesJsonObject.length === 0) {
-            _Window_Menu_Status_Refresh_Cursor.apply(this, arguments);
-        }
-    }
-
-    const _Window_Menu_Status_Activate = Window_MenuStatus.prototype.activate;
-    Window_MenuStatus.prototype.activate = function() {
-        _Window_Menu_Status_Activate.apply(this, arguments);
-        if (statusWindowCursor === statusWindowCursorSelectImage && statusWindowCursorImagesJsonObject.length > 1) {
-            if (this._cursorSprite.children[0].children[0]._playing === false) {
-                this._cursorSprite.children[0].children[0].gotoAndPlay(0);
-            }
-        }
-    }
-
-    const _Window_Menu_Status_Deactivate = Window_MenuStatus.prototype.deactivate;
-    Window_MenuStatus.prototype.deactivate = function() {
-        _Window_Menu_Status_Deactivate.apply(this, arguments);
-        if (statusWindowCursor === statusWindowCursorSelectImage && statusWindowCursorImagesJsonObject.length > 1) {
-            if (this._cursorSprite.children[0].children[0]._playing === true) {
-                this._cursorSprite.children[0].children[0].gotoAndStop(0);
-            }
-        }
-    }
-
-    Window_MenuStatus.prototype.drawItemImage = function(index) {
-        if (statusWindowItemFaceImageVisible === true) {
-            const actor = this.actor(index);
-            const rect = this.itemRect(index);
-            const width = statusWindowItemFaceImageWidth;
-            const height = statusWindowItemFaceImageHeight;
-            this.changePaintOpacity(actor.isBattleMember());
-            this.drawActorFace(actor, rect.x + statusWindowItemFaceImageOffset.x, rect.y + statusWindowItemFaceImageOffset.y, width, height);
-            this.changePaintOpacity(true);
-        }
-    };
-
-    Window_MenuStatus.prototype.drawFace = function(
-        faceName, faceIndex, x, y, width, height
-    ) {
-        width = width || ImageManager.faceWidth;
-        height = height || ImageManager.faceHeight;
-        const bitmap = ImageManager.loadFace(faceName);
-        const pw = ImageManager.faceWidth;
-        const ph = ImageManager.faceHeight;
-        const dx = Math.floor(x);
-        const dy = Math.floor(y);
-        const sx = Math.floor((faceIndex % 4) * pw);
-        const sy = Math.floor(Math.floor(faceIndex / 4) * ph);
-        this.contents.blt(bitmap, sx, sy, pw, ph, dx, dy, width, height);
-    };
-
-    Window_MenuStatus.prototype.drawBackgroundRect = function(rect) {
-        const c1 = colorJsonObjectConvertToColorRGBA(statusWindowItemBGColor1JsonObject);
-        const c2 = colorJsonObjectConvertToColorRGBA(statusWindowItemBGColor2JsonObject);
-        const c3 = colorJsonObjectConvertToColorRGBA(statusWindowItemBGBorderColorJsonObject);
-        const x = rect.x + statusWindowItemBGOffset.x;
-        const y = rect.y + statusWindowItemBGOffset.y;
-        const w = statusWindowItemBGWidth;
-        const h = statusWindowItemBGHeight;
-        this.contentsBack.gradientFillRoundRect(x, y, w, h, c1, c2, true, statusWindowItemBGBorderRadius);
-        if (statusWindowItemBGBorderLineWidth > 0) {
-            this.contentsBack.strokeRoundRect(x, y, w, h, c3, statusWindowItemBGBorderLineWidth, statusWindowItemBGBorderRadius);
-        }
-    };
-
-    Window_MenuStatus.prototype.drawPendingItemBackground = function(index) {
-        if (index === this._pendingIndex) {
-            const rect = this.itemRect(index);
-            const c1 = colorJsonObjectConvertToColorRGBA(statusWindowPendingItemBGColorJsonObject);
-            const x = rect.x + statusWindowPendingItemBGOffset.x;
-            const y = rect.y + statusWindowPendingItemBGOffset.y;
-            const w = statusWindowPendingItemBGWidth;
-            const h = statusWindowPendingItemBGHeight;
-            this.changePaintOpacity(false);
-            this.contents.fillRoundRect(x, y, w, h, c1, statusWindowPendingItemBGRadius);
-            this.changePaintOpacity(true);
-            if (statusWindowPendingItemBGImageBitmap) {
-                this.contents.blt(statusWindowPendingItemBGImageBitmap, 0, 0, statusWindowPendingItemBGImageBitmap.width, statusWindowPendingItemBGImageBitmap.height, rect.x + statusWindowPendingItemBGImageOffset.x, rect.y + statusWindowPendingItemBGImageOffset.y, statusWindowPendingItemBGImageBitmap.width, statusWindowPendingItemBGImageBitmap.height);
-            }
-        }
-    };
-
-    Window_MenuStatus.prototype.drawItemStatus = function(index) {
-        const actor = this.actor(index);
-        const rect = this.itemRect(index);
-        const x = rect.x;
-        const y = rect.y;
-        this.drawActorSimpleStatus(actor, x, y);
-    };
-
-    Window_MenuStatus.prototype.drawActorSimpleStatus = function(actor, x, y) {
-        if (statusWindowItemNameVisible === true) {
-            this.drawActorName(actor, x, y);
-        }
-        if (statusWindowItemLevelVisible === true) {
-            this.drawActorLevel(actor, x, y);
-        }
-        if (statusWindowItemIconsVisible === true) {
-            this.drawActorIcons(actor, x, y);
-        }
-        if (statusWindowItemClassVisible === true) {
-            this.drawActorClass(actor, x, y);
-        }
-        //this.placeBasicGauges(actor, x2, y + lineHeight + 11);
-        if (statusWindowItemHPVisible === true) {
-            //console.log("drawActorSimpleStatus placeGauge hp--------------start")
-            this.placeGauge(actor, "hp", x + statusWindowItemHPOffset.x, y + statusWindowItemHPOffset.y);
-            //console.log("drawActorSimpleStatus placeGauge hp--------------end")
-        }
-        // this.placeGauge(actor, "mp", x2, y + lineHeight + 11 + this.gaugeLineHeight());
-        if (statusWindowItemMPVisible === true) {
-            //console.log("drawActorSimpleStatus placeGauge mp--------------start")
-            this.placeGauge(actor, "mp", x + statusWindowItemMPOffset.x, y + statusWindowItemMPOffset.y);
-            //console.log("drawActorSimpleStatus placeGauge mp--------------end")
-        }
-        // if ($dataSystem.optDisplayTp) {
-        //     this.placeGauge(actor, "tp", x2, y + lineHeight + 11 + this.gaugeLineHeight() * 2);
-        // }
-        if (statusWindowItemTPVisible === true) {
-            this.placeGauge(actor, "tp", x + statusWindowItemTPOffset.x, y + statusWindowItemTPOffset.y);
-        }
-    };
-
-    Window_MenuStatus.prototype.drawActorName = function(actor, x, y, width) {
-        width = width || 168;
-        this.contents.fontSize = statusWindowItemNameFontSize;
-        this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemNameTextColorJsonObject));
-        this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemNameTextOutlineColorJsonObject));
-        // console.log("x: ", x)//184
-        // console.log("y: ", y)//13
-        // console.log("width: ", width)//168
-        this.drawText(actor.name(), x + statusWindowItemNameOffset.x, y + statusWindowItemNameOffset.y, statusWindowItemNameWidth, statusWindowItemNameTextAlign);
-    };
-
-    Window_MenuStatus.prototype.drawActorLevel = function(actor, x, y) {
-        this.contents.fontSize = statusWindowItemLevelLabelFontSize;
-        this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelLabelTextColorJsonObject));
-        this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelLabelTextOutlineColorJsonObject));
-        this.drawText(TextManager.levelA, x + statusWindowItemLevelLabelOffset.x, y + statusWindowItemLevelLabelOffset.y, statusWindowItemLevelLabelWidth, statusWindowItemLevelLabelTextAlign);
-
-        this.contents.fontSize = statusWindowItemLevelValueFontSize;
-        this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelValueTextColorJsonObject));
-        this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemLevelValueTextOutlineColorJsonObject));
-        this.drawText(actor.level, x + statusWindowItemLevelValueOffset.x, y + statusWindowItemLevelValueOffset.y, statusWindowItemLevelValueWidth, statusWindowItemLevelValueTextAlign);
-    };
-
-    Window_MenuStatus.prototype.drawActorIcons = function(actor, x, y, width) {
-        width = width || 144;
-        const iconWidth = statusWindowItemIconWidth;
-        const icons = actor.allIcons().slice(0, Math.floor(statusWindowItemAllIconsWidth / (iconWidth + statusWindowItemIconColSpacing)));
-        let iconX = x + statusWindowItemIconsOffset.x;
-        let iconY = y + statusWindowItemIconsOffset.y;
-        let nextX = iconWidth + statusWindowItemIconColSpacing;
-        for (const icon of icons) {
-            this.drawIcon(icon, iconX, iconY);
-            iconX += nextX;
-        }
-    };
-
-    Window_MenuStatus.prototype.drawIcon = function(iconIndex, x, y) {
-        const bitmap = ImageManager.loadSystem("IconSet");
-        const pw = ImageManager.iconWidth;
-        const ph = ImageManager.iconHeight;
-        const sx = (iconIndex % 16) * pw;
-        const sy = Math.floor(iconIndex / 16) * ph;
-        this.contents.blt(bitmap, sx, sy, pw, ph, x, y, statusWindowItemIconWidth, statusWindowItemIconWidth);
-    };
-
-    Window_MenuStatus.prototype.drawActorClass = function(actor, x, y, width) {
-        width = width || 168;
-        this.contents.fontSize = statusWindowItemClassFontSize;
-        this.changeTextColor(colorJsonObjectConvertToColorRGBA(statusWindowItemClassTextColorJsonObject));
-        this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(statusWindowItemClassTextOutlineColorJsonObject));
-        this.drawText(actor.currentClass().name, x + statusWindowItemClassOffset.x, y + statusWindowItemClassOffset.y, statusWindowItemClassWidth, statusWindowItemClassTextAlign);
-    };
-
-    Window_MenuStatus.prototype.placeGauge = function(actor, type, x, y) {
-        const key = "actor%1-gauge-%2".format(actor.actorId(), type);
-        const sprite = this.createInnerSprite(key, Sprite_MenuGauge);
-        sprite.setup(actor, type);
-        sprite.move(x, y);
-        sprite.show();
     };
 
 
