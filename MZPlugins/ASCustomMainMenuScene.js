@@ -29,6 +29,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
+ * This plugin is mainly used to customise the main menu scene
+ * 
+ * 【V1.0.0】
+ *     1. Use a video or image as a background for the main menu scene
+ *     2. Modify the position and size of various view elements of the main menu
+ *     3. Added some visual additions to the main menu, such as cursors, icon labels
+ * 
+ *  Note:
+ *     1. The Command Options window, the Character Status window and the Gold window 
+ *        are actually laid out between (4, 4) and (812, 620) in the default resolution,
+ *        when you set the offset of these windows to (0, 0), is actually at (4, 4)       
+ *     2. Window width = number of horizontal options * (option width + col spacing) + 2 * padding
+ *        Window height = number of vertical options * (option height + row spacing) + 2 * padding
+ * 
  * @param mainMenuSceneSet
  * @text Main Menu Scene Set
  * @desc Main Menu Scene Set
@@ -1925,12 +1939,12 @@
  * @type number
  * @default 26
  * 
- * @param goldWindowValueTextOffsetX
- * @text Text OffsetX
- * @desc Gold Window Value Text OffsetX
+ * @param goldWindowValueOffset
+ * @text Offset
+ * @desc Gold Window Value Offset
  * @parent goldWindowValueStyle
- * @type number
- * @default 0
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
  * 
  * @param goldWindowValueTextAlign
  * @text Text Align
@@ -1979,12 +1993,12 @@
  * @type number
  * @default 26
  * 
- * @param goldWindowUnitTextOffsetX
- * @text Text OffsetX
- * @desc Gold Window Unit Text OffsetX
+ * @param goldWindowUnitOffset
+ * @text Offset
+ * @desc Gold Window Unit Offset
  * @parent goldWindowUnitStyle
- * @type number
- * @default 0
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
  * 
  * @param goldWindowUnitTextAlign
  * @text Text Align
@@ -2037,7 +2051,7 @@
 
 /*:zh
  * @target MZ
- * @plugindesc [V1.0.0] Customized Main Menu Plugin
+ * @plugindesc [V1.0.0] 自定义主菜单插件
  * @author Arrose
  * 
  * @url https://github.com/arrosev/RPGMakerMZPlugins
@@ -2073,7 +2087,12 @@
  *     2. 对主菜单的各种视图元素进行位置和尺寸等样式的修改
  *     3. 对主菜单增加了一些视觉上的功能补充，比如光标，图标标签等
  * 
- * this._windowLayer(808, 616)
+ *  注意：
+ *     1. 命令选项窗口，角色状态窗口和金币窗口在默认分辨率下，实际是在（4，4）和(812, 620)
+ *        之间布局，当你将这三个窗口的偏移设置为（0，0）时，实际是在（4，4）
+ *     2. 窗口的宽 = 横向选项个数 * （选项宽度 + 列间距）+ 2 * 内边距
+ *        窗口的高 = 纵向选项个数 * （选项高度 + 行间距）+ 2 * 内边距
+ *        
  * 
  * @param mainMenuSceneSet
  * @text 主菜单场景设置
@@ -3971,12 +3990,12 @@
  * @type number
  * @default 26
  * 
- * @param goldWindowValueTextOffsetX
- * @text 文本横向偏移
- * @desc 金币窗口数值文本横向偏移
+ * @param goldWindowValueOffset
+ * @text 偏移
+ * @desc 金币窗口数值偏移
  * @parent goldWindowValueStyle
- * @type number
- * @default 0
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
  * 
  * @param goldWindowValueTextAlign
  * @text 文本对齐
@@ -4025,12 +4044,12 @@
  * @type number
  * @default 26
  * 
- * @param goldWindowUnitTextOffsetX
- * @text 文本横向偏移
- * @desc 金币窗口单位文本横向偏移
+ * @param goldWindowUnitOffset
+ * @text 偏移
+ * @desc 金币窗口单位偏移
  * @parent goldWindowUnitStyle
- * @type number
- * @default 0
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
  * 
  * @param goldWindowUnitTextAlign
  * @text 文本对齐
@@ -4450,14 +4469,16 @@ const ASCustomMainMenuSceneNameSpace = (() => {
     const goldWindowBGBorderRadius = Number(parameters.goldWindowBGBorderRadius);
 
     const goldWindowValueFontSize = Number(parameters.goldWindowValueFontSize) || 26;
-    const goldWindowValueTextOffsetX = Number(parameters.goldWindowValueTextOffsetX);
+    const goldWindowValueOffsetJsonObject = JSON.parse(parameters.goldWindowValueOffset);
+    const goldWindowValueOffset = new Point(Number(goldWindowValueOffsetJsonObject.x) || 0, Number(goldWindowValueOffsetJsonObject.y) || 0);
     const goldWindowValueTextAlign = parameters.goldWindowValueTextAlign;
     const goldWindowValueTextColorJsonObject = JSON.parse(parameters.goldWindowValueTextColor);
     const goldWindowValueTextOutlineColorJsonObject = JSON.parse(parameters.goldWindowValueTextOutlineColor);
 
     const goldWindowUnitFormality = parameters.goldWindowUnitFormality;
     const goldWindowUnitFontSize = Number(parameters.goldWindowUnitFontSize) || 26;
-    const goldWindowUnitTextOffsetX = Number(parameters.goldWindowUnitTextOffsetX);
+    const goldWindowUnitOffsetJsonObject = JSON.parse(parameters.goldWindowUnitOffset);
+    const goldWindowUnitOffset = new Point(Number(goldWindowUnitOffsetJsonObject.x) || 0, Number(goldWindowUnitOffsetJsonObject.y) || 0);
     const goldWindowUnitTextAlign = parameters.goldWindowUnitTextAlign;
     const goldWindowUnitTextColorJsonObject = JSON.parse(parameters.goldWindowUnitTextColor);
     const goldWindowUnitTextOutlineColorJsonObject = JSON.parse(parameters.goldWindowUnitTextOutlineColor);
@@ -4683,7 +4704,12 @@ const ASCustomMainMenuSceneNameSpace = (() => {
                     this.backgroundSpriteBitmap.strokeRoundRect(x, y, w, h, c3, goldWindowBGBorderLineWidth, goldWindowBGBorderRadius);
                 }
             }
+            
         };
+
+        itemHeight() {
+            return goldWindowHeight - this._padding * 2 - this.rowSpacing();
+        }
 
         refresh() {
             const rect = this.itemLineRect(0);
@@ -4714,13 +4740,13 @@ const ASCustomMainMenuSceneNameSpace = (() => {
             const valueTextColor = colorJsonObjectConvertToColorRGBA(goldWindowValueTextColorJsonObject);
             const valueTextOutlineColor = colorJsonObjectConvertToColorRGBA(goldWindowValueTextOutlineColorJsonObject);
             this.changeContentsTextStyle(goldWindowValueFontSize, valueTextColor, valueTextOutlineColor);
-            this.drawText(value, x + goldWindowValueTextOffsetX, y, width - unitWidth - 6, goldWindowValueTextAlign);
+            this.drawText(value, x + goldWindowValueOffset.x, y + goldWindowValueOffset.y, width - unitWidth - 6, goldWindowValueTextAlign);
 
             if (goldWindowUnitFormality === goldWindowUnitFormalitySelectText) {
                 const unitTextColor = colorJsonObjectConvertToColorRGBA(goldWindowUnitTextColorJsonObject);
                 const unitTextOutlineColor = colorJsonObjectConvertToColorRGBA(goldWindowUnitTextOutlineColorJsonObject);
                 this.changeContentsTextStyle(goldWindowUnitFontSize, unitTextColor, unitTextOutlineColor);
-                this.drawText(unit, x + goldWindowUnitTextOffsetX, y, width, goldWindowUnitTextAlign);
+                this.drawText(unit, x + goldWindowUnitOffset.x, y + goldWindowUnitOffset.y, width, goldWindowUnitTextAlign);
             } else {
                 const rect = new Rectangle(goldWindowUnitIconOffset.x, goldWindowUnitIconOffset.y, goldWindowUnitIconWidth, goldWindowUnitIconWidth);
                 this.drawIcon(goldWindowUnitIconIndex, rect.x, rect.y, rect.width, rect.height);
