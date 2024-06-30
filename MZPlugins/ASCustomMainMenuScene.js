@@ -4721,6 +4721,7 @@ const ASCustomMainMenuSceneNameSpace = (() => {
                     this._cursorSprite.children[0].move(statusWindowCursorOffset.x, statusWindowCursorOffset.y); // 居中微调
                     this._clientArea.addChild(this._cursorSprite);
                 } else {
+                    PIXI.utils.clearTextureCache();
                     this._cursorSprite = new Sprite();
     
                     const statusWindowCursorImagesPathArray = [];
@@ -5244,6 +5245,7 @@ const ASCustomMainMenuSceneNameSpace = (() => {
                 this._cursorSprite.children[0].move(commandWindowCursorOffset.x, commandWindowCursorOffset.y); // 居中微调
                 this._clientArea.addChild(this._cursorSprite);
             } else {
+                PIXI.utils.clearTextureCache();
                 this._cursorSprite = new Sprite();
 
                 const commandWindowCursorImagesPathArray = [];
