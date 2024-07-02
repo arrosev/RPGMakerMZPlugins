@@ -34,6 +34,8 @@
  * 
  */
 
+// 变量保存当前选中物品id 变量设置-1并且鼠标图标还原之后表示空手（绑定一个快捷键）窗口的selectItemID默认初始化为=是否等于-1 ? -1 : 变量保存的值
+
 const ASItemBarWindowNameSpace = (() => {
     "use strict";
 
@@ -41,6 +43,9 @@ const ASItemBarWindowNameSpace = (() => {
     const parameters = PluginManager.parameters(pluginName);
 
     Input.keyMapper["73"] = "itembar";
+    Input.keyMapper["85"] = "itembarup";//U
+    Input.keyMapper["79"] = "itembardown";//O
+    
 
     console.log("Input.keyMapper: ", Input.keyMapper)
 
@@ -55,15 +60,54 @@ const ASItemBarWindowNameSpace = (() => {
             this.addCommand(TextManager.optimize, "optimize");
             this.addCommand(TextManager.clear, "clear");
         }
+        
+        processCursorMove() {
+            console.log("processCursorMove")
+            if (this.isCursorMovable()) {
+                const lastIndex = this.index();
+                if (Input.isRepeated("itembardown")) {
+                    console.log("Input.isRepeated(down)")
+                    this.cursorDown(Input.isTriggered("itembardown"));
+                }
+                if (Input.isRepeated("itembarup")) {
+                    console.log("Input.isRepeated(up)")
+                    this.cursorUp(Input.isTriggered("itembarup"));
+                }
+                if (Input.isRepeated("right")) {
+                    this.cursorRight(Input.isTriggered("right"));
+                }
+                if (Input.isRepeated("left")) {
+                    this.cursorLeft(Input.isTriggered("left"));
+                }
+                if (!this.isHandled("pagedown") && Input.isTriggered("pagedown")) {
+                    this.cursorPagedown();
+                }
+                if (!this.isHandled("pageup") && Input.isTriggered("pageup")) {
+                    this.cursorPageup();
+                }
+                if (this.index() !== lastIndex) {
+                    this.playCursorSound();
+                }
+            }
+        };
 
     }
+
+    // const _Game_Player_CanMove = Game_Player.prototype.canMove;
+    // Game_Player.prototype.canMove = function() {
+    //     const canMove = _Game_Player_CanMove.apply(this, arguments);
+    //     if () {
+    //         return false;
+    //     }
+    //     return canMove;
+    // };
 
     const _Scene_Map_CreateDisplayObjects = Scene_Map.prototype.createDisplayObjects;
     Scene_Map.prototype.createDisplayObjects = function() {
         _Scene_Map_CreateDisplayObjects.apply(this, arguments);
 
         const rect = new Rectangle(50, 50, 100, 400);
-        this.itemBarCommandWindow = new Window_Base(rect);
+        this.itemBarCommandWindow = new Window_ItemBarCommand(rect);
         this.itemBarCommandWindow.visible = false;
         this.addChild(this.itemBarCommandWindow);
 
