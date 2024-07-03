@@ -957,41 +957,40 @@ const ASItemBarWindowNameSpace = (() => {
     Scene_Map.prototype.createDisplayObjects = function() {
         _Scene_Map_CreateDisplayObjects.apply(this, arguments);
 
+        this.charm = new Charm(PIXI);
+    
         // const rect = new Rectangle(50, 50, 100, 400);
         const rect = new Rectangle(-100, 50, 100, 400);
         this.itemBarCommandWindow = new Window_ItemBarCommand(rect);
         this.itemBarCommandWindow.visible = false;
+        this.itemBarCommandWindowPlaying = false;
         this.addChild(this.itemBarCommandWindow);
 
     };
 
-    
-
-    let c = new Charm(PIXI);
-    console.log("c: ", c)
-
     const _Scene_Map_Update = Scene_Map.prototype.update;
     Scene_Map.prototype.update = function() {
         _Scene_Map_Update.apply(this, arguments);
-        c.update();
+        this.charm.update();
         if (Input.isTriggered("itembar")) {
-
-            if(this.itemBarCommandWindow.visible === false) {
-                console.log("弹出")
-                this.itemBarCommandWindow.visible = true;
-                //this.addChild(this.itemBarCommandWindow);
-                c.slide(this.itemBarCommandWindow, 50, 50, 60);
+          if(this.itemBarCommandWindowPlaying !== true) {
+            if (this.itemBarCommandWindow.visible === false) {
+              console.log("弹出")
+              this.itemBarCommandWindow.visible = true;
+              this.itemBarCommandWindowPlaying = true;
+              this.charm.slide(this.itemBarCommandWindow, 50, 50, 30).onComplete = () => {
+                this.itemBarCommandWindowPlaying = false;
+              };
             } else {
-                console.log("隐藏")
-                c.slide(this.itemBarCommandWindow, -100, 50, 60);
+              console.log("隐藏")
+              this.itemBarCommandWindowPlaying = true;
+              this.charm.slide(this.itemBarCommandWindow, -100, 50, 30).onComplete = () => {
                 this.itemBarCommandWindow.visible = false;
-                //this.removeChild(this.itemBarCommandWindow);
+                this.itemBarCommandWindowPlaying = false;
+              };
             }
-
-            console.log("this: ", this)
-            console.log("Scene_Map.prototype.update---------itembar")
+          }
         }
-
     };
 
 })();
