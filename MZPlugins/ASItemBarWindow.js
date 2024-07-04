@@ -73,9 +73,83 @@
  * @type string
  * @default
  * 
+ * @param itemBarWindowWindowSkin
+ * @text Window Skin
+ * @desc Item Bar Window WindowSkin
+ * @parent itemBarWindowStyle
+ * @type file
+ * @dir img/system/
+ * @default Window
+ * 
+ * @param itemBarWindowFinalOffset
+ * @text Final Offset
+ * @desc Item Bar Window Final Offset
+ * @parent itemBarWindowStyle
+ * @type struct<Point>
+ * @default {"x":"50","y":"50"}
+ * 
+ * @param itemBarWindowItemWidth
+ * @text Item Width
+ * @desc Item Bar Window Item Width
+ * @parent itemBarWindowStyle
+ * @type number
+ * @min 0
+ * @default 96
+ * 
+ * @param itemBarWindowItemHeight
+ * @text Item Height
+ * @desc Item Bar Window Item Height
+ * @parent itemBarWindowStyle
+ * @type number
+ * @min 0
+ * @default 96
+ * 
+ * @param itemBarWindowPadding
+ * @text Padding
+ * @desc Item Bar Window Padding
+ * @parent itemBarWindowStyle
+ * @type number
+ * @default 12
+ * 
+ * @param itemBarWindowRowSpacing
+ * @text Row Spacing
+ * @desc Item Bar Window Row Spacing
+ * @parent itemBarWindowStyle
+ * @type number
+ * @default 4
+ * 
+ * @param itemBarWindowColSpacing
+ * @text Col Spacing
+ * @desc Item Bar Window Col Spacing
+ * @parent itemBarWindowStyle
+ * @type number
+ * @default 8
+ * 
+ * @param itemBarWindowVisibleItems
+ * @text Visible Items
+ * @desc Item Bar Window Visible Items
+ * @parent itemBarWindowStyle
+ * @type number
+ * @default 5
+ * 
  * 
  */
 
+/*~struct~Point:
+ * 
+ * @param x
+ * @text X
+ * @desc X
+ * @type number
+ * @default 0
+ * 
+ * @param y
+ * @text Y
+ * @desc Y
+ * @type number
+ * @default 0
+ * 
+ */
 
 //***************************************************************************
 // ---------------------------- Interpolation Animation Dependency Library ----------------------------
@@ -939,54 +1013,82 @@ const ASItemBarWindowNameSpace = (() => {
     const itembarUpKeyCode = parameters.itembarUpKeyCode;
     const itembarDownKeyCode = parameters.itembarDownKeyCode;
 
+    const itemBarWindowWindowSkin = parameters.itemBarWindowWindowSkin;
+    const itemBarWindowFinalOffsetJsonObject = JSON.parse(parameters.itemBarWindowFinalOffset);
+    const itemBarWindowFinalOffset = new Point(Number(itemBarWindowFinalOffsetJsonObject.x) || 0, Number(itemBarWindowFinalOffsetJsonObject.y) || 0);
+
+    const itemBarWindowItemWidth = Number(parameters.itemBarWindowItemWidth);
+    const itemBarWindowItemHeight = Number(parameters.itemBarWindowItemHeight);
+    const itemBarWindowPadding = Number(parameters.itemBarWindowPadding);
+    const itemBarWindowRowSpacing = Number(parameters.itemBarWindowRowSpacing);
+    const itemBarWindowColSpacing = Number(parameters.itemBarWindowColSpacing);
+    const itemBarWindowVisibleItems = Number(parameters.itemBarWindowVisibleItems);
+
     Input.keyMapper[itemBarShowKeyCode] = "itembarshow";//I
     Input.keyMapper[itembarUpKeyCode] = "itembarup";//U
     Input.keyMapper[itembarDownKeyCode] = "itembardown";//O
-    
 
     console.log("Input.keyMapper: ", Input.keyMapper)
 
     class Window_ItemBarCommand extends Window_Command {
 
-        initialize(rect) {
-            Window_Command.prototype.initialize.call(this, rect);
-        }
+      initialize(rect) {
+        Window_Command.prototype.initialize.call(this, rect);
+        this.windowskin = ImageManager.loadSystem(itemBarWindowWindowSkin);
+        this._padding = itemBarWindowPadding;
+      }
 
-        makeCommandList() {
-            this.addCommand(TextManager.equip2, "equip");
-            this.addCommand(TextManager.optimize, "optimize");
-            this.addCommand(TextManager.clear, "clear");
-        }
+      colSpacing() {
+        return itemBarWindowColSpacing;
+      }
+
+      rowSpacing() {
+        return itemBarWindowRowSpacing;
+      }
+
+      itemWidth() {
+        return itemBarWindowItemWidth + this.colSpacing();
+      }
+
+      itemHeight() {
+        return itemBarWindowItemHeight + this.rowSpacing();
+      }
+
+      makeCommandList() {
+        this.addCommand(TextManager.equip2, "equip");
+        this.addCommand(TextManager.optimize, "optimize");
+        this.addCommand(TextManager.clear, "clear");
+      }
         
-        processCursorMove() {
-            //console.log("processCursorMove")
-            if (this.isCursorMovable()) {
-                const lastIndex = this.index();
-                if (Input.isRepeated("itembardown")) {
-                    console.log("Input.isRepeated(down)")
-                    this.cursorDown(Input.isTriggered("itembardown"));
-                }
-                if (Input.isRepeated("itembarup")) {
-                    console.log("Input.isRepeated(up)")
-                    this.cursorUp(Input.isTriggered("itembarup"));
-                }
-                if (Input.isRepeated("right")) {
-                    this.cursorRight(Input.isTriggered("right"));
-                }
-                if (Input.isRepeated("left")) {
-                    this.cursorLeft(Input.isTriggered("left"));
-                }
-                if (!this.isHandled("pagedown") && Input.isTriggered("pagedown")) {
-                    this.cursorPagedown();
-                }
-                if (!this.isHandled("pageup") && Input.isTriggered("pageup")) {
-                    this.cursorPageup();
-                }
-                if (this.index() !== lastIndex) {
-                    this.playCursorSound();
-                }
-            }
-        };
+      processCursorMove() {
+        //console.log("processCursorMove")
+        if (this.isCursorMovable()) {
+          const lastIndex = this.index();
+          if (Input.isRepeated("itembardown")) {
+            console.log("Input.isRepeated(down)")
+            this.cursorDown(Input.isTriggered("itembardown"));
+          }
+          if (Input.isRepeated("itembarup")) {
+            console.log("Input.isRepeated(up)")
+            this.cursorUp(Input.isTriggered("itembarup"));
+          }
+          if (Input.isRepeated("right")) {
+            this.cursorRight(Input.isTriggered("right"));
+          }
+          if (Input.isRepeated("left")) {
+            this.cursorLeft(Input.isTriggered("left"));
+          }
+          if (!this.isHandled("pagedown") && Input.isTriggered("pagedown")) {
+            this.cursorPagedown();
+          }
+          if (!this.isHandled("pageup") && Input.isTriggered("pageup")) {
+            this.cursorPageup();
+          }
+          if (this.index() !== lastIndex) {
+            this.playCursorSound();
+          }
+        }
+      };
 
     }
 
@@ -1005,8 +1107,9 @@ const ASItemBarWindowNameSpace = (() => {
 
         this.charm = new Charm(PIXI);
     
-        // const rect = new Rectangle(50, 50, 100, 400);
-        const rect = new Rectangle(-100, 50, 100, 400);
+        const itemBarCommandWindowWidth = itemBarWindowItemWidth + itemBarWindowColSpacing + 2 * itemBarWindowPadding;
+        const itemBarCommandWindowHeight = (itemBarWindowItemHeight + itemBarWindowRowSpacing) * itemBarWindowVisibleItems + 2 * itemBarWindowPadding;
+        const rect = new Rectangle(- (itemBarWindowFinalOffset.x + itemBarCommandWindowWidth), itemBarWindowFinalOffset.y, itemBarCommandWindowWidth, itemBarCommandWindowHeight);
         this.itemBarCommandWindow = new Window_ItemBarCommand(rect);
         this.itemBarCommandWindow.visible = false;
         this.itemBarCommandWindowPlaying = false;
@@ -1024,13 +1127,13 @@ const ASItemBarWindowNameSpace = (() => {
               console.log("弹出")
               this.itemBarCommandWindow.visible = true;
               this.itemBarCommandWindowPlaying = true;
-              this.charm.slide(this.itemBarCommandWindow, 50, 50, 30).onComplete = () => {
+              this.charm.slide(this.itemBarCommandWindow, itemBarWindowFinalOffset.x, itemBarWindowFinalOffset.y, 30).onComplete = () => {
                 this.itemBarCommandWindowPlaying = false;
               };
             } else {
               console.log("隐藏")
               this.itemBarCommandWindowPlaying = true;
-              this.charm.slide(this.itemBarCommandWindow, -100, 50, 30).onComplete = () => {
+              this.charm.slide(this.itemBarCommandWindow, - (itemBarWindowFinalOffset.x + this.itemBarCommandWindow.width), itemBarWindowFinalOffset.y, 30).onComplete = () => {
                 this.itemBarCommandWindow.visible = false;
                 this.itemBarCommandWindowPlaying = false;
               };
