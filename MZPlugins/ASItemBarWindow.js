@@ -30,6 +30,48 @@
  * SOFTWARE.
  * 
  * This plugin is mainly used to make item bar windows.
+ * Key Code Reference: https://www.toptal.com/developers/keycode
+ * 
+ * @param itemBarWindowSet
+ * @text Item Bar Window Set
+ * @desc Item Bar Window Set
+ * @type string
+ * @default
+ * 
+ * @param keyboardControlSet
+ * @text Keyboard Control Set
+ * @desc Keyboard Control Set
+ * @parent itemBarWindowSet
+ * @type string
+ * @default
+ * 
+ * @param itemBarShowKeyCode
+ * @text Show Key Code
+ * @desc Show Key Code (default 73)
+ * @parent keyboardControlSet
+ * @type string
+ * @default 73
+ * 
+ * @param itembarUpKeyCode
+ * @text Up Key Code
+ * @desc Up Key Code (default 85)
+ * @parent keyboardControlSet
+ * @type string
+ * @default 85
+ * 
+ * @param itembarDownKeyCode
+ * @text Down Key Code
+ * @desc Down Key Code (default 79)
+ * @parent keyboardControlSet
+ * @type string
+ * @default 79
+ * 
+ * @param itemBarWindowStyle
+ * @text Item Bar Window Style
+ * @desc Item Bar Window Style
+ * @parent itemBarWindowSet
+ * @type string
+ * @default
  * 
  * 
  */
@@ -893,9 +935,13 @@ const ASItemBarWindowNameSpace = (() => {
     const pluginName = "ASItemBarWindow";
     const parameters = PluginManager.parameters(pluginName);
 
-    Input.keyMapper["73"] = "itembar";
-    Input.keyMapper["85"] = "itembarup";//U
-    Input.keyMapper["79"] = "itembardown";//O
+    const itemBarShowKeyCode = parameters.itemBarShowKeyCode;
+    const itembarUpKeyCode = parameters.itembarUpKeyCode;
+    const itembarDownKeyCode = parameters.itembarDownKeyCode;
+
+    Input.keyMapper[itemBarShowKeyCode] = "itembarshow";//I
+    Input.keyMapper[itembarUpKeyCode] = "itembarup";//U
+    Input.keyMapper[itembarDownKeyCode] = "itembardown";//O
     
 
     console.log("Input.keyMapper: ", Input.keyMapper)
@@ -913,7 +959,7 @@ const ASItemBarWindowNameSpace = (() => {
         }
         
         processCursorMove() {
-            console.log("processCursorMove")
+            //console.log("processCursorMove")
             if (this.isCursorMovable()) {
                 const lastIndex = this.index();
                 if (Input.isRepeated("itembardown")) {
@@ -972,7 +1018,7 @@ const ASItemBarWindowNameSpace = (() => {
     Scene_Map.prototype.update = function() {
         _Scene_Map_Update.apply(this, arguments);
         this.charm.update();
-        if (Input.isTriggered("itembar")) {
+        if (Input.isTriggered("itembarshow")) {
           if(this.itemBarCommandWindowPlaying !== true) {
             if (this.itemBarCommandWindow.visible === false) {
               console.log("弹出")
