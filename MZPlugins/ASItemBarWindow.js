@@ -32,6 +32,11 @@
  * This plugin is mainly used to make item bar windows.
  * Key Code Reference: https://www.toptal.com/developers/keycode
  * 
+ * @noteParam ASItemBarThumbnail
+ * @noteDir img/
+ * @noteType file
+ * @noteData items
+ * 
  * @param itemBarWindowSet
  * @text Item Bar Window Set
  * @desc Item Bar Window Set
@@ -1002,6 +1007,7 @@ class Charm {
   }
 
 // 变量保存当前选中物品id 变量设置-1并且鼠标图标还原之后表示空手（绑定一个快捷键）窗口的selectItemID默认初始化为=是否等于-1 ? -1 : 变量保存的值
+// 鉴于可能连续多次获得物品，可能加入手动刷新，以避免连续多次自带刷新带来的性能问题。
 
 const ASItemBarWindowNameSpace = (() => {
     "use strict";
@@ -1055,9 +1061,35 @@ const ASItemBarWindowNameSpace = (() => {
       }
 
       makeCommandList() {
-        this.addCommand(TextManager.equip2, "equip");
-        this.addCommand(TextManager.optimize, "optimize");
-        this.addCommand(TextManager.clear, "clear");
+        console.log("$gameParty.items(): ", $gameParty.items())
+        // this.addCommand(TextManager.equip2, "equip");
+        // this.addCommand(TextManager.optimize, "optimize");
+        // this.addCommand(TextManager.clear, "clear");
+        for (const item of $gameParty.items()) {
+          this.addCommand(item.name, `${item.id}`);
+        }
+      }
+
+      drawItem(index) {
+        const rect = this.itemRect(index);
+        const itemId = Number(this.commandSymbol(index)) || 0;
+        const itemBarThumbnail = $dataItems[itemId].meta.ASItemBarThumbnail;
+        console.log("itemBarThumbnail: ", itemBarThumbnail)
+        if (itemBarThumbnail) {
+          const bitmap = ImageManager.loadBitmap("img/", itemBarThumbnail);
+          bitmap.addLoadListener(() => {
+            this.contents.clearRect(rect.x, rect.y, rect.width, rect.height);
+            this.contents.blt(bitmap, 0, 0, rect.width, rect.height, rect.x, rect.y, rect.width, rect.height);
+          });
+        }
+        // if (itemExtensionParametersDic[id]) {
+        //   const item = itemExtensionParametersDic[id];
+        //   const bitmap = ImageManager.loadBitmap("img/", item.itemThumbnail);
+        //   bitmap.addLoadListener(() => {
+        //     this.contents.clearRect(rect.x, rect.y, rect.width, rect.height);
+        //     this.contents.blt(bitmap, 0, 0, rect.width, rect.height, rect.x, rect.y, rect.width, rect.height);
+        //   });
+        // }
       }
         
       processCursorMove() {
@@ -1128,6 +1160,7 @@ const ASItemBarWindowNameSpace = (() => {
               this.itemBarCommandWindow.visible = true;
               this.itemBarCommandWindowPlaying = true;
               this.charm.slide(this.itemBarCommandWindow, itemBarWindowFinalOffset.x, itemBarWindowFinalOffset.y, 30).onComplete = () => {
+                //this.itemBarCommandWindow.refresh();
                 this.itemBarCommandWindowPlaying = false;
               };
             } else {
