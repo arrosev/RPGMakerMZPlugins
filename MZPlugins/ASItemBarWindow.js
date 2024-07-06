@@ -1323,25 +1323,6 @@ const ASItemBarWindowNameSpace = (() => {
       this._baseTexture.update();
     };
 
-    Game_Interpreter.prototype.isOnCurrentMap = function() {
-      console.log("this._mapId: ", this._mapId)
-      console.log("$gameMap.mapId(): ", $gameMap.mapId())
-      return this._mapId === $gameMap.mapId();
-    };
-
-    Game_Interpreter.prototype.command117 = function (params) {
-      const commonEvent = $dataCommonEvents[params[0]];
-      console.log("commonEvent: ", commonEvent)
-      if (commonEvent) {
-        console.log("this.isOnCurrentMap(): ", this.isOnCurrentMap())
-        const eventId = this.isOnCurrentMap() ? this._eventId : 0;
-        console.log("eventId: ", eventId)
-        this.setupChild(commonEvent.list, eventId);
-        console.log("commonEvent.list: ", commonEvent.list)
-      }
-      return true;
-    };
-
     class Window_ItemBarCommand extends Window_Command {
 
       initialize(rect) {
@@ -1378,13 +1359,12 @@ const ASItemBarWindowNameSpace = (() => {
       }
 
       commandActionBind(itemId) {
+        
         if (itemBarWindowHoldingItemIdVariable >= 1 && itemId >= 1) {
           $gameVariables.setValue(itemBarWindowHoldingItemIdVariable, itemId);
         }
         if (itemBarWindowClickItemCommonEvents >= 1) {
-          // console.log("itemBarWindowClickItemCommonEvents: ", itemBarWindowClickItemCommonEvents)
-          // console.log("$gameMap._interpreter: ", $gameMap._interpreter)
-          $gameMap._interpreter.command117([itemBarWindowClickItemCommonEvents]);
+          $gameTemp.reserveCommonEvent(itemBarWindowClickItemCommonEvents);
         }
         this.activate();
         // SceneManager.pop();
