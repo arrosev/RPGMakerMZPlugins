@@ -52,24 +52,31 @@
  * 
  * @param itemBarShowKeyCode
  * @text Show Key Code
- * @desc Show Key Code (default 73)
+ * @desc Show Key Code (default 73(I))
  * @parent keyboardControlSet
  * @type string
  * @default 73
  * 
  * @param itembarUpKeyCode
  * @text Up Key Code
- * @desc Up Key Code (default 85)
+ * @desc Up Key Code (default 85(U))
  * @parent keyboardControlSet
  * @type string
  * @default 85
  * 
  * @param itembarDownKeyCode
  * @text Down Key Code
- * @desc Down Key Code (default 79)
+ * @desc Down Key Code (default 79(O))
  * @parent keyboardControlSet
  * @type string
  * @default 79
+ * 
+ * @param itembarClickKeyCode
+ * @text Click Key Code
+ * @desc Click Key Code (default 72(H))
+ * @parent keyboardControlSet
+ * @type string
+ * @default 72
  * 
  * @param itemBarWindowStyle
  * @text Item Bar Window Style
@@ -320,6 +327,7 @@
 // 加入物品和删除物品都需要及时更新工具栏，手动刷新开始-加入或删除物品多次-手动刷新结束
 // 删除物品时，需判断删除物品是否是当前持有物品，如果是持有物品且删除后数量为0，则更新持有物品为空手。
 // 为兼容手柄游玩，可能需要加入一个持有物品窗口以显示当前持有物品。
+// 是否显示物品数量待考虑
 
 const ASItemBarWindowNameSpace = (() => {
     "use strict";
@@ -330,6 +338,7 @@ const ASItemBarWindowNameSpace = (() => {
     const itemBarShowKeyCode = parameters.itemBarShowKeyCode;
     const itembarUpKeyCode = parameters.itembarUpKeyCode;
     const itembarDownKeyCode = parameters.itembarDownKeyCode;
+    const itembarClickKeyCode = parameters.itembarClickKeyCode;
 
     const itemBarWindowWindowSkin = parameters.itemBarWindowWindowSkin;
     const itemBarWindowFinalOffsetJsonObject = JSON.parse(parameters.itemBarWindowFinalOffset);
@@ -367,6 +376,7 @@ const ASItemBarWindowNameSpace = (() => {
     Input.keyMapper[itemBarShowKeyCode] = "itembarshow";//I
     Input.keyMapper[itembarUpKeyCode] = "itembarup";//U
     Input.keyMapper[itembarDownKeyCode] = "itembardown";//O
+    Input.keyMapper[itembarClickKeyCode] = "itembarclick";//H 72
 
     console.log("Input.keyMapper: ", Input.keyMapper)
 
@@ -1323,6 +1333,13 @@ const ASItemBarWindowNameSpace = (() => {
       this._baseTexture.update();
     };
 
+    // Game_Interpreter.prototype.callCommonEvent = function(ceid, immediately) {  
+    //   let child = this;
+    //   while(child._childInterpreter)  child = child._childInterpreter;
+    //   child.setupChild($dataCommonEvents[ceid].list, child._eventId);
+    //   if(immediately) child.updateChild();
+    // }
+
     class Window_ItemBarCommand extends Window_Command {
 
       initialize(rect) {
@@ -1364,6 +1381,7 @@ const ASItemBarWindowNameSpace = (() => {
           $gameVariables.setValue(itemBarWindowHoldingItemIdVariable, itemId);
         }
         if (itemBarWindowClickItemCommonEvents >= 1) {
+          //$gameMap._interpreter.callCommonEvent(itemBarWindowClickItemCommonEvents, true);
           $gameTemp.reserveCommonEvent(itemBarWindowClickItemCommonEvents);
         }
         this.activate();
@@ -1452,6 +1470,34 @@ const ASItemBarWindowNameSpace = (() => {
         }
       };
 
+      isOkTriggered() {
+        return this._canRepeat ? Input.isRepeated("itembarclick") : Input.isTriggered("itembarclick");
+      }
+
+      isTouchedInsideFrame() {
+        const touchPos = new Point(TouchInput.x, TouchInput.y);
+        const localPos = this.worldTransform.applyInverse(touchPos);
+        return this.innerRect.contains(localPos.x, localPos.y) && TouchInput.isTriggered();
+      }
+
+      isTouchedInsideFrameForWheelScroll() {
+        const touchPos = new Point(TouchInput.x, TouchInput.y);
+        const localPos = this.worldTransform.applyInverse(touchPos);
+        return this.innerRect.contains(localPos.x, localPos.y);
+      }
+
+      processWheelScroll() {
+        if (this.isWheelScrollEnabled() && this.isTouchedInsideFrameForWheelScroll()) {
+          const threshold = 20;
+          if (TouchInput.wheelY >= threshold) {
+            this.smoothScrollDown(1);
+          }
+          if (TouchInput.wheelY <= -threshold) {
+            this.smoothScrollUp(1);
+          }
+        }
+      }
+
     }
 
     // const _Game_Player_CanMove = Game_Player.prototype.canMove;
@@ -1462,6 +1508,12 @@ const ASItemBarWindowNameSpace = (() => {
     //     }
     //     return canMove;
     // };
+
+    const _Scene_Map_IsMapTouchOk = Scene_Map.prototype.isMapTouchOk;
+    Scene_Map.prototype.isMapTouchOk = function() {
+      const isMapTouchOk = _Scene_Map_IsMapTouchOk.apply(this, arguments) && !this.itemBarCommandWindow.isTouchedInsideFrame();
+      return isMapTouchOk;
+    };
 
     const _Scene_Map_CreateDisplayObjects = Scene_Map.prototype.createDisplayObjects;
     Scene_Map.prototype.createDisplayObjects = function() {
