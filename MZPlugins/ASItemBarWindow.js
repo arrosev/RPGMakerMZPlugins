@@ -236,6 +236,29 @@
  * @min 0
  * @default 0
  * 
+ * @param itemBarWindowAction
+ * @text Item Bar Window Action
+ * @desc Item Bar Window Action
+ * @parent itemBarWindowSet
+ * @type string
+ * @default
+ * 
+ * @param itemBarWindowHoldingItemIdVariable
+ * @text Variable
+ * @desc Variable holding the id of the item being held
+ * @parent itemBarWindowAction
+ * @type variable
+ * @min 0
+ * @default 0
+ * 
+ * @param itemBarWindowClickItemCommonEvents
+ * @text Common Events
+ * @desc Common events that are executed when an item is clicked
+ * @parent itemBarWindowAction
+ * @type common_event
+ * @min 0
+ * @default 0
+ * 
  */
 
 /*~struct~Point:
@@ -337,6 +360,9 @@ const ASItemBarWindowNameSpace = (() => {
     const itemBarWindowItemBackgroundBorderColorJsonObject = JSON.parse(parameters.itemBarWindowItemBackgroundBorderColor);
     const itemBarWindowItemBackgroundBorderLineWidth = Number(parameters.itemBarWindowItemBackgroundBorderLineWidth);
     const itemBarWindowItemBackgroundBorderRadius = Number(parameters.itemBarWindowItemBackgroundBorderRadius);
+
+    const itemBarWindowHoldingItemIdVariable =  Number(parameters.itemBarWindowHoldingItemIdVariable) || 0;
+    const itemBarWindowClickItemCommonEvents =  Number(parameters.itemBarWindowClickItemCommonEvents) || 0;
 
     Input.keyMapper[itemBarShowKeyCode] = "itembarshow";//I
     Input.keyMapper[itembarUpKeyCode] = "itembarup";//U
@@ -1297,6 +1323,25 @@ const ASItemBarWindowNameSpace = (() => {
       this._baseTexture.update();
     };
 
+    Game_Interpreter.prototype.isOnCurrentMap = function() {
+      console.log("this._mapId: ", this._mapId)
+      console.log("$gameMap.mapId(): ", $gameMap.mapId())
+      return this._mapId === $gameMap.mapId();
+    };
+
+    Game_Interpreter.prototype.command117 = function (params) {
+      const commonEvent = $dataCommonEvents[params[0]];
+      console.log("commonEvent: ", commonEvent)
+      if (commonEvent) {
+        console.log("this.isOnCurrentMap(): ", this.isOnCurrentMap())
+        const eventId = this.isOnCurrentMap() ? this._eventId : 0;
+        console.log("eventId: ", eventId)
+        this.setupChild(commonEvent.list, eventId);
+        console.log("commonEvent.list: ", commonEvent.list)
+      }
+      return true;
+    };
+
     class Window_ItemBarCommand extends Window_Command {
 
       initialize(rect) {
@@ -1326,6 +1371,23 @@ const ASItemBarWindowNameSpace = (() => {
         for (const item of $gameParty.items()) {
           this.addCommand(item.name, `${item.id}`);
         }
+
+        for (const command of this._list) {
+          this.setHandler(command.symbol, this.commandActionBind.bind(this, Number(command.symbol) || 0));
+        }
+      }
+
+      commandActionBind(itemId) {
+        if (itemBarWindowHoldingItemIdVariable >= 1 && itemId >= 1) {
+          $gameVariables.setValue(itemBarWindowHoldingItemIdVariable, itemId);
+        }
+        if (itemBarWindowClickItemCommonEvents >= 1) {
+          // console.log("itemBarWindowClickItemCommonEvents: ", itemBarWindowClickItemCommonEvents)
+          // console.log("$gameMap._interpreter: ", $gameMap._interpreter)
+          $gameMap._interpreter.command117([itemBarWindowClickItemCommonEvents]);
+        }
+        this.activate();
+        // SceneManager.pop();
       }
 
       drawItemText(index) {
@@ -1369,11 +1431,13 @@ const ASItemBarWindowNameSpace = (() => {
               this.contentsBack.strokeRoundRect(rect.x, rect.y, rect.width, rect.height, c3, itemBarWindowItemBackgroundBorderLineWidth, itemBarWindowItemBackgroundBorderRadius);
             }
           } else {
-            const bitmap = ImageManager.loadBitmap("img/", itemBarWindowItemBackgroundImage);
-            bitmap.addLoadListener(() => {
-              this.contentsBack.clearRect(rect.x, rect.y, rect.width, rect.height);
-              this.contentsBack.blt(bitmap, 0, 0, bitmap.width, bitmap.height, rect.x, rect.y, rect.width, rect.height);
-            });
+            if (itemBarWindowItemBackgroundImage) {
+              const bitmap = ImageManager.loadBitmap("img/", itemBarWindowItemBackgroundImage);
+              bitmap.addLoadListener(() => {
+                this.contentsBack.clearRect(rect.x, rect.y, rect.width, rect.height);
+                this.contentsBack.blt(bitmap, 0, 0, bitmap.width, bitmap.height, rect.x, rect.y, rect.width, rect.height);
+              });
+            }
           }
         }
       };
