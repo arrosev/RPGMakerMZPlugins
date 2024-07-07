@@ -181,6 +181,50 @@
  * @type struct<Color>
  * @default {"r":"0","g":"0","b":"0","a":"1"}
  * 
+ * @param itemBarWindowItemNumberText
+ * @text ----Item Number Text----
+ * @desc Styles for the item Number text
+ * @parent itemBarWindowStyle
+ * @type string
+ * @default 
+ * 
+ * @param itemBarWindowItemNumberTextVisible
+ * @text Number Text Visible
+ * @desc Item Bar Window Item Number Text Visible
+ * @parent itemBarWindowStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param itemBarWindowItemNumberTextOffset
+ * @text Number Text Offset
+ * @desc Item Bar Window Item Number Text Offset
+ * @parent itemBarWindowStyle
+ * @type struct<Point>
+ * @default {"x":"86","y":"86"}
+ * 
+ * @param itemBarWindowItemNumberTextSize
+ * @text Number Text Size
+ * @desc Item Bar Window Item Number Text Size
+ * @parent itemBarWindowStyle
+ * @type number
+ * @default 16
+ * 
+ * @param itemBarWindowItemNumberTextColor
+ * @text Number Text Color
+ * @desc Item Bar Window Item Number Text Color
+ * @parent itemBarWindowStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param itemBarWindowItemNumberTextOutlineColor
+ * @text Number Text Outline Color
+ * @desc Item Bar Window Item Number Text Outline Color
+ * @parent itemBarWindowStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
  * @param itemBarWindowItemBackground
  * @text ---Item Background---
  * @desc Styles for the item text
@@ -242,6 +286,37 @@
  * @type number
  * @min 0
  * @default 0
+ * 
+ * @param itemBarWindowItemHoldingTag
+ * @text ----Item Holding Tag----
+ * @desc Styles for the item Holding Tag
+ * @parent itemBarWindowStyle
+ * @type string
+ * @default
+ * 
+ * @param itemBarWindowItemHoldingTagVisible
+ * @text Item Holding Tag Visible
+ * @desc Item Bar Window Item Holding Tag Visible
+ * @parent itemBarWindowStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param itemBarWindowItemHoldingTagOffset
+ * @text Item Holding Tag Offset
+ * @desc Item Bar Window Item Holding Tag Offset
+ * @parent itemBarWindowStyle
+ * @type struct<Point>
+ * @default {"x":"5","y":"5"}
+ * 
+ * @param itemBarWindowItemHoldingTagImage
+ * @text Item Holding Tag Image
+ * @desc Item Bar Window Item Holding Tag Image
+ * @parent itemBarWindowStyle
+ * @type file
+ * @dir img/
+ * @default
  * 
  * @param itemBarWindowAction
  * @text Item Bar Window Action
@@ -433,6 +508,14 @@ const ASItemBarWindowNameSpace = (() => {
     const itemBarWindowItemTextColorJsonObject = JSON.parse(parameters.itemBarWindowItemTextColor);
     const itemBarWindowItemTextOutlineColorJsonObject = JSON.parse(parameters.itemBarWindowItemTextOutlineColor);
 
+    //----Item Number Text----
+    const itemBarWindowItemNumberTextVisible = parameters.itemBarWindowItemNumberTextVisible !== "false";
+    const itemBarWindowItemNumberTextOffsetJsonObject = JSON.parse(parameters.itemBarWindowItemNumberTextOffset);
+    const itemBarWindowItemNumberTextOffset = new Point(Number(itemBarWindowItemNumberTextOffsetJsonObject.x) || 0, Number(itemBarWindowItemNumberTextOffsetJsonObject.y) || 0);
+    const itemBarWindowItemNumberTextSize = Number(parameters.itemBarWindowItemNumberTextSize) || 16;
+    const itemBarWindowItemNumberTextColorJsonObject = JSON.parse(parameters.itemBarWindowItemNumberTextColor);
+    const itemBarWindowItemNumberTextOutlineColorJsonObject = JSON.parse(parameters.itemBarWindowItemNumberTextOutlineColor);
+
     //---Item Background---
     const itemBarWindowItemBackgroundFormalitySelectNone = "none";
     const itemBarWindowItemBackgroundFormalitySelectColor = "color";
@@ -446,6 +529,13 @@ const ASItemBarWindowNameSpace = (() => {
     const itemBarWindowItemBackgroundBorderLineWidth = Number(parameters.itemBarWindowItemBackgroundBorderLineWidth);
     const itemBarWindowItemBackgroundBorderRadius = Number(parameters.itemBarWindowItemBackgroundBorderRadius);
 
+    //---Item Holding Tag---
+    const itemBarWindowItemHoldingTagVisible = parameters.itemBarWindowItemHoldingTagVisible !== "false";
+    const itemBarWindowItemHoldingTagOffsetJsonObject = JSON.parse(parameters.itemBarWindowItemHoldingTagOffset);
+    const itemBarWindowItemHoldingTagOffset = new Point(Number(itemBarWindowItemHoldingTagOffsetJsonObject.x) || 0, Number(itemBarWindowItemHoldingTagOffsetJsonObject.y) || 0);
+    const itemBarWindowItemHoldingTagImage = parameters.itemBarWindowItemHoldingTagImage;
+
+    //------Action------
     const itemBarWindowHoldingItemIdVariable =  Number(parameters.itemBarWindowHoldingItemIdVariable) || 0;
     const itemBarWindowClickItemCommonEvents =  Number(parameters.itemBarWindowClickItemCommonEvents) || 0;
 
@@ -1461,6 +1551,7 @@ const ASItemBarWindowNameSpace = (() => {
       }
 
       commandActionBind(itemId) {
+
         
         if (itemBarWindowHoldingItemIdVariable >= 1 && itemId >= 1) {
           $gameVariables.setValue(itemBarWindowHoldingItemIdVariable, itemId);
@@ -1475,6 +1566,8 @@ const ASItemBarWindowNameSpace = (() => {
           const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
           this.proxy.refreshContent(currentHoldingItemIdVariableValue);
         }
+
+        this.refresh();
 
         this.activate();
         // SceneManager.pop();
@@ -1492,6 +1585,39 @@ const ASItemBarWindowNameSpace = (() => {
         }
       }
 
+      drawItemNumberText(index) {
+        if (itemBarWindowItemNumberTextVisible === true) {
+          const rect = this.itemRect(index);
+          const itemId = Number(this.commandSymbol(index)) || 0;
+          //console.log("itemId: ", itemId)
+          const itemNumber = $gameParty.numItems($dataItems[itemId]);
+          //console.log("itemNumber: ", itemNumber)
+          this.contents.fontSize = itemBarWindowItemNumberTextSize;
+          this.changeTextColor(colorJsonObjectConvertToColorRGBA(itemBarWindowItemNumberTextColorJsonObject));
+          this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(itemBarWindowItemNumberTextOutlineColorJsonObject));
+          this.changePaintOpacity(this.isCommandEnabled(index));
+          const width = this.textWidth(itemNumber);
+          //console.log("width: ", width)
+          this.drawText(itemNumber, rect.x + itemBarWindowItemNumberTextOffset.x - width, rect.y + itemBarWindowItemNumberTextOffset.y, width, "right");
+        }
+      }
+
+      drawItemHoldingTag(index) {
+        const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
+        const itemId = Number(this.commandSymbol(index)) || 0;
+        // console.log("currentHoldingItemIdVariableValue: ", currentHoldingItemIdVariableValue)
+        // console.log("itemId: ", itemId)
+        if (itemBarWindowItemHoldingTagVisible === true && currentHoldingItemIdVariableValue !== 0 && currentHoldingItemIdVariableValue === itemId) {
+          if (itemBarWindowItemHoldingTagImage) {
+            const rect = this.itemRect(index);
+            const bitmap = ImageManager.loadBitmap("img/", itemBarWindowItemHoldingTagImage);
+            bitmap.addLoadListener(() => {
+              this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, rect.x + itemBarWindowItemHoldingTagOffset.x, rect.y + itemBarWindowItemHoldingTagOffset.y, bitmap.width, bitmap.height);
+            });
+          }
+        }
+      }
+
       drawItem(index) {
         const rect = this.itemRect(index);
         const itemId = Number(this.commandSymbol(index)) || 0;
@@ -1504,9 +1630,13 @@ const ASItemBarWindowNameSpace = (() => {
             this.contents.clearRect(rect.x, rect.y, rect.width, rect.height);
             this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, rect.x, rect.y, rect.width, rect.height);
             this.drawItemText(index);
+            this.drawItemNumberText(index);
+            this.drawItemHoldingTag(index);
           });
         } else {
           this.drawItemText(index);
+          this.drawItemNumberText(index);
+          this.drawItemHoldingTag(index);
         }
       }
 
