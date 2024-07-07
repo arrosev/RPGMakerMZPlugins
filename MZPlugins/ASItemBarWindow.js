@@ -57,21 +57,21 @@
  * @type string
  * @default 73
  * 
- * @param itembarUpKeyCode
+ * @param itemBarUpKeyCode
  * @text Up Key Code
  * @desc Up Key Code (default 85(U))
  * @parent keyboardControlSet
  * @type string
  * @default 85
  * 
- * @param itembarDownKeyCode
+ * @param itemBarDownKeyCode
  * @text Down Key Code
  * @desc Down Key Code (default 79(O))
  * @parent keyboardControlSet
  * @type string
  * @default 79
  * 
- * @param itembarClickKeyCode
+ * @param itemBarClickKeyCode
  * @text Click Key Code
  * @desc Click Key Code (default 72(H))
  * @parent keyboardControlSet
@@ -266,6 +266,51 @@
  * @min 0
  * @default 0
  * 
+ * @param itemPreviewWindowSet
+ * @text Item Preview Window Set
+ * @desc Item Preview Window Set
+ * @type string
+ * @default
+ * 
+ * @param itemPreviewWindowVisible
+ * @text Visible
+ * @desc Item Preview Window Visible
+ * @parent itemPreviewWindowSet
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param itemPreviewWindowWindowSkin
+ * @text Window Skin
+ * @desc Item Preview Window WindowSkin
+ * @parent itemPreviewWindowSet
+ * @type file
+ * @dir img/system/
+ * @default Window
+ * 
+ * @param itemPreviewWindowRect
+ * @text Rect
+ * @desc Item Preview Window Rect
+ * @parent itemPreviewWindowSet
+ * @type struct<Rect>
+ * @default {"x":"624","y":"450","width":"124","height":"124"}
+ * 
+ * @param itemPreviewWindowPadding
+ * @text Padding
+ * @desc Item Preview Window Padding
+ * @parent itemPreviewWindowSet
+ * @type number
+ * @default 12
+ * 
+ * @param itemPreviewWindowEmptyHandedImage
+ * @text Empty Handed Image
+ * @desc Item Preview Window Empty Handed Image
+ * @parent itemPreviewWindowSet
+ * @type file
+ * @dir img/
+ * @default
+ * 
  */
 
 /*~struct~Point:
@@ -280,6 +325,36 @@
  * @text Y
  * @desc Y
  * @type number
+ * @default 0
+ * 
+ */
+
+/*~struct~Rect:
+ * 
+ * @param x
+ * @text X
+ * @desc X
+ * @type number
+ * @default 0
+ * 
+ * @param y
+ * @text Y
+ * @desc Y
+ * @type number
+ * @default 0
+ * 
+ * @param width
+ * @text Width
+ * @desc Width
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param height
+ * @text Height
+ * @desc Height
+ * @type number
+ * @min 0
  * @default 0
  * 
  */
@@ -336,10 +411,11 @@ const ASItemBarWindowNameSpace = (() => {
     const parameters = PluginManager.parameters(pluginName);
 
     const itemBarShowKeyCode = parameters.itemBarShowKeyCode;
-    const itembarUpKeyCode = parameters.itembarUpKeyCode;
-    const itembarDownKeyCode = parameters.itembarDownKeyCode;
-    const itembarClickKeyCode = parameters.itembarClickKeyCode;
+    const itemBarUpKeyCode = parameters.itemBarUpKeyCode;
+    const itemBarDownKeyCode = parameters.itemBarDownKeyCode;
+    const itemBarClickKeyCode = parameters.itemBarClickKeyCode;
 
+    //------Item Bar Set------
     const itemBarWindowWindowSkin = parameters.itemBarWindowWindowSkin;
     const itemBarWindowFinalOffsetJsonObject = JSON.parse(parameters.itemBarWindowFinalOffset);
     const itemBarWindowFinalOffset = new Point(Number(itemBarWindowFinalOffsetJsonObject.x) || 0, Number(itemBarWindowFinalOffsetJsonObject.y) || 0);
@@ -373,10 +449,18 @@ const ASItemBarWindowNameSpace = (() => {
     const itemBarWindowHoldingItemIdVariable =  Number(parameters.itemBarWindowHoldingItemIdVariable) || 0;
     const itemBarWindowClickItemCommonEvents =  Number(parameters.itemBarWindowClickItemCommonEvents) || 0;
 
+    //------Item Preview Set------
+    const itemPreviewWindowVisible = parameters.itemPreviewWindowVisible !== "false";
+    const itemPreviewWindowWindowSkin = parameters.itemPreviewWindowWindowSkin;
+    const itemPreviewWindowRectObject = JSON.parse(parameters.itemPreviewWindowRect);
+    const itemPreviewWindowRect = new Rectangle(Number(itemPreviewWindowRectObject.x) || 0, Number(itemPreviewWindowRectObject.y) || 0, Number(itemPreviewWindowRectObject.width) || 0, Number(itemPreviewWindowRectObject.height) || 0);
+    const itemPreviewWindowPadding = Number(parameters.itemPreviewWindowPadding);
+    const itemPreviewWindowEmptyHandedImage = parameters.itemPreviewWindowEmptyHandedImage;
+
     Input.keyMapper[itemBarShowKeyCode] = "itembarshow";//I
-    Input.keyMapper[itembarUpKeyCode] = "itembarup";//U
-    Input.keyMapper[itembarDownKeyCode] = "itembardown";//O
-    Input.keyMapper[itembarClickKeyCode] = "itembarclick";//H 72
+    Input.keyMapper[itemBarUpKeyCode] = "itembarup";//U
+    Input.keyMapper[itemBarDownKeyCode] = "itembardown";//O
+    Input.keyMapper[itemBarClickKeyCode] = "itembarclick";//H 72
 
     console.log("Input.keyMapper: ", Input.keyMapper)
 
@@ -1344,6 +1428,7 @@ const ASItemBarWindowNameSpace = (() => {
 
       initialize(rect) {
         Window_Command.prototype.initialize.call(this, rect);
+        this.proxy = null;
         this.windowskin = ImageManager.loadSystem(itemBarWindowWindowSkin);
         this._padding = itemBarWindowPadding;
       }
@@ -1380,10 +1465,17 @@ const ASItemBarWindowNameSpace = (() => {
         if (itemBarWindowHoldingItemIdVariable >= 1 && itemId >= 1) {
           $gameVariables.setValue(itemBarWindowHoldingItemIdVariable, itemId);
         }
+        
         if (itemBarWindowClickItemCommonEvents >= 1) {
           //$gameMap._interpreter.callCommonEvent(itemBarWindowClickItemCommonEvents, true);
           $gameTemp.reserveCommonEvent(itemBarWindowClickItemCommonEvents);
         }
+
+        if (this.proxy && this.proxy.__proto__.hasOwnProperty("refreshContent")) {
+          const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
+          this.proxy.refreshContent(currentHoldingItemIdVariableValue);
+        }
+
         this.activate();
         // SceneManager.pop();
       }
@@ -1438,7 +1530,7 @@ const ASItemBarWindowNameSpace = (() => {
             }
           }
         }
-      };
+      }
         
       processCursorMove() {
         //console.log("processCursorMove")
@@ -1468,7 +1560,7 @@ const ASItemBarWindowNameSpace = (() => {
             this.playCursorSound();
           }
         }
-      };
+      }
 
       isOkTriggered() {
         return this._canRepeat ? Input.isRepeated("itembarclick") : Input.isTriggered("itembarclick");
@@ -1500,6 +1592,47 @@ const ASItemBarWindowNameSpace = (() => {
 
     }
 
+    class Window_ItemPreview extends Window_Base {
+
+      initialize(rect) {
+        Window_Base.prototype.initialize.call(this, rect);
+
+        this.visible = itemPreviewWindowVisible;
+        this.windowskin = ImageManager.loadSystem(itemPreviewWindowWindowSkin);
+        this._padding = itemPreviewWindowPadding;
+
+      }
+
+      setContentImage(imagePath) {
+        const bitmap = ImageManager.loadBitmap("img/", imagePath);
+        bitmap.addLoadListener(() => {
+          this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, 0, 0, this.contents.width, this.contents.height);
+        });
+      }
+
+      refreshContent(holdingItemIdVariableValue) {
+        this.contents.clear();
+        if (holdingItemIdVariableValue === 0) {
+          if (itemPreviewWindowEmptyHandedImage) {
+            this.setContentImage(itemPreviewWindowEmptyHandedImage);
+          }
+        } else {
+          const itemPreviewThumbnail = $dataItems[holdingItemIdVariableValue].meta.ASItemBarThumbnail;
+          if (itemPreviewThumbnail) {
+            const noBlankItemPreviewThumbnail = itemPreviewThumbnail.replace(/^\s*|\s*$/g, "");
+            this.setContentImage(noBlankItemPreviewThumbnail);
+          }
+        }
+      }
+
+      isTouchedInsideFrame() {
+        const touchPos = new Point(TouchInput.x, TouchInput.y);
+        const localPos = this.worldTransform.applyInverse(touchPos);
+        return this.innerRect.contains(localPos.x, localPos.y) && this.visible;
+      }
+
+    }
+
     // const _Game_Player_CanMove = Game_Player.prototype.canMove;
     // Game_Player.prototype.canMove = function() {
     //     const canMove = _Game_Player_CanMove.apply(this, arguments);
@@ -1511,7 +1644,7 @@ const ASItemBarWindowNameSpace = (() => {
 
     const _Scene_Map_IsMapTouchOk = Scene_Map.prototype.isMapTouchOk;
     Scene_Map.prototype.isMapTouchOk = function() {
-      const isMapTouchOk = _Scene_Map_IsMapTouchOk.apply(this, arguments) && !this.itemBarCommandWindow.isTouchedInsideFrame();
+      const isMapTouchOk = _Scene_Map_IsMapTouchOk.apply(this, arguments) && !this.itemBarCommandWindow.isTouchedInsideFrame() && !this.itemPreviewWindow.isTouchedInsideFrame();
       return isMapTouchOk;
     };
 
@@ -1520,11 +1653,17 @@ const ASItemBarWindowNameSpace = (() => {
         _Scene_Map_CreateDisplayObjects.apply(this, arguments);
 
         this.charm = new Charm(PIXI);
+
+        this.itemPreviewWindow = new Window_ItemPreview(itemPreviewWindowRect);
+        const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
+        this.itemPreviewWindow.refreshContent(currentHoldingItemIdVariableValue);
+        this.addChild(this.itemPreviewWindow);
     
         const itemBarCommandWindowWidth = itemBarWindowItemWidth + itemBarWindowColSpacing + 2 * itemBarWindowPadding;
         const itemBarCommandWindowHeight = (itemBarWindowItemHeight + itemBarWindowRowSpacing) * itemBarWindowVisibleItems + 2 * itemBarWindowPadding;
         const rect = new Rectangle(- (itemBarWindowFinalOffset.x + itemBarCommandWindowWidth), itemBarWindowFinalOffset.y, itemBarCommandWindowWidth, itemBarCommandWindowHeight);
         this.itemBarCommandWindow = new Window_ItemBarCommand(rect);
+        this.itemBarCommandWindow.proxy = this.itemPreviewWindow;
         this.itemBarCommandWindow.visible = false;
         this.itemBarCommandWindowPlaying = false;
         this.addChild(this.itemBarCommandWindow);
