@@ -486,6 +486,7 @@
 // 为兼容手柄游玩，可能需要加入一个持有物品窗口以显示当前持有物品。
 // 是否显示物品数量待考虑
 // 是否添加声效待考虑,如弹出和隐藏，持有和脱卸
+// 非地图场景，用完持有的物品，在重新获得该物品，回到地图界面不会持有该物品
 
 const ASItemBarWindowNameSpace = (() => {
     "use strict";
@@ -1617,6 +1618,62 @@ const ASItemBarWindowNameSpace = (() => {
         
       }
 
+      drawLoseItem(item) {
+        //判断失去的物品是不是最后一个，如果不是则把后面所有物品往前移动并往下滚一格，否则直接往下滚一格
+        const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
+        if(currentHoldingItemIdVariableValue !== 0 && currentHoldingItemIdVariableValue === item.id) {
+
+          if ($gameParty.numItems(item) === 0) {
+            $gameVariables.setValue(itemBarWindowHoldingItemIdVariable, 0);
+            if (this.proxy && this.proxy.__proto__.hasOwnProperty("refreshContent")) {
+              this.proxy.refreshContent(0);
+            }
+            console.log("$gameParty._items: ", $gameParty._items)
+            console.log("this._list: ", this._list)
+            this.refresh();
+
+            // const deleteItemIndex = this.findSymbol(`${item.id}`);
+
+            // for (let i = deleteItemIndex; i <= this._list.length - 1; i++) {
+
+            // }
+
+
+          } else {
+            
+            const currentHoldingItemTagIndex = this.findSymbol(`${currentHoldingItemIdVariableValue}`)
+            this.redrawItem(currentHoldingItemTagIndex);
+
+          }
+
+          
+        } else {
+          if ($gameParty.numItems(item) !== 0) {
+            const currentHoldingItemTagIndex = this.findSymbol(`${item.id}`)
+            this.redrawItem(currentHoldingItemTagIndex);
+          } else {
+            console.log("$gameParty._items: ", $gameParty._items)
+
+            const deleteItemIndex = this.findSymbol(`${item.id}`);
+            console.log("deleteItemIndex: ", deleteItemIndex)
+            if (deleteItemIndex !== -1) {
+              this._list.splice(deleteItemIndex, 1);
+            }
+            
+            this.clearItem(deleteItemIndex);
+            for (let i = 0; i <= this._list.length - 1; i++) {
+              console.log("i: ", i)
+              this.redrawItem(i);
+            }
+
+            console.log("this._list: ", this._list)
+            //this.refresh();
+          }
+        }
+
+        
+      }
+
       drawItemText(index) {
         if (itemBarWindowItemTextVisible === true) {
           const rect = this.itemLineRect(index);
@@ -1850,6 +1907,7 @@ const ASItemBarWindowNameSpace = (() => {
 
         this.itemPreviewWindow = new Window_ItemPreview(itemPreviewWindowRect);
         const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
+        console.log("createDisplayObjects----currentHoldingItemIdVariableValue: ", currentHoldingItemIdVariableValue)
         this.itemPreviewWindow.refreshContent(currentHoldingItemIdVariableValue);
         this.addChild(this.itemPreviewWindow);
     
@@ -1929,6 +1987,15 @@ const ASItemBarWindowNameSpace = (() => {
         }
         if (DataManager.isItem(item) && amount <= -1) {
           console.log("失去物品");
+          currentScene.itemBarCommandWindow.drawLoseItem(item);
+        }
+      } else {
+        if (DataManager.isItem(item) && amount <= -1) {
+          console.log("失去物品");
+          const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
+          if(currentHoldingItemIdVariableValue !== 0 && currentHoldingItemIdVariableValue === item.id && $gameParty.numItems(item) === 0) {
+            $gameVariables.setValue(itemBarWindowHoldingItemIdVariable, 0);
+          }
         }
       }
       
