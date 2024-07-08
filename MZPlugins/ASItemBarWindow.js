@@ -478,6 +478,7 @@
 // 删除物品时，需判断删除物品是否是当前持有物品，如果是持有物品且删除后数量为0，则更新持有物品为空手。
 // 为兼容手柄游玩，可能需要加入一个持有物品窗口以显示当前持有物品。
 // 是否显示物品数量待考虑
+// 是否添加声效待考虑
 
 const ASItemBarWindowNameSpace = (() => {
     "use strict";
@@ -1551,10 +1552,19 @@ const ASItemBarWindowNameSpace = (() => {
       }
 
       commandActionBind(itemId) {
-
         
         if (itemBarWindowHoldingItemIdVariable >= 1 && itemId >= 1) {
+          const lastHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
+          //console.log("lastHoldingItemIdVariableValue: ", lastHoldingItemIdVariableValue)
+          const lastHoldingItemTagIndex = this.findSymbol(`${lastHoldingItemIdVariableValue}`)
+          //console.log("lastHoldingItemTagIndex: ", lastHoldingItemTagIndex)
+
           $gameVariables.setValue(itemBarWindowHoldingItemIdVariable, itemId);
+
+          const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
+          const currentHoldingItemTagIndex = this.findSymbol(`${currentHoldingItemIdVariableValue}`)
+          this.redrawItem(lastHoldingItemTagIndex);
+          this.redrawItem(currentHoldingItemTagIndex);
         }
         
         if (itemBarWindowClickItemCommonEvents >= 1) {
@@ -1567,7 +1577,7 @@ const ASItemBarWindowNameSpace = (() => {
           this.proxy.refreshContent(currentHoldingItemIdVariableValue);
         }
 
-        this.refresh();
+        //this.refresh();
 
         this.activate();
         // SceneManager.pop();
