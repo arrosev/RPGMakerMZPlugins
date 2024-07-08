@@ -1598,7 +1598,22 @@ const ASItemBarWindowNameSpace = (() => {
       //   }
       // }
 
-      drawGainItem (item) {
+      drawGainItem(item, isNewItem) {
+
+        // console.log("$gameParty.items(): ", $gameParty.items())
+        console.log("$gameParty._items: ", $gameParty._items)
+        console.log("$gameParty._items[item.id]: ", $gameParty._items[item.id])
+        if (isNewItem) {
+          console.log("新获得物品")
+          this.addCommand(item.name, `${item.id}`);
+          const newItemCommand = this._list[this._list.length - 1];
+          this.setHandler(newItemCommand.symbol, this.commandActionBind.bind(this, Number(newItemCommand.symbol) || 0));
+          this.redrawItem(this._list.length - 1);
+        } else {
+          console.log("已获得物品, 增加数量")
+          const addItemNumberIndex = this.findSymbol(`${item.id}`);
+          this.redrawItem(addItemNumberIndex);
+        }
         
       }
 
@@ -1620,7 +1635,7 @@ const ASItemBarWindowNameSpace = (() => {
           const itemId = Number(this.commandSymbol(index)) || 0;
           //console.log("itemId: ", itemId)
           const itemNumber = $gameParty.numItems($dataItems[itemId]);
-          //console.log("itemNumber: ", itemNumber)
+          // console.log("itemNumber: ", itemNumber)
           this.contents.fontSize = itemBarWindowItemNumberTextSize;
           this.changeTextColor(colorJsonObjectConvertToColorRGBA(itemBarWindowItemNumberTextColorJsonObject));
           this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(itemBarWindowItemNumberTextOutlineColorJsonObject));
@@ -1897,21 +1912,24 @@ const ASItemBarWindowNameSpace = (() => {
 
     const _Game_Party_GainItem = Game_Party.prototype.gainItem;
     Game_Party.prototype.gainItem = function (item, amount, includeEquip) {
+
+      const isNewItem = !this._items[item.id];
+
       _Game_Party_GainItem.apply(this, arguments);
 
       const currentScene = SceneManager._scene;
-
       if (currentScene && currentScene instanceof Scene_Map && currentScene.itemBarCommandWindow && currentScene.itemPreviewWindow) {
         console.log("在地图处理物品")
         if (DataManager.isItem(item) && amount >= 1) {
           console.log("获得物品");
+          // console.log("item: ", item)
+          // console.log("items: ", this._items)
+          currentScene.itemBarCommandWindow.drawGainItem(item, isNewItem);
           //currentScene.itemBarCommandWindow.refresh()
         }
-
         if (DataManager.isItem(item) && amount <= -1) {
           console.log("失去物品");
         }
-
       }
       
     };
