@@ -78,6 +78,13 @@
  * @type string
  * @default 72
  * 
+ * @param itemBarEmptyHandedKeyCode
+ * @text Empty Handed Key Code
+ * @desc Empty Handed Key Code (default 75(K))
+ * @parent keyboardControlSet
+ * @type string
+ * @default 75
+ * 
  * @param itemBarWindowStyle
  * @text Item Bar Window Style
  * @desc Item Bar Window Style
@@ -478,7 +485,7 @@
 // 删除物品时，需判断删除物品是否是当前持有物品，如果是持有物品且删除后数量为0，则更新持有物品为空手。
 // 为兼容手柄游玩，可能需要加入一个持有物品窗口以显示当前持有物品。
 // 是否显示物品数量待考虑
-// 是否添加声效待考虑
+// 是否添加声效待考虑,如弹出和隐藏，持有和脱卸
 
 const ASItemBarWindowNameSpace = (() => {
     "use strict";
@@ -490,6 +497,7 @@ const ASItemBarWindowNameSpace = (() => {
     const itemBarUpKeyCode = parameters.itemBarUpKeyCode;
     const itemBarDownKeyCode = parameters.itemBarDownKeyCode;
     const itemBarClickKeyCode = parameters.itemBarClickKeyCode;
+    const itemBarEmptyHandedKeyCode = parameters.itemBarEmptyHandedKeyCode;
 
     //------Item Bar Set------
     const itemBarWindowWindowSkin = parameters.itemBarWindowWindowSkin;
@@ -552,6 +560,7 @@ const ASItemBarWindowNameSpace = (() => {
     Input.keyMapper[itemBarUpKeyCode] = "itembarup";//U
     Input.keyMapper[itemBarDownKeyCode] = "itembardown";//O
     Input.keyMapper[itemBarClickKeyCode] = "itembarclick";//H 72
+    Input.keyMapper[itemBarEmptyHandedKeyCode] = "itembaremptyhanded";//K 75
 
     console.log("Input.keyMapper: ", Input.keyMapper)
 
@@ -1583,6 +1592,16 @@ const ASItemBarWindowNameSpace = (() => {
         // SceneManager.pop();
       }
 
+      // redrawEmptyHandedItem (index) {
+      //   if (index >= 0) {
+
+      //   }
+      // }
+
+      drawGainItem (item) {
+        
+      }
+
       drawItemText(index) {
         if (itemBarWindowItemTextVisible === true) {
           const rect = this.itemLineRect(index);
@@ -1706,6 +1725,24 @@ const ASItemBarWindowNameSpace = (() => {
         return this._canRepeat ? Input.isRepeated("itembarclick") : Input.isTriggered("itembarclick");
       }
 
+      onTouchSelect(trigger) {
+        this._doubleTouch = false;
+        if (this.isCursorMovable()) {
+          const lastIndex = this.index();
+          const hitIndex = this.hitIndex();
+          if (hitIndex >= 0) {
+            if (hitIndex === this.index()) {
+              this._doubleTouch = true;
+            }
+            this.select(hitIndex);
+          }
+          if (trigger && this.index() !== lastIndex) {
+            console.log("onTouchSelect: ", trigger);
+            this.playCursorSound();
+          }
+        }
+      }
+
       isTouchedInsideFrame() {
         const touchPos = new Point(TouchInput.x, TouchInput.y);
         const localPos = this.worldTransform.applyInverse(touchPos);
@@ -1751,16 +1788,18 @@ const ASItemBarWindowNameSpace = (() => {
       }
 
       refreshContent(holdingItemIdVariableValue) {
-        this.contents.clear();
-        if (holdingItemIdVariableValue === 0) {
-          if (itemPreviewWindowEmptyHandedImage) {
-            this.setContentImage(itemPreviewWindowEmptyHandedImage);
-          }
-        } else {
-          const itemPreviewThumbnail = $dataItems[holdingItemIdVariableValue].meta.ASItemBarThumbnail;
-          if (itemPreviewThumbnail) {
-            const noBlankItemPreviewThumbnail = itemPreviewThumbnail.replace(/^\s*|\s*$/g, "");
-            this.setContentImage(noBlankItemPreviewThumbnail);
+        if (this.visible === true) {
+          this.contents.clear();
+          if (holdingItemIdVariableValue === 0) {
+            if (itemPreviewWindowEmptyHandedImage) {
+              this.setContentImage(itemPreviewWindowEmptyHandedImage);
+            }
+          } else {
+            const itemPreviewThumbnail = $dataItems[holdingItemIdVariableValue].meta.ASItemBarThumbnail;
+            if (itemPreviewThumbnail) {
+              const noBlankItemPreviewThumbnail = itemPreviewThumbnail.replace(/^\s*|\s*$/g, "");
+              this.setContentImage(noBlankItemPreviewThumbnail);
+            }
           }
         }
       }
@@ -1814,6 +1853,7 @@ const ASItemBarWindowNameSpace = (() => {
     Scene_Map.prototype.update = function() {
         _Scene_Map_Update.apply(this, arguments);
         this.charm.update();
+
         if (Input.isTriggered("itembarshow")) {
           if(this.itemBarCommandWindowPlaying !== true) {
             if (this.itemBarCommandWindow.visible === false) {
@@ -1834,6 +1874,46 @@ const ASItemBarWindowNameSpace = (() => {
             }
           }
         }
+
+        if (Input.isTriggered("itembaremptyhanded")) {
+
+          this.setItemBarEmptyHanded();
+
+        }
+
+    };
+
+    Scene_Map.prototype.setItemBarEmptyHanded = function() {
+      const lastHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
+      const lastHoldingItemTagIndex = this.itemBarCommandWindow.findSymbol(`${lastHoldingItemIdVariableValue}`)
+      if (lastHoldingItemIdVariableValue > 0 && lastHoldingItemTagIndex >= 0) {
+        $gameVariables.setValue(itemBarWindowHoldingItemIdVariable, 0);
+        this.itemBarCommandWindow.redrawItem(lastHoldingItemTagIndex);
+        const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
+        this.itemPreviewWindow.refreshContent(currentHoldingItemIdVariableValue);
+      }
+      
+    };
+
+    const _Game_Party_GainItem = Game_Party.prototype.gainItem;
+    Game_Party.prototype.gainItem = function (item, amount, includeEquip) {
+      _Game_Party_GainItem.apply(this, arguments);
+
+      const currentScene = SceneManager._scene;
+
+      if (currentScene && currentScene instanceof Scene_Map && currentScene.itemBarCommandWindow && currentScene.itemPreviewWindow) {
+        console.log("在地图处理物品")
+        if (DataManager.isItem(item) && amount >= 1) {
+          console.log("获得物品");
+          //currentScene.itemBarCommandWindow.refresh()
+        }
+
+        if (DataManager.isItem(item) && amount <= -1) {
+          console.log("失去物品");
+        }
+
+      }
+      
     };
 
 })();
