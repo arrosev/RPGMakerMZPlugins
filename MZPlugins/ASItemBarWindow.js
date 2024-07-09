@@ -1551,7 +1551,7 @@ const ASItemBarWindowNameSpace = (() => {
       }
 
       makeCommandList() {
-        console.log("$gameParty.items(): ", $gameParty.items())
+        console.log("makeCommandList---------$gameParty.items(): ", $gameParty.items())
         for (const item of $gameParty.items()) {
           this.addCommand(item.name, `${item.id}`);
         }
@@ -1620,57 +1620,84 @@ const ASItemBarWindowNameSpace = (() => {
 
       drawLoseItem(item) {
         //判断失去的物品是不是最后一个，如果不是则把后面所有物品往前移动并往下滚一格，否则直接往下滚一格
-        const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
-        if(currentHoldingItemIdVariableValue !== 0 && currentHoldingItemIdVariableValue === item.id) {
 
-          if ($gameParty.numItems(item) === 0) {
+        if ($gameParty.numItems(item) !== 0) {
+          const loseItemIndex = this.findSymbol(`${item.id}`)
+          this.redrawItem(loseItemIndex);
+        } else {
+          // this.clearCommandList();
+          // for (const item of $gameParty.items()) {
+          //   this.addCommand(item.name, `${item.id}`);
+          // }
+  
+          // for (const command of this._list) {
+          //   this.setHandler(command.symbol, this.commandActionBind.bind(this, Number(command.symbol) || 0));
+          // }
+          console.log("drawLoseItem----------$gameParty._items: ", $gameParty._items)
+          console.log("drawLoseItem----------$gameParty.items(): ", $gameParty.items())
+          
+          this.refresh()
+
+          const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
+          if(currentHoldingItemIdVariableValue !== 0 && currentHoldingItemIdVariableValue === item.id) {
             $gameVariables.setValue(itemBarWindowHoldingItemIdVariable, 0);
             if (this.proxy && this.proxy.__proto__.hasOwnProperty("refreshContent")) {
               this.proxy.refreshContent(0);
             }
-            console.log("$gameParty._items: ", $gameParty._items)
-            console.log("this._list: ", this._list)
-            this.refresh();
-
-            // const deleteItemIndex = this.findSymbol(`${item.id}`);
-
-            // for (let i = deleteItemIndex; i <= this._list.length - 1; i++) {
-
-            // }
-
-
-          } else {
-            
-            const currentHoldingItemTagIndex = this.findSymbol(`${currentHoldingItemIdVariableValue}`)
-            this.redrawItem(currentHoldingItemTagIndex);
-
           }
 
-          
-        } else {
-          if ($gameParty.numItems(item) !== 0) {
-            const currentHoldingItemTagIndex = this.findSymbol(`${item.id}`)
-            this.redrawItem(currentHoldingItemTagIndex);
-          } else {
-            console.log("$gameParty._items: ", $gameParty._items)
-
-            const deleteItemIndex = this.findSymbol(`${item.id}`);
-            console.log("deleteItemIndex: ", deleteItemIndex)
-            if (deleteItemIndex !== -1) {
-              this._list.splice(deleteItemIndex, 1);
-            }
-            
-            this.clearItem(deleteItemIndex);
-            for (let i = 0; i <= this._list.length - 1; i++) {
-              console.log("i: ", i)
-              this.redrawItem(i);
-            }
-
-            console.log("this._list: ", this._list)
-            //this.refresh();
-          }
         }
 
+        // const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
+        // if(currentHoldingItemIdVariableValue !== 0 && currentHoldingItemIdVariableValue === item.id) {
+
+        //   if ($gameParty.numItems(item) === 0) {
+        //     $gameVariables.setValue(itemBarWindowHoldingItemIdVariable, 0);
+        //     if (this.proxy && this.proxy.__proto__.hasOwnProperty("refreshContent")) {
+        //       this.proxy.refreshContent(0);
+        //     }
+        //     console.log("$gameParty._items: ", $gameParty._items)
+        //     console.log("this._list: ", this._list)
+        //     this.refresh();
+
+        //     // const deleteItemIndex = this.findSymbol(`${item.id}`);
+
+        //     // for (let i = deleteItemIndex; i <= this._list.length - 1; i++) {
+
+        //     // }
+
+
+        //   } else {
+            
+        //     const currentHoldingItemTagIndex = this.findSymbol(`${currentHoldingItemIdVariableValue}`)
+        //     this.redrawItem(currentHoldingItemTagIndex);
+
+        //   }
+
+          
+        // } else {
+        //   if ($gameParty.numItems(item) !== 0) {
+        //     const currentHoldingItemTagIndex = this.findSymbol(`${item.id}`)
+        //     this.redrawItem(currentHoldingItemTagIndex);
+        //   } else {
+        //     console.log("$gameParty._items: ", $gameParty._items)
+
+        //     const deleteItemIndex = this.findSymbol(`${item.id}`);
+        //     console.log("deleteItemIndex: ", deleteItemIndex)
+        //     if (deleteItemIndex !== -1) {
+        //       this._list.splice(deleteItemIndex, 1);
+        //     }
+            
+        //     this.clearItem(deleteItemIndex);
+        //     for (let i = 0; i <= this._list.length - 1; i++) {
+        //       console.log("i: ", i)
+        //       this.redrawItem(i);
+        //     }
+
+        //     console.log("this._list: ", this._list)
+        //     //this.refresh();
+        //   }
+        // }
         
       }
 
@@ -1999,6 +2026,48 @@ const ASItemBarWindowNameSpace = (() => {
         }
       }
       
+    };
+
+    Game_Party.prototype.initAllItems = function () {
+      this._items = new Map();
+      this._weapons = {};
+      this._armors = {};
+    };
+
+    Game_Party.prototype.items = function () {
+      const items = [];
+      // const keys = this._items.keys();
+      // console.log("this._items: ", this._items)
+      // console.log("this._items instanceof Map: ", this._items instanceof Map)
+      // console.log("this._items.keys(): ", Array.from(this._items.keys()))
+      // console.log("this._items.values(): ", this._items.values())
+      // for (const key of keys) {
+      //   // items.push(key)
+      //   console.log("key: ", key)
+      // }
+
+      //可能需要给gameparty添加一个保存物品获取顺序的属性
+
+      const maps = new Map();
+      // maps[1] = "q"
+      // maps[2] = "q"
+      // maps[3] = "q"
+      // maps[4] = "q"
+      // maps[5] = "q"
+      maps.set(1, "q")
+      maps.set(2, "q")
+      maps.set(6, "q")
+      maps.set(5, "q")
+      maps.set(4, "q")
+      maps.set(3, "q")
+
+      console.log("maps: ", maps);
+
+      console.log("maps.keys(): ", maps.keys());
+      console.log("keys: ",Array.from(maps.keys()));
+
+      console.log("Game_Party.prototype.items-----items: ", items)
+      return items.map(id => $dataItems[id]);
     };
 
 })();
