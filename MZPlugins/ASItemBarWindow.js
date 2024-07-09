@@ -1635,8 +1635,7 @@ const ASItemBarWindowNameSpace = (() => {
           
           console.log("drawLoseItem----------$gameParty.orderItems(): ", $gameParty.orderItems())
           
-          // const deleteItemIndex = this.findSymbol(`${item.id}`);
-
+          //if (deleteItemIndex === )
           // if (deleteItemIndex !== -1) {
           //   this._list.splice(deleteItemIndex, 1);
           // }
@@ -1648,10 +1647,16 @@ const ASItemBarWindowNameSpace = (() => {
           //   console.log("i: ", i)
           //   this.redrawItem(i);
           // }
+          
           console.log("drawLoseItem----------refresh")
           this.refresh();
           console.log("drawLoseItem----------smoothScrollBy")
           this.smoothScrollBy(0, itemBarWindowItemHeight + itemBarWindowRowSpacing);
+          
+          //this.refreshCursor();
+          //this.ensureCursorVisible(false)
+          //this.select(-1)
+          
 
         }
         
@@ -2009,5 +2014,6 @@ const ASItemBarWindowNameSpace = (() => {
     Game_Party.prototype.numOrderItems = function (item) {
       return this._orderItems ? this._orderItems.get(item.id) || 0 : 0;
     }
+
 
 })();
