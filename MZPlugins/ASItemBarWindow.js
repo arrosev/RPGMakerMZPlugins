@@ -487,6 +487,7 @@
 // 是否显示物品数量待考虑
 // 是否添加声效待考虑,如弹出和隐藏，持有和脱卸
 // 非地图场景，用完持有的物品，在重新获得该物品，回到地图界面不会持有该物品
+// 是否提供预览动画隐藏参数，预览窗口背景参数
 
 const ASItemBarWindowNameSpace = (() => {
     "use strict";
@@ -1553,6 +1554,7 @@ const ASItemBarWindowNameSpace = (() => {
       makeCommandList() {
 
         const orderItems = $gameParty.orderItems();
+        console.log("makeCommandList---------items: ", $gameParty.items())
         console.log("makeCommandList---------orderItems: ", orderItems)
         for (const item of orderItems) {
           this.addCommand(item.name, `${item.id}`);
@@ -1586,7 +1588,7 @@ const ASItemBarWindowNameSpace = (() => {
 
         if (this.proxy && this.proxy.__proto__.hasOwnProperty("refreshContent")) {
           const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
-          this.proxy.refreshContent(currentHoldingItemIdVariableValue);
+          this.proxy.refreshContent(currentHoldingItemIdVariableValue, true);
         }
 
         //this.refresh();
@@ -1597,10 +1599,8 @@ const ASItemBarWindowNameSpace = (() => {
 
 
       drawGainItem(item, isNewItem) {
-
-        // console.log("$gameParty.items(): ", $gameParty.items())
-        // console.log("$gameParty._items: ", $gameParty._items)
-        // console.log("$gameParty._items[item.id]: ", $gameParty._items[item.id])
+        // console.log("drawGainItem---------items: ", $gameParty.items())
+        // console.log("drawGainItem----------$gameParty.orderItems(): ", $gameParty.orderItems())
         if (isNewItem) {
           console.log("新获得物品")
           this.addCommand(item.name, `${item.id}`);
@@ -1629,10 +1629,11 @@ const ASItemBarWindowNameSpace = (() => {
           if(currentHoldingItemIdVariableValue !== 0 && currentHoldingItemIdVariableValue === item.id) {
             $gameVariables.setValue(itemBarWindowHoldingItemIdVariable, 0);
             if (this.proxy && this.proxy.__proto__.hasOwnProperty("refreshContent")) {
-              this.proxy.refreshContent(0);
+              this.proxy.refreshContent(0, true);
             }
           }
           
+          console.log("drawLoseItem---------items: ", $gameParty.items())
           console.log("drawLoseItem----------$gameParty.orderItems(): ", $gameParty.orderItems())
           const deleteItemIndex = this.findSymbol(`${item.id}`)
           console.log("deleteItemIndex: ", deleteItemIndex)
@@ -1840,25 +1841,39 @@ const ASItemBarWindowNameSpace = (() => {
 
       }
 
-      setContentImage(imagePath) {
-        const bitmap = ImageManager.loadBitmap("img/", imagePath);
-        bitmap.addLoadListener(() => {
-          this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, 0, 0, this.contents.width, this.contents.height);
-        });
+      setContentImage(imagePath, needAnimation) {
+        if (needAnimation === true) {
+          const currentScene = SceneManager._scene;
+          currentScene.charm.slide(this._contentsSprite, 0, this._contentsSprite.height, 10).onComplete = () => {
+            this.contents.clear();
+            const bitmap = ImageManager.loadBitmap("img/", imagePath);
+            bitmap.addLoadListener(() => {
+              this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, 0, 0, this.contents.width, this.contents.height);
+              this._contentsSprite.move(0, - this._contentsSprite.height);
+              currentScene.charm.slide(this._contentsSprite, 0, 0, 10);
+            });
+          };
+        } else {
+          this.contents.clear();
+          const bitmap = ImageManager.loadBitmap("img/", imagePath);
+          bitmap.addLoadListener(() => {
+            this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, 0, 0, this.contents.width, this.contents.height);
+          });
+        }
       }
 
-      refreshContent(holdingItemIdVariableValue) {
+      refreshContent(holdingItemIdVariableValue, needAnimation) {
         if (this.visible === true) {
-          this.contents.clear();
+          // this.contents.clear();
           if (holdingItemIdVariableValue === 0) {
             if (itemPreviewWindowEmptyHandedImage) {
-              this.setContentImage(itemPreviewWindowEmptyHandedImage);
+              this.setContentImage(itemPreviewWindowEmptyHandedImage, needAnimation);
             }
           } else {
             const itemPreviewThumbnail = $dataItems[holdingItemIdVariableValue].meta.ASItemBarThumbnail;
             if (itemPreviewThumbnail) {
               const noBlankItemPreviewThumbnail = itemPreviewThumbnail.replace(/^\s*|\s*$/g, "");
-              this.setContentImage(noBlankItemPreviewThumbnail);
+              this.setContentImage(noBlankItemPreviewThumbnail, needAnimation);
             }
           }
         }
@@ -1896,7 +1911,7 @@ const ASItemBarWindowNameSpace = (() => {
         this.itemPreviewWindow = new Window_ItemPreview(itemPreviewWindowRect);
         const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
         console.log("createDisplayObjects----currentHoldingItemIdVariableValue: ", currentHoldingItemIdVariableValue)
-        this.itemPreviewWindow.refreshContent(currentHoldingItemIdVariableValue);
+        this.itemPreviewWindow.refreshContent(currentHoldingItemIdVariableValue, false);
         this.addChild(this.itemPreviewWindow);
     
         const itemBarCommandWindowWidth = itemBarWindowItemWidth + itemBarWindowColSpacing + 2 * itemBarWindowPadding;
@@ -1951,7 +1966,7 @@ const ASItemBarWindowNameSpace = (() => {
         $gameVariables.setValue(itemBarWindowHoldingItemIdVariable, 0);
         this.itemBarCommandWindow.redrawItem(lastHoldingItemTagIndex);
         const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
-        this.itemPreviewWindow.refreshContent(currentHoldingItemIdVariableValue);
+        this.itemPreviewWindow.refreshContent(currentHoldingItemIdVariableValue, true);
       }
       
     };
@@ -1964,13 +1979,12 @@ const ASItemBarWindowNameSpace = (() => {
       _Game_Party_GainItem.apply(this, arguments);
 
       if (this._orderItems) {
-          // const lastNumber = this.numItems(item);
-          // const newNumber = lastNumber + amount;
-          this._orderItems.push(item.id);
-          //this._orderItems.set(item.id, newNumber.clamp(0, this.maxItems(item)));
-          if (this._items[item.id] === 0) {
+          if (!this._orderItems.includes(item.id)) {
+            this._orderItems.push(item.id);
+          }
+          if (!this._items[item.id]) {
             const deleteItemIndex = this._orderItems.indexOf(item.id);
-            if (index !== -1) {
+            if (deleteItemIndex !== -1) {
               this._orderItems.splice(deleteItemIndex, 1);
             }
           }
@@ -2016,10 +2030,5 @@ const ASItemBarWindowNameSpace = (() => {
       // return orderItems.map(id => $dataItems[id]);
       return this._orderItems.map(id => $dataItems[id]);
     }
-
-    // Game_Party.prototype.numOrderItems = function (item) {
-    //   return this._orderItems ? this._orderItems.get(item.id) || 0 : 0;
-    // }
-
 
 })();
