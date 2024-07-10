@@ -325,6 +325,48 @@
  * @dir img/
  * @default
  * 
+ * @param itemBarWindowSoundEffects
+ * @text Item Bar Window Sound Effects
+ * @desc Item Bar Window Sound Effects
+ * @parent itemBarWindowSet
+ * @type string
+ * @default
+ * 
+ * @param itemBarWindowShowSoundEffects
+ * @text Show
+ * @desc Show Sound Effects
+ * @parent itemBarWindowSoundEffects
+ * @type struct<SoundEffects>
+ * @default {"name":"","pan":"0","pitch":"100","volume":"90"}
+ * 
+ * @param itemBarWindowHideSoundEffects
+ * @text Hide
+ * @desc Hide Sound Effects
+ * @parent itemBarWindowSoundEffects
+ * @type struct<SoundEffects>
+ * @default {"name":"","pan":"0","pitch":"100","volume":"90"}
+ * 
+ * @param itemBarWindowHoldingItemSoundEffects
+ * @text Holding Item
+ * @desc Holding Item Sound Effects
+ * @parent itemBarWindowSoundEffects
+ * @type struct<SoundEffects>
+ * @default {"name":"","pan":"0","pitch":"100","volume":"90"}
+ * 
+ * @param itemBarWindowEmptyHandedSoundEffects
+ * @text Empty Handed
+ * @desc Empty Handed Sound Effects
+ * @parent itemBarWindowSoundEffects
+ * @type struct<SoundEffects>
+ * @default {"name":"","pan":"0","pitch":"100","volume":"90"}
+ * 
+ * @param itemBarWindowCursorMoveSoundEffects
+ * @text Cursor Move
+ * @desc Cursor Move Sound Effects
+ * @parent itemBarWindowSoundEffects
+ * @type struct<SoundEffects>
+ * @default {"name":"","pan":"0","pitch":"100","volume":"90"}
+ * 
  * @param itemBarWindowAction
  * @text Item Bar Window Action
  * @desc Item Bar Window Action
@@ -384,6 +426,14 @@
  * @parent itemPreviewWindowSet
  * @type number
  * @default 12
+ * 
+ * @param itemPreviewWindowBackgroundImage
+ * @text Background Image
+ * @desc Item Preview Window Background Image
+ * @parent itemPreviewWindowSet
+ * @type file
+ * @dir img/
+ * @default
  * 
  * @param itemPreviewWindowEmptyHandedImage
  * @text Empty Handed Image
@@ -477,6 +527,39 @@
  * 
  */
 
+/*~struct~SoundEffects:
+ * 
+ * @param name
+ * @text Name[名称]
+ * @desc Name[名称]
+ * @type file
+ * @dir audio/se
+ * @default
+ * 
+ * @param pan
+ * @text Pan[声像]
+ * @desc Pan[声像](-100 ~ 100)
+ * @type string
+ * @default 0
+ * 
+ * @param pitch
+ * @text Pitch[音调]
+ * @desc Pitch[音调](50 ~ 150)
+ * @type number
+ * @min 50
+ * @max 150
+ * @default 100
+ * 
+ * @param volume
+ * @text Volume[音量]
+ * @desc Volume[音量](0 ~ 100)
+ * @type number
+ * @min 0
+ * @max 100
+ * @default 90
+ * 
+ */
+
 
 // 此插件仅仅只会显示背包内物品数量大于等于1的物品，工具栏每一格都会显示不同物品id的物品，而不对物品数量做过分探究（主要用于重要物品这种最大数量为1的类型），如有其他需要请在点击物品的公共事件内操作。
 // 变量保存当前选中物品id 变量设置-1并且鼠标图标还原之后表示空手（绑定一个快捷键）窗口的selectItemID默认初始化为=是否等于-1 ? -1 : 变量保存的值
@@ -546,6 +629,13 @@ const ASItemBarWindowNameSpace = (() => {
     const itemBarWindowItemHoldingTagOffset = new Point(Number(itemBarWindowItemHoldingTagOffsetJsonObject.x) || 0, Number(itemBarWindowItemHoldingTagOffsetJsonObject.y) || 0);
     const itemBarWindowItemHoldingTagImage = parameters.itemBarWindowItemHoldingTagImage;
 
+    //---Sound Effects---
+    const itemBarWindowShowSoundEffects = parameters.itemBarWindowShowSoundEffects;
+    const itemBarWindowHideSoundEffects = parameters.itemBarWindowHideSoundEffects;
+    const itemBarWindowHoldingItemSoundEffects = parameters.itemBarWindowHoldingItemSoundEffects;
+    const itemBarWindowEmptyHandedSoundEffects = parameters.itemBarWindowEmptyHandedSoundEffects;
+    const itemBarWindowCursorMoveSoundEffects = parameters.itemBarWindowCursorMoveSoundEffects;
+
     //------Action------
     const itemBarWindowHoldingItemIdVariable =  Number(parameters.itemBarWindowHoldingItemIdVariable) || 0;
     const itemBarWindowClickItemCommonEvents =  Number(parameters.itemBarWindowClickItemCommonEvents) || 0;
@@ -556,6 +646,7 @@ const ASItemBarWindowNameSpace = (() => {
     const itemPreviewWindowRectObject = JSON.parse(parameters.itemPreviewWindowRect);
     const itemPreviewWindowRect = new Rectangle(Number(itemPreviewWindowRectObject.x) || 0, Number(itemPreviewWindowRectObject.y) || 0, Number(itemPreviewWindowRectObject.width) || 0, Number(itemPreviewWindowRectObject.height) || 0);
     const itemPreviewWindowPadding = Number(parameters.itemPreviewWindowPadding);
+    const itemPreviewWindowBackgroundImage = parameters.itemPreviewWindowBackgroundImage;
     const itemPreviewWindowEmptyHandedImage = parameters.itemPreviewWindowEmptyHandedImage;
 
     Input.keyMapper[itemBarShowKeyCode] = "itembarshow";//I
@@ -1519,6 +1610,15 @@ const ASItemBarWindowNameSpace = (() => {
       this._baseTexture.update();
     };
 
+    const playSoundEffectsObject = function (soundEffects) {
+      if (soundEffects) {
+        const soundEffectsObject = JSON.parse(soundEffects);
+        if (soundEffectsObject.name.length !== 0) {
+          AudioManager.playStaticSe(soundEffectsObject);
+        }
+      }
+    }
+
     // Game_Interpreter.prototype.callCommonEvent = function(ceid, immediately) {  
     //   let child = this;
     //   while(child._childInterpreter)  child = child._childInterpreter;
@@ -1588,7 +1688,7 @@ const ASItemBarWindowNameSpace = (() => {
 
         if (this.proxy && this.proxy.__proto__.hasOwnProperty("refreshContent")) {
           const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
-          this.proxy.refreshContent(currentHoldingItemIdVariableValue, true);
+          this.proxy.refreshContent(currentHoldingItemIdVariableValue, false);
         }
 
         //this.refresh();
@@ -1629,7 +1729,7 @@ const ASItemBarWindowNameSpace = (() => {
           if(currentHoldingItemIdVariableValue !== 0 && currentHoldingItemIdVariableValue === item.id) {
             $gameVariables.setValue(itemBarWindowHoldingItemIdVariable, 0);
             if (this.proxy && this.proxy.__proto__.hasOwnProperty("refreshContent")) {
-              this.proxy.refreshContent(0, true);
+              this.proxy.refreshContent(0, false);
             }
           }
           
@@ -1751,9 +1851,38 @@ const ASItemBarWindowNameSpace = (() => {
           }
         }
       }
+
+      processOk() {
+        if (this.isCurrentItemEnabled()) {
+          //this.playOkSound();
+          playSoundEffectsObject(itemBarWindowHoldingItemSoundEffects);
+          this.updateInputData();
+          this.deactivate();
+          this.callOkHandler();
+        } else {
+          this.playBuzzerSound();
+        }
+      }
+
+      onTouchSelect(trigger) {
+        this._doubleTouch = false;
+        if (this.isCursorMovable()) {
+          const lastIndex = this.index();
+          const hitIndex = this.hitIndex();
+          if (hitIndex >= 0) {
+            if (hitIndex === this.index()) {
+              this._doubleTouch = true;
+            }
+            this.select(hitIndex);
+          }
+          if (trigger && this.index() !== lastIndex) {
+            //this.playCursorSound();
+            playSoundEffectsObject(itemBarWindowCursorMoveSoundEffects);
+          }
+        }
+      }
         
       processCursorMove() {
-        //console.log("processCursorMove")
         if (this.isCursorMovable()) {
           const lastIndex = this.index();
           if (Input.isRepeated("itembardown")) {
@@ -1777,31 +1906,14 @@ const ASItemBarWindowNameSpace = (() => {
             this.cursorPageup();
           }
           if (this.index() !== lastIndex) {
-            this.playCursorSound();
+            //this.playCursorSound();
+            playSoundEffectsObject(itemBarWindowCursorMoveSoundEffects);
           }
         }
       }
 
       isOkTriggered() {
         return this._canRepeat ? Input.isRepeated("itembarclick") : Input.isTriggered("itembarclick");
-      }
-
-      onTouchSelect(trigger) {
-        this._doubleTouch = false;
-        if (this.isCursorMovable()) {
-          const lastIndex = this.index();
-          const hitIndex = this.hitIndex();
-          if (hitIndex >= 0) {
-            if (hitIndex === this.index()) {
-              this._doubleTouch = true;
-            }
-            this.select(hitIndex);
-          }
-          if (trigger && this.index() !== lastIndex) {
-            console.log("onTouchSelect: ", trigger);
-            this.playCursorSound();
-          }
-        }
       }
 
       isTouchedInsideFrame() {
@@ -1838,6 +1950,16 @@ const ASItemBarWindowNameSpace = (() => {
         this.visible = itemPreviewWindowVisible;
         this.windowskin = ImageManager.loadSystem(itemPreviewWindowWindowSkin);
         this._padding = itemPreviewWindowPadding;
+
+        //console.log("this._contentsBackSprite: ", this._contentsBackSprite)
+        //itemPreviewWindowBackgroundImage
+        console.log("itemPreviewWindowBackgroundImage: ",itemPreviewWindowBackgroundImage)
+        if (itemPreviewWindowBackgroundImage) {
+          const bitmap = ImageManager.loadBitmap("img/", itemPreviewWindowBackgroundImage);
+          bitmap.addLoadListener(() => {
+            this.contentsBack.blt(bitmap, 0, 0, bitmap.width, bitmap.height, 0, 0, this.contentsBack.width, this.contentsBack.height);
+          });
+        }
 
       }
 
@@ -1887,15 +2009,6 @@ const ASItemBarWindowNameSpace = (() => {
 
     }
 
-    // const _Game_Player_CanMove = Game_Player.prototype.canMove;
-    // Game_Player.prototype.canMove = function() {
-    //     const canMove = _Game_Player_CanMove.apply(this, arguments);
-    //     if () {
-    //         return false;
-    //     }
-    //     return canMove;
-    // };
-
     const _Scene_Map_IsMapTouchOk = Scene_Map.prototype.isMapTouchOk;
     Scene_Map.prototype.isMapTouchOk = function() {
       const isMapTouchOk = _Scene_Map_IsMapTouchOk.apply(this, arguments) && !this.itemBarCommandWindow.isTouchedInsideFrame() && !this.itemPreviewWindow.isTouchedInsideFrame();
@@ -1936,13 +2049,16 @@ const ASItemBarWindowNameSpace = (() => {
               console.log("弹出")
               this.itemBarCommandWindow.visible = true;
               this.itemBarCommandWindowPlaying = true;
+              
+              playSoundEffectsObject(itemBarWindowShowSoundEffects);
               this.charm.slide(this.itemBarCommandWindow, itemBarWindowFinalOffset.x, itemBarWindowFinalOffset.y, 30).onComplete = () => {
-                //this.itemBarCommandWindow.refresh();
                 this.itemBarCommandWindowPlaying = false;
               };
             } else {
               console.log("隐藏")
               this.itemBarCommandWindowPlaying = true;
+              
+              playSoundEffectsObject(itemBarWindowHideSoundEffects);
               this.charm.slide(this.itemBarCommandWindow, - (itemBarWindowFinalOffset.x + this.itemBarCommandWindow.width), itemBarWindowFinalOffset.y, 30).onComplete = () => {
                 this.itemBarCommandWindow.visible = false;
                 this.itemBarCommandWindowPlaying = false;
@@ -1952,9 +2068,8 @@ const ASItemBarWindowNameSpace = (() => {
         }
 
         if (Input.isTriggered("itembaremptyhanded")) {
-
+          playSoundEffectsObject(itemBarWindowEmptyHandedSoundEffects);
           this.setItemBarEmptyHanded();
-
         }
 
     };
@@ -1966,7 +2081,7 @@ const ASItemBarWindowNameSpace = (() => {
         $gameVariables.setValue(itemBarWindowHoldingItemIdVariable, 0);
         this.itemBarCommandWindow.redrawItem(lastHoldingItemTagIndex);
         const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
-        this.itemPreviewWindow.refreshContent(currentHoldingItemIdVariableValue, true);
+        this.itemPreviewWindow.refreshContent(currentHoldingItemIdVariableValue, false);
       }
       
     };
@@ -1997,10 +2112,7 @@ const ASItemBarWindowNameSpace = (() => {
         console.log("在地图处理物品")
         if (DataManager.isItem(item) && amount >= 1) {
           console.log("获得物品");
-          // console.log("item: ", item)
-          // console.log("items: ", this._items)
           currentScene.itemBarCommandWindow.drawGainItem(item, isNewItem);
-          //currentScene.itemBarCommandWindow.refresh()
         }
         if (DataManager.isItem(item) && amount <= -1) {
           console.log("失去物品");
@@ -2021,14 +2133,11 @@ const ASItemBarWindowNameSpace = (() => {
     const _Game_Party_InitAllItems = Game_Party.prototype.initAllItems;
     Game_Party.prototype.initAllItems = function () {
       _Game_Party_InitAllItems.apply(this, arguments);
-      //this._orderItems = new Map();
       this._orderItems = [];
     };
 
     Game_Party.prototype.orderItems = function () {
-      // const orderItems = Array.from(this._orderItems.keys());
-      // return orderItems.map(id => $dataItems[id]);
       return this._orderItems.map(id => $dataItems[id]);
-    }
+    };
 
 })();
