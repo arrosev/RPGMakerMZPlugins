@@ -1634,7 +1634,8 @@ const ASItemBarWindowNameSpace = (() => {
           }
           
           console.log("drawLoseItem----------$gameParty.orderItems(): ", $gameParty.orderItems())
-          
+          const deleteItemIndex = this.findSymbol(`${item.id}`)
+          console.log("deleteItemIndex: ", deleteItemIndex)
           //if (deleteItemIndex === )
           // if (deleteItemIndex !== -1) {
           //   this._list.splice(deleteItemIndex, 1);
@@ -1647,16 +1648,15 @@ const ASItemBarWindowNameSpace = (() => {
           //   console.log("i: ", i)
           //   this.redrawItem(i);
           // }
-          
-          console.log("drawLoseItem----------refresh")
-          this.refresh();
-          console.log("drawLoseItem----------smoothScrollBy")
-          this.smoothScrollBy(0, itemBarWindowItemHeight + itemBarWindowRowSpacing);
-          
-          //this.refreshCursor();
-          //this.ensureCursorVisible(false)
-          //this.select(-1)
-          
+
+          if (deleteItemIndex !== -1) {
+            console.log("drawLoseItem----------refresh")
+            this.refresh();
+            console.log("drawLoseItem----------smoothScrollBy")
+            this.smoothScrollBy(0, itemBarWindowItemHeight + itemBarWindowRowSpacing);
+
+            this.select(-1)
+          }
 
         }
         
@@ -1964,11 +1964,15 @@ const ASItemBarWindowNameSpace = (() => {
       _Game_Party_GainItem.apply(this, arguments);
 
       if (this._orderItems) {
-          const lastNumber = this.numOrderItems(item);
-          const newNumber = lastNumber + amount;
-          this._orderItems.set(item.id, newNumber.clamp(0, this.maxItems(item)));
-          if (this._orderItems.get(item.id) === 0) {
-            this._orderItems.delete(item.id);
+          // const lastNumber = this.numItems(item);
+          // const newNumber = lastNumber + amount;
+          this._orderItems.push(item.id);
+          //this._orderItems.set(item.id, newNumber.clamp(0, this.maxItems(item)));
+          if (this._items[item.id] === 0) {
+            const deleteItemIndex = this._orderItems.indexOf(item.id);
+            if (index !== -1) {
+              this._orderItems.splice(deleteItemIndex, 1);
+            }
           }
           $gameMap.requestRefresh();
       }
@@ -2003,17 +2007,19 @@ const ASItemBarWindowNameSpace = (() => {
     const _Game_Party_InitAllItems = Game_Party.prototype.initAllItems;
     Game_Party.prototype.initAllItems = function () {
       _Game_Party_InitAllItems.apply(this, arguments);
-      this._orderItems = new Map();
+      //this._orderItems = new Map();
+      this._orderItems = [];
     };
 
     Game_Party.prototype.orderItems = function () {
-      const orderItems = Array.from(this._orderItems.keys());
-      return orderItems.map(id => $dataItems[id]);
+      // const orderItems = Array.from(this._orderItems.keys());
+      // return orderItems.map(id => $dataItems[id]);
+      return this._orderItems.map(id => $dataItems[id]);
     }
 
-    Game_Party.prototype.numOrderItems = function (item) {
-      return this._orderItems ? this._orderItems.get(item.id) || 0 : 0;
-    }
+    // Game_Party.prototype.numOrderItems = function (item) {
+    //   return this._orderItems ? this._orderItems.get(item.id) || 0 : 0;
+    // }
 
 
 })();
