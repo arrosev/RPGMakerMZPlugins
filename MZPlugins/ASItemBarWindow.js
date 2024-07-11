@@ -42,32 +42,38 @@
  *      6. You can display a preview image of the currently held items.
  * 
  * Note:
- *      1. A bound variable must be set in the "Item Bar Window Action", 
+ *      1. Item note format: <ASItemBarThumbnail:items/bottles>, 
+ *         "items/bottles" refers to the path of the item's thumbnail 
+ *         in the img folder, no file extension is needed, and there 
+ *         can't be any space in the middle of the label, please refer
+ *         to the Demo's Folder structure.
+ *      2. A bound variable must be set in the "Item Bar Window Action", 
  *         common events are optional.
- *      2. Every time an item is clicked, a common event is executed, 
+ *      3. Every time an item is clicked, a common event is executed, 
  *         if it is not possible to execute a common event at the moment, 
  *         the event will be saved to the common event list first and will
  *         be executed when it is possible to do so.
- *      3. The gamepad was only tested on my xbox 2nd gen elite, it seems 
+ *      4. The gamepad was only tested on my xbox 2nd gen elite, it seems 
  *         that my gamepad is recognized as an xbox 360 controller, other 
  *         gamepads may require modifications to the parameters of the 
  *         gamepad control.
- *      4. Keyboard default controls: I(show and hide) 
+ *      5. Keyboard default controls: I(show and hide) 
  *                                    U(cursor up)
  *                                    O(cursor down)
  *                                    H(holding item)
  *                                    K(empty handed)
  * 
- *      5. Gamepad default controls: Start(show and hide) 
+ *      6. Gamepad default controls: Start(show and hide) 
  *                                   LT(cursor up)
  *                                   RT(cursor down)
  *                                   LS(holding item)
  *                                   RS(empty handed)
- *      6. Items mentioned in this plugin do not include weapons, armor, etc, items
+ *      7. Items mentioned in this plugin do not include weapons, armor, etc, items
  *         here are only those that appear in the database item categorization.
  * 
  * 
  * @noteParam ASItemBarThumbnail
+ * @noteRequire 1
  * @noteDir img/
  * @noteType file
  * @noteData items
@@ -566,26 +572,30 @@
  *      6. 您可以显示当前持有物品的预览图像
  * 
  * 注意:
- *      1. 必须在 "物品栏窗口操作" 中设置绑定变量, 但共通事件是可选的
- *      2. 每次点击一个物品，都会执行一个共通事件， 如果暂时无法执行共通事件，
+ *      1. 物品备注格式：<ASItemBarThumbnail:items/bottles>，“items/bottles” 指
+ *         img文件夹下的物品缩略图路径，不需要文件扩展名，标签中间不能有空格，具体请
+ *         看Demo的文件夹结构
+ *      2. 必须在 "物品栏窗口操作" 中设置绑定变量, 但共通事件是可选的
+ *      3. 每次点击一个物品，都会执行一个共通事件， 如果暂时无法执行共通事件，
  *         事件将先保存到共通事件列表中，当可以执行时再执行
- *      3. 游戏手柄只用我的XBOX二代精英版测试过，我的游戏手柄似乎被识别
+ *      4. 游戏手柄只用我的XBOX二代精英版测试过，我的游戏手柄似乎被识别
  *         为XBOX 360手柄，其他游戏手柄可能需要修改参数        
- *      4. 键盘默认控制: I(显示和隐藏) 
+ *      5. 键盘默认控制: I(显示和隐藏) 
  *                      U(光标往上)              
  *                      O(光标往下)             
  *                      H(持有物品)              
  *                      K(空手)              
  * 
- *      5. 手柄默认控制: Start(显示和隐藏) 
+ *      6. 手柄默认控制: Start(显示和隐藏) 
  *                      LT(光标往上)             
  *                      RT(光标往下)             
  *                      LS(持有物品)             
  *                      RS(空手)             
- *      6. 本插件中提到的物品不包括武器、盔甲等，这里的物品仅指出现在数据库
+ *      7. 本插件中提到的物品不包括武器、盔甲等，这里的物品仅指出现在数据库
  *         物品分类中的物品
  * 
  * @noteParam ASItemBarThumbnail
+ * @noteRequire 1
  * @noteDir img/
  * @noteType file
  * @noteData items
