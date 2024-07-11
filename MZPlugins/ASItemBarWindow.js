@@ -85,6 +85,48 @@
  * @type string
  * @default 75
  * 
+ * @param gamepadControlSet
+ * @text Gamepad Control Set
+ * @desc Gamepad Control Set
+ * @parent itemBarWindowSet
+ * @type string
+ * @default
+ * 
+ * @param itemBarShowButtonCode
+ * @text Show Button Code
+ * @desc Show Button Code (default 9(Start button))
+ * @parent gamepadControlSet
+ * @type string
+ * @default 9
+ * 
+ * @param itemBarUpButtonCode
+ * @text Up Button Code
+ * @desc Up Button Code (default 6(Left trigger))
+ * @parent gamepadControlSet
+ * @type string
+ * @default 6
+ * 
+ * @param itemBarDownButtonCode
+ * @text Down Button Code
+ * @desc Down Button Code (default 7(Right trigger))
+ * @parent gamepadControlSet
+ * @type string
+ * @default 7
+ * 
+ * @param itemBarClickButtonCode
+ * @text Click Button Code
+ * @desc Click Button Code (default 10(Left stick))
+ * @parent gamepadControlSet
+ * @type string
+ * @default 10
+ * 
+ * @param itemBarEmptyHandedButtonCode
+ * @text Empty Handed Button Code
+ * @desc Empty Handed Button Code (default 11(Right stick))
+ * @parent gamepadControlSet
+ * @type string
+ * @default 11
+ * 
  * @param itemBarWindowStyle
  * @text Item Bar Window Style
  * @desc Item Bar Window Style
@@ -578,11 +620,19 @@ const ASItemBarWindowNameSpace = (() => {
     const pluginName = "ASItemBarWindow";
     const parameters = PluginManager.parameters(pluginName);
 
+    //------Keyboard Control Set------
     const itemBarShowKeyCode = parameters.itemBarShowKeyCode;
     const itemBarUpKeyCode = parameters.itemBarUpKeyCode;
     const itemBarDownKeyCode = parameters.itemBarDownKeyCode;
     const itemBarClickKeyCode = parameters.itemBarClickKeyCode;
     const itemBarEmptyHandedKeyCode = parameters.itemBarEmptyHandedKeyCode;
+
+    //------Gamepad Control Set------
+    const itemBarShowButtonCode = parameters.itemBarShowButtonCode;
+    const itemBarUpButtonCode = parameters.itemBarUpButtonCode;
+    const itemBarDownButtonCode = parameters.itemBarDownButtonCode;
+    const itemBarClickButtonCode = parameters.itemBarClickButtonCode;
+    const itemBarEmptyHandedButtonCode = parameters.itemBarEmptyHandedButtonCode;
 
     //------Item Bar Set------
     const itemBarWindowWindowSkin = parameters.itemBarWindowWindowSkin;
@@ -652,10 +702,18 @@ const ASItemBarWindowNameSpace = (() => {
     Input.keyMapper[itemBarShowKeyCode] = "itembarshow";//I
     Input.keyMapper[itemBarUpKeyCode] = "itembarup";//U
     Input.keyMapper[itemBarDownKeyCode] = "itembardown";//O
-    Input.keyMapper[itemBarClickKeyCode] = "itembarclick";//H 72
-    Input.keyMapper[itemBarEmptyHandedKeyCode] = "itembaremptyhanded";//K 75
+    Input.keyMapper[itemBarClickKeyCode] = "itembarclick";//H
+    Input.keyMapper[itemBarEmptyHandedKeyCode] = "itembaremptyhanded";//K
 
     console.log("Input.keyMapper: ", Input.keyMapper)
+
+    Input.gamepadMapper[itemBarShowButtonCode] = "itembarshow";//Start Button
+    Input.gamepadMapper[itemBarUpButtonCode] = "itembarup";//LT
+    Input.gamepadMapper[itemBarDownButtonCode] = "itembardown";//RT
+    Input.gamepadMapper[itemBarClickButtonCode] = "itembarclick";//LS
+    Input.gamepadMapper[itemBarEmptyHandedButtonCode] = "itembaremptyhanded";//RS
+
+    console.log("Input.gamepadMapper: ", Input.gamepadMapper)
 
     //***************************************************************************
     // ---------------------------- Interpolation Animation Dependency Library Start ----------------------------
@@ -2046,7 +2104,6 @@ const ASItemBarWindowNameSpace = (() => {
         if (Input.isTriggered("itembarshow")) {
           if(this.itemBarCommandWindowPlaying !== true) {
             if (this.itemBarCommandWindow.visible === false) {
-              console.log("弹出")
               this.itemBarCommandWindow.visible = true;
               this.itemBarCommandWindowPlaying = true;
               
@@ -2055,7 +2112,6 @@ const ASItemBarWindowNameSpace = (() => {
                 this.itemBarCommandWindowPlaying = false;
               };
             } else {
-              console.log("隐藏")
               this.itemBarCommandWindowPlaying = true;
               
               playSoundEffectsObject(itemBarWindowHideSoundEffects);
