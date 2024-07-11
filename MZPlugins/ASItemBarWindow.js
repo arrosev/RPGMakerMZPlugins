@@ -32,6 +32,41 @@
  * This plugin is mainly used to make item bar windows.
  * Key Code Reference: https://www.toptal.com/developers/keycode
  * 
+ * [V1.0.0]
+ * Features:
+ *      1. Display a toolbar with all items in the map scene.
+ *      2. Use a variable to get the ID of the currently held item.
+ *      3. A common event can be executed after clicking on an item.
+ *      4. You can set a thumbnail for each item in the toolbar in the item notes.
+ *      5. You can attach an icon tag to the currently held item.
+ *      6. You can display a preview image of the currently held items.
+ * 
+ * Note:
+ *      1. A bound variable must be set in the "Item Bar Window Action", 
+ *         common events are optional.
+ *      2. Every time an item is clicked, a common event is executed, 
+ *         if it is not possible to execute a common event at the moment, 
+ *         the event will be saved to the common event list first and will
+ *         be executed when it is possible to do so.
+ *      3. The gamepad was only tested on my xbox 2nd gen elite, it seems 
+ *         that my gamepad is recognized as an xbox 360 controller, other 
+ *         gamepads may require modifications to the parameters of the 
+ *         gamepad control.
+ *      4. Keyboard default controls: I(show and hide) 
+ *                                    U(cursor up)
+ *                                    O(cursor down)
+ *                                    H(holding item)
+ *                                    K(empty handed)
+ * 
+ *      5. Gamepad default controls: Start(show and hide) 
+ *                                   LT(cursor up)
+ *                                   RT(cursor down)
+ *                                   LS(holding item)
+ *                                   RS(empty handed)
+ *      6. Items mentioned in this plugin do not include weapons, armor, etc, items
+ *         here are only those that appear in the database item categorization.
+ * 
+ * 
  * @noteParam ASItemBarThumbnail
  * @noteDir img/
  * @noteType file
@@ -73,7 +108,7 @@
  * 
  * @param itemBarClickKeyCode
  * @text Click Key Code
- * @desc Click Key Code (default 72(H))
+ * @desc Click Key Code (holding item) (default 72(H))
  * @parent keyboardControlSet
  * @type string
  * @default 72
@@ -115,7 +150,7 @@
  * 
  * @param itemBarClickButtonCode
  * @text Click Button Code
- * @desc Click Button Code (default 10(Left stick))
+ * @desc Click Button Code (holding item) (default 10(Left stick))
  * @parent gamepadControlSet
  * @type string
  * @default 10
@@ -276,7 +311,7 @@
  * 
  * @param itemBarWindowItemBackground
  * @text ---Item Background---
- * @desc Styles for the item text
+ * @desc Styles for the item background
  * @parent itemBarWindowStyle
  * @type string
  * @default
@@ -487,6 +522,524 @@
  * 
  */
 
+/*:zh
+ * @target MZ
+ * @plugindesc [V1.0.0] 物品工具栏窗口插件
+ * @author Arrose
+ * 
+ * @url https://github.com/arrosev/RPGMakerMZPlugins
+ * 
+ * @help
+ * 
+ * 这个插件在MIT许可下发布
+ * 
+ * Copyright (c) 2024 Arrose
+
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ * 
+ * 这个插件主要用于制作在地图场景的物品工具栏。
+ * 键盘按键代码查询网站: https://www.toptal.com/developers/keycode
+ * 
+ * [V1.0.0]
+ * 功能:
+ *      1. 在地图场景中显示一个包含所有物品的工具栏
+ *      2. 使用变量获取当前持有物品的ID
+ *      3. 点击物品后可执行一个共通事件
+ *      4. 您可以在物品的备注中为每一个物品设置一个在工具栏中显示的缩略图
+ *      5. 您可以为当前持有的物品附加图标标签
+ *      6. 您可以显示当前持有物品的预览图像
+ * 
+ * 注意:
+ *      1. 必须在 "物品栏窗口操作" 中设置绑定变量, 但共通事件是可选的
+ *      2. 每次点击一个物品，都会执行一个共通事件， 如果暂时无法执行共通事件，
+ *         事件将先保存到共通事件列表中，当可以执行时再执行
+ *      3. 游戏手柄只用我的XBOX二代精英版测试过，我的游戏手柄似乎被识别
+ *         为XBOX 360手柄，其他游戏手柄可能需要修改参数        
+ *      4. 键盘默认控制: I(显示和隐藏) 
+ *                      U(光标往上)              
+ *                      O(光标往下)             
+ *                      H(持有物品)              
+ *                      K(空手)              
+ * 
+ *      5. 手柄默认控制: Start(显示和隐藏) 
+ *                      LT(光标往上)             
+ *                      RT(光标往下)             
+ *                      LS(持有物品)             
+ *                      RS(空手)             
+ *      6. 本插件中提到的物品不包括武器、盔甲等，这里的物品仅指出现在数据库
+ *         物品分类中的物品
+ * 
+ * @noteParam ASItemBarThumbnail
+ * @noteDir img/
+ * @noteType file
+ * @noteData items
+ * 
+ * @param itemBarWindowSet
+ * @text 物品栏窗口设置
+ * @desc 物品栏窗口设置
+ * @type string
+ * @default
+ * 
+ * @param keyboardControlSet
+ * @text 键盘控制设置
+ * @desc 键盘控制设置
+ * @parent itemBarWindowSet
+ * @type string
+ * @default
+ * 
+ * @param itemBarShowKeyCode
+ * @text 显示隐藏按键代码
+ * @desc 显示隐藏按键代码 (默认 73(I))
+ * @parent keyboardControlSet
+ * @type string
+ * @default 73
+ * 
+ * @param itemBarUpKeyCode
+ * @text 光标往上按键代码
+ * @desc 光标往上按键代码 (默认 85(U))
+ * @parent keyboardControlSet
+ * @type string
+ * @default 85
+ * 
+ * @param itemBarDownKeyCode
+ * @text 光标往下按键代码
+ * @desc 光标往下按键代码 (默认 79(O))
+ * @parent keyboardControlSet
+ * @type string
+ * @default 79
+ * 
+ * @param itemBarClickKeyCode
+ * @text 点击按键代码
+ * @desc 点击按键代码 (持有物品) (默认 72(H))
+ * @parent keyboardControlSet
+ * @type string
+ * @default 72
+ * 
+ * @param itemBarEmptyHandedKeyCode
+ * @text 空手按键代码
+ * @desc 空手按键代码 (默认 75(K))
+ * @parent keyboardControlSet
+ * @type string
+ * @default 75
+ * 
+ * @param gamepadControlSet
+ * @text 游戏手柄控制设置
+ * @desc 游戏手柄控制设置
+ * @parent itemBarWindowSet
+ * @type string
+ * @default
+ * 
+ * @param itemBarShowButtonCode
+ * @text 显示隐藏按钮代码
+ * @desc 显示隐藏按钮代码 (默认 9(Start button))
+ * @parent gamepadControlSet
+ * @type string
+ * @default 9
+ * 
+ * @param itemBarUpButtonCode
+ * @text 光标往上按钮代码
+ * @desc 光标往上按钮代码 (默认 6(Left trigger))
+ * @parent gamepadControlSet
+ * @type string
+ * @default 6
+ * 
+ * @param itemBarDownButtonCode
+ * @text 光标往下按钮代码
+ * @desc 光标往下按钮代码 (默认 7(Right trigger))
+ * @parent gamepadControlSet
+ * @type string
+ * @default 7
+ * 
+ * @param itemBarClickButtonCode
+ * @text 点击按钮代码
+ * @desc 点击按钮代码 (持有物品) (默认 10(Left stick))
+ * @parent gamepadControlSet
+ * @type string
+ * @default 10
+ * 
+ * @param itemBarEmptyHandedButtonCode
+ * @text 空手按钮代码
+ * @desc 空手按钮代码 (默认 11(Right stick))
+ * @parent gamepadControlSet
+ * @type string
+ * @default 11
+ * 
+ * @param itemBarWindowStyle
+ * @text 物品栏窗口样式
+ * @desc 物品栏窗口样式
+ * @parent itemBarWindowSet
+ * @type string
+ * @default
+ * 
+ * @param itemBarWindowWindowSkin
+ * @text 窗口皮肤
+ * @desc 物品栏窗口皮肤
+ * @parent itemBarWindowStyle
+ * @type file
+ * @dir img/system/
+ * @default Window
+ * 
+ * @param itemBarWindowFinalOffset
+ * @text 最终偏移
+ * @desc 物品栏窗口最终偏移
+ * @parent itemBarWindowStyle
+ * @type struct<Point>
+ * @default {"x":"50","y":"50"}
+ * 
+ * @param itemBarWindowItemWidth
+ * @text 物品单元格宽度
+ * @desc 物品栏窗口物品单元格宽度
+ * @parent itemBarWindowStyle
+ * @type number
+ * @min 0
+ * @default 96
+ * 
+ * @param itemBarWindowItemHeight
+ * @text 物品单元格高度
+ * @desc 物品栏窗口物品单元格高度
+ * @parent itemBarWindowStyle
+ * @type number
+ * @min 0
+ * @default 96
+ * 
+ * @param itemBarWindowPadding
+ * @text 内边距
+ * @desc 物品栏窗口内边距
+ * @parent itemBarWindowStyle
+ * @type number
+ * @default 12
+ * 
+ * @param itemBarWindowRowSpacing
+ * @text 行间距
+ * @desc 物品栏窗口行间距
+ * @parent itemBarWindowStyle
+ * @type number
+ * @default 4
+ * 
+ * @param itemBarWindowColSpacing
+ * @text 列间距
+ * @desc 物品栏窗口列间距
+ * @parent itemBarWindowStyle
+ * @type number
+ * @default 8
+ * 
+ * @param itemBarWindowVisibleItems
+ * @text 最大可见物品数
+ * @desc 物品栏窗口最大可见物品数
+ * @parent itemBarWindowStyle
+ * @type number
+ * @default 5
+ * 
+ * @param itemBarWindowItemText
+ * @text ------物品名文本------
+ * @desc 物品名文本样式
+ * @parent itemBarWindowStyle
+ * @type string
+ * @default 
+ * 
+ * @param itemBarWindowItemTextVisible
+ * @text 文本可见性
+ * @desc 物品栏窗口文本可见性
+ * @parent itemBarWindowStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param itemBarWindowItemTextSize
+ * @text 文本字体大小
+ * @desc 物品栏窗口文本字体大小
+ * @parent itemBarWindowStyle
+ * @type number
+ * @default 26
+ * 
+ * @param itemBarWindowItemTextColor
+ * @text 文本颜色
+ * @desc 物品栏窗口文本颜色
+ * @parent itemBarWindowStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param itemBarWindowItemTextOutlineColor
+ * @text 文本描边颜色
+ * @desc 物品栏窗口文本描边颜色
+ * @parent itemBarWindowStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param itemBarWindowItemNumberText
+ * @text ----物品数量文本----
+ * @desc 物品数量文本样式
+ * @parent itemBarWindowStyle
+ * @type string
+ * @default 
+ * 
+ * @param itemBarWindowItemNumberTextVisible
+ * @text 数量文本可见性
+ * @desc 物品栏窗口数量文本可见性
+ * @parent itemBarWindowStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param itemBarWindowItemNumberTextOffset
+ * @text 数量文本偏移
+ * @desc 物品栏窗口数量文本偏移
+ * @parent itemBarWindowStyle
+ * @type struct<Point>
+ * @default {"x":"86","y":"86"}
+ * 
+ * @param itemBarWindowItemNumberTextSize
+ * @text 数量文本字体大小
+ * @desc 物品栏窗口数量文本字体大小
+ * @parent itemBarWindowStyle
+ * @type number
+ * @default 16
+ * 
+ * @param itemBarWindowItemNumberTextColor
+ * @text 数量文本颜色
+ * @desc 物品栏窗口数量文本颜色
+ * @parent itemBarWindowStyle
+ * @type struct<Color>
+ * @default {"r":"255","g":"255","b":"255","a":"1"}
+ * 
+ * @param itemBarWindowItemNumberTextOutlineColor
+ * @text 数量文本描边颜色
+ * @desc 物品栏窗口数量文本描边颜色
+ * @parent itemBarWindowStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"1"}
+ * 
+ * @param itemBarWindowItemBackground
+ * @text ---物品单元背景---
+ * @desc 物品单元背景样式
+ * @parent itemBarWindowStyle
+ * @type string
+ * @default
+ * 
+ * @param itemBarWindowItemBackgroundFormality
+ * @text 背景形式
+ * @desc 物品栏窗口背景形式
+ * @parent itemBarWindowStyle
+ * @type select
+ * @option none
+ * @option color
+ * @option image
+ * @default color
+ * 
+ * @param itemBarWindowItemBackgroundImage
+ * @text 背景图片
+ * @desc 物品栏窗口背景图片
+ * @parent itemBarWindowStyle
+ * @type file
+ * @dir img/
+ * @default
+ * 
+ * @param itemBarWindowItemBackgroundColor1
+ * @text 背景颜色1
+ * @desc 物品栏窗口背景颜色1
+ * @parent itemBarWindowStyle
+ * @type struct<Color>
+ * @default {"r":"32","g":"32","b":"32","a":"0.5"}
+ * 
+ * @param itemBarWindowItemBackgroundColor2
+ * @text 背景颜色2
+ * @desc 物品栏窗口背景颜色2
+ * @parent itemBarWindowStyle
+ * @type struct<Color>
+ * @default {"r":"0","g":"0","b":"0","a":"0.5"}
+ * 
+ * @param itemBarWindowItemBackgroundBorderColor
+ * @text 背景边框颜色
+ * @desc 物品栏窗口背景边框颜色
+ * @parent itemBarWindowStyle
+ * @type struct<Color>
+ * @default {"r":"32","g":"32","b":"32","a":"0.5"}
+ * 
+ * @param itemBarWindowItemBackgroundBorderLineWidth
+ * @text 背景边框厚度
+ * @desc 物品栏窗口背景边框厚度
+ * @parent itemBarWindowStyle
+ * @type number
+ * @min 0
+ * @default 1
+ * 
+ * @param itemBarWindowItemBackgroundBorderRadius
+ * @text 背景边框半径
+ * @desc 物品栏窗口背景边框半径
+ * @parent itemBarWindowStyle
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param itemBarWindowItemHoldingTag
+ * @text ----物品持有标签----
+ * @desc 物品持有标签样式
+ * @parent itemBarWindowStyle
+ * @type string
+ * @default
+ * 
+ * @param itemBarWindowItemHoldingTagVisible
+ * @text 物品持有标签可见性
+ * @desc 物品栏窗口物品持有标签可见性
+ * @parent itemBarWindowStyle
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param itemBarWindowItemHoldingTagOffset
+ * @text 物品持有标签偏移
+ * @desc 物品栏窗口物品持有标签偏移
+ * @parent itemBarWindowStyle
+ * @type struct<Point>
+ * @default {"x":"5","y":"5"}
+ * 
+ * @param itemBarWindowItemHoldingTagImage
+ * @text 物品持有标签图片
+ * @desc 物品栏窗口物品持有标签图片
+ * @parent itemBarWindowStyle
+ * @type file
+ * @dir img/
+ * @default
+ * 
+ * @param itemBarWindowSoundEffects
+ * @text 物品栏窗口声音效果
+ * @desc 物品栏窗口声音效果
+ * @parent itemBarWindowSet
+ * @type string
+ * @default
+ * 
+ * @param itemBarWindowShowSoundEffects
+ * @text 显示
+ * @desc 显示声音效果
+ * @parent itemBarWindowSoundEffects
+ * @type struct<SoundEffects>
+ * @default {"name":"","pan":"0","pitch":"100","volume":"90"}
+ * 
+ * @param itemBarWindowHideSoundEffects
+ * @text 隐藏
+ * @desc 隐藏声音效果
+ * @parent itemBarWindowSoundEffects
+ * @type struct<SoundEffects>
+ * @default {"name":"","pan":"0","pitch":"100","volume":"90"}
+ * 
+ * @param itemBarWindowHoldingItemSoundEffects
+ * @text 持有物品
+ * @desc 持有物品声音效果
+ * @parent itemBarWindowSoundEffects
+ * @type struct<SoundEffects>
+ * @default {"name":"","pan":"0","pitch":"100","volume":"90"}
+ * 
+ * @param itemBarWindowEmptyHandedSoundEffects
+ * @text 空手
+ * @desc 空手声音效果
+ * @parent itemBarWindowSoundEffects
+ * @type struct<SoundEffects>
+ * @default {"name":"","pan":"0","pitch":"100","volume":"90"}
+ * 
+ * @param itemBarWindowCursorMoveSoundEffects
+ * @text 光标移动
+ * @desc 光标移动声音效果
+ * @parent itemBarWindowSoundEffects
+ * @type struct<SoundEffects>
+ * @default {"name":"","pan":"0","pitch":"100","volume":"90"}
+ * 
+ * @param itemBarWindowAction
+ * @text 物品栏窗口操作
+ * @desc 物品栏窗口操作
+ * @parent itemBarWindowSet
+ * @type string
+ * @default
+ * 
+ * @param itemBarWindowHoldingItemIdVariable
+ * @text 变量
+ * @desc 保存持有物品ID的变量
+ * @parent itemBarWindowAction
+ * @type variable
+ * @min 0
+ * @default 0
+ * 
+ * @param itemBarWindowClickItemCommonEvents
+ * @text 共通事件
+ * @desc 点击物品时执行的共通事件
+ * @parent itemBarWindowAction
+ * @type common_event
+ * @min 0
+ * @default 0
+ * 
+ * @param itemPreviewWindowSet
+ * @text 物品预览窗口设置
+ * @desc 物品预览窗口设置
+ * @type string
+ * @default
+ * 
+ * @param itemPreviewWindowVisible
+ * @text 可见性
+ * @desc 物品预览窗口可见性
+ * @parent itemPreviewWindowSet
+ * @type boolean
+ * @on Show
+ * @off Hide
+ * @default true
+ * 
+ * @param itemPreviewWindowWindowSkin
+ * @text 窗口皮肤
+ * @desc 物品预览窗口皮肤
+ * @parent itemPreviewWindowSet
+ * @type file
+ * @dir img/system/
+ * @default Window
+ * 
+ * @param itemPreviewWindowRect
+ * @text 布局
+ * @desc 物品预览窗口布局
+ * @parent itemPreviewWindowSet
+ * @type struct<Rect>
+ * @default {"x":"624","y":"450","width":"124","height":"124"}
+ * 
+ * @param itemPreviewWindowPadding
+ * @text 内边距
+ * @desc 物品预览窗口内边距
+ * @parent itemPreviewWindowSet
+ * @type number
+ * @default 12
+ * 
+ * @param itemPreviewWindowBackgroundImage
+ * @text 背景图片
+ * @desc 物品预览窗口背景图片
+ * @parent itemPreviewWindowSet
+ * @type file
+ * @dir img/
+ * @default
+ * 
+ * @param itemPreviewWindowEmptyHandedImage
+ * @text 空手图片
+ * @desc 物品预览窗口空手图片
+ * @parent itemPreviewWindowSet
+ * @type file
+ * @dir img/
+ * @default
+ * 
+ */
+
 /*~struct~Point:
  * 
  * @param x
@@ -602,18 +1155,6 @@
  * 
  */
 
-
-// 此插件仅仅只会显示背包内物品数量大于等于1的物品，工具栏每一格都会显示不同物品id的物品，而不对物品数量做过分探究（主要用于重要物品这种最大数量为1的类型），如有其他需要请在点击物品的公共事件内操作。
-// 变量保存当前选中物品id 变量设置-1并且鼠标图标还原之后表示空手（绑定一个快捷键）窗口的selectItemID默认初始化为=是否等于-1 ? -1 : 变量保存的值
-// 鉴于可能连续多次获得物品，可能加入手动刷新指令，以避免连续多次自动刷新带来的性能问题。
-// 加入物品和删除物品都需要及时更新工具栏，手动刷新开始-加入或删除物品多次-手动刷新结束
-// 删除物品时，需判断删除物品是否是当前持有物品，如果是持有物品且删除后数量为0，则更新持有物品为空手。
-// 为兼容手柄游玩，可能需要加入一个持有物品窗口以显示当前持有物品。
-// 是否显示物品数量待考虑
-// 是否添加声效待考虑,如弹出和隐藏，持有和脱卸
-// 非地图场景，用完持有的物品，在重新获得该物品，回到地图界面不会持有该物品
-// 是否提供预览动画隐藏参数，预览窗口背景参数
-
 const ASItemBarWindowNameSpace = (() => {
     "use strict";
 
@@ -705,7 +1246,7 @@ const ASItemBarWindowNameSpace = (() => {
     Input.keyMapper[itemBarClickKeyCode] = "itembarclick";//H
     Input.keyMapper[itemBarEmptyHandedKeyCode] = "itembaremptyhanded";//K
 
-    console.log("Input.keyMapper: ", Input.keyMapper)
+    //console.log("Input.keyMapper: ", Input.keyMapper)
 
     Input.gamepadMapper[itemBarShowButtonCode] = "itembarshow";//Start Button
     Input.gamepadMapper[itemBarUpButtonCode] = "itembarup";//LT
@@ -713,7 +1254,7 @@ const ASItemBarWindowNameSpace = (() => {
     Input.gamepadMapper[itemBarClickButtonCode] = "itembarclick";//LS
     Input.gamepadMapper[itemBarEmptyHandedButtonCode] = "itembaremptyhanded";//RS
 
-    console.log("Input.gamepadMapper: ", Input.gamepadMapper)
+    //console.log("Input.gamepadMapper: ", Input.gamepadMapper)
 
     //***************************************************************************
     // ---------------------------- Interpolation Animation Dependency Library Start ----------------------------
@@ -1710,10 +2251,9 @@ const ASItemBarWindowNameSpace = (() => {
       }
 
       makeCommandList() {
-
         const orderItems = $gameParty.orderItems();
-        console.log("makeCommandList---------items: ", $gameParty.items())
-        console.log("makeCommandList---------orderItems: ", orderItems)
+        // console.log("makeCommandList---------items: ", $gameParty.items())
+        // console.log("makeCommandList---------orderItems: ", orderItems)
         for (const item of orderItems) {
           this.addCommand(item.name, `${item.id}`);
         }
@@ -1724,7 +2264,6 @@ const ASItemBarWindowNameSpace = (() => {
       }
 
       commandActionBind(itemId) {
-        
         if (itemBarWindowHoldingItemIdVariable >= 1 && itemId >= 1) {
           const lastHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
           //console.log("lastHoldingItemIdVariableValue: ", lastHoldingItemIdVariableValue)
@@ -1749,10 +2288,7 @@ const ASItemBarWindowNameSpace = (() => {
           this.proxy.refreshContent(currentHoldingItemIdVariableValue, false);
         }
 
-        //this.refresh();
-
         this.activate();
-        // SceneManager.pop();
       }
 
 
@@ -1760,65 +2296,41 @@ const ASItemBarWindowNameSpace = (() => {
         // console.log("drawGainItem---------items: ", $gameParty.items())
         // console.log("drawGainItem----------$gameParty.orderItems(): ", $gameParty.orderItems())
         if (isNewItem) {
-          console.log("新获得物品")
           this.addCommand(item.name, `${item.id}`);
           const newItemCommand = this._list[this._list.length - 1];
           this.setHandler(newItemCommand.symbol, this.commandActionBind.bind(this, Number(newItemCommand.symbol) || 0));
           this.redrawItem(this._list.length - 1);
-          //this.refresh();
         } else {
-          console.log("已获得物品, 增加数量")
           const addItemNumberIndex = this.findSymbol(`${item.id}`);
           this.redrawItem(addItemNumberIndex);
         }
-        
       }
 
       drawLoseItem(item) {
-        //判断失去的物品是不是最后一个，如果不是则把后面所有物品往前移动并往下滚一格，否则直接往下滚一格
-
         if ($gameParty.numItems(item) !== 0) {
           const loseItemIndex = this.findSymbol(`${item.id}`)
           this.redrawItem(loseItemIndex);
         } else {
-
           const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
-          console.log("drawLoseItem---currentHoldingItemIdVariableValue: ", currentHoldingItemIdVariableValue)
+          // console.log("drawLoseItem---currentHoldingItemIdVariableValue: ", currentHoldingItemIdVariableValue)
           if(currentHoldingItemIdVariableValue !== 0 && currentHoldingItemIdVariableValue === item.id) {
             $gameVariables.setValue(itemBarWindowHoldingItemIdVariable, 0);
             if (this.proxy && this.proxy.__proto__.hasOwnProperty("refreshContent")) {
               this.proxy.refreshContent(0, false);
             }
           }
-          
-          console.log("drawLoseItem---------items: ", $gameParty.items())
-          console.log("drawLoseItem----------$gameParty.orderItems(): ", $gameParty.orderItems())
+          // console.log("drawLoseItem---------items: ", $gameParty.items())
+          // console.log("drawLoseItem----------$gameParty.orderItems(): ", $gameParty.orderItems())
           const deleteItemIndex = this.findSymbol(`${item.id}`)
-          console.log("deleteItemIndex: ", deleteItemIndex)
-          //if (deleteItemIndex === )
-          // if (deleteItemIndex !== -1) {
-          //   this._list.splice(deleteItemIndex, 1);
-          // }
-          // console.log("drawLoseItem----------this._list: ", this._list)
-          // this.clearItem(deleteItemIndex);
-          // this.contents.clear();
-          // this.contentsBack.clear();
-          // for (let i = 0; i <= this._list.length - 1; i++) {
-          //   console.log("i: ", i)
-          //   this.redrawItem(i);
-          // }
-
+          //console.log("deleteItemIndex: ", deleteItemIndex)
           if (deleteItemIndex !== -1) {
-            console.log("drawLoseItem----------refresh")
+            //console.log("drawLoseItem----------refresh")
             this.refresh();
-            console.log("drawLoseItem----------smoothScrollBy")
+            //console.log("drawLoseItem----------smoothScrollBy")
             this.smoothScrollBy(0, itemBarWindowItemHeight + itemBarWindowRowSpacing);
-
             this.select(-1)
           }
-
         }
-        
       }
 
       drawItemText(index) {
@@ -1837,15 +2349,12 @@ const ASItemBarWindowNameSpace = (() => {
         if (itemBarWindowItemNumberTextVisible === true) {
           const rect = this.itemRect(index);
           const itemId = Number(this.commandSymbol(index)) || 0;
-          //console.log("itemId: ", itemId)
           const itemNumber = $gameParty.numItems($dataItems[itemId]);
-          // console.log("itemNumber: ", itemNumber)
           this.contents.fontSize = itemBarWindowItemNumberTextSize;
           this.changeTextColor(colorJsonObjectConvertToColorRGBA(itemBarWindowItemNumberTextColorJsonObject));
           this.changeOutlineColor(colorJsonObjectConvertToColorRGBA(itemBarWindowItemNumberTextOutlineColorJsonObject));
           this.changePaintOpacity(this.isCommandEnabled(index));
           const width = this.textWidth(itemNumber);
-          //console.log("width: ", width)
           this.drawText(itemNumber, rect.x + itemBarWindowItemNumberTextOffset.x - width, rect.y + itemBarWindowItemNumberTextOffset.y, width, "right");
         }
       }
@@ -1853,8 +2362,8 @@ const ASItemBarWindowNameSpace = (() => {
       drawItemHoldingTag(index) {
         const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
         const itemId = Number(this.commandSymbol(index)) || 0;
-        console.log("drawItemHoldingTag-------currentHoldingItemIdVariableValue: ", currentHoldingItemIdVariableValue)
-        console.log("drawItemHoldingTag-------itemId: ", itemId)
+        // console.log("drawItemHoldingTag-------currentHoldingItemIdVariableValue: ", currentHoldingItemIdVariableValue)
+        // console.log("drawItemHoldingTag-------itemId: ", itemId)
         if (itemBarWindowItemHoldingTagVisible === true && currentHoldingItemIdVariableValue !== 0 && currentHoldingItemIdVariableValue === itemId) {
           if (itemBarWindowItemHoldingTagImage) {
             const rect = this.itemRect(index);
@@ -1870,7 +2379,7 @@ const ASItemBarWindowNameSpace = (() => {
         const rect = this.itemRect(index);
         const itemId = Number(this.commandSymbol(index)) || 0;
         const itemBarThumbnail = $dataItems[itemId].meta.ASItemBarThumbnail;
-        console.log("itemBarThumbnail: ", itemBarThumbnail)
+        //console.log("itemBarThumbnail: ", itemBarThumbnail)
         if (itemBarThumbnail) {
           const noBlankItemBarThumbnail = itemBarThumbnail.replace(/^\s*|\s*$/g,"");
           const bitmap = ImageManager.loadBitmap("img/", noBlankItemBarThumbnail);
@@ -1944,11 +2453,11 @@ const ASItemBarWindowNameSpace = (() => {
         if (this.isCursorMovable()) {
           const lastIndex = this.index();
           if (Input.isRepeated("itembardown")) {
-            console.log("Input.isRepeated(down)")
+            //console.log("Input.isRepeated(down)")
             this.cursorDown(Input.isTriggered("itembardown"));
           }
           if (Input.isRepeated("itembarup")) {
-            console.log("Input.isRepeated(up)")
+            //console.log("Input.isRepeated(up)")
             this.cursorUp(Input.isTriggered("itembarup"));
           }
           if (Input.isRepeated("right")) {
@@ -2009,9 +2518,6 @@ const ASItemBarWindowNameSpace = (() => {
         this.windowskin = ImageManager.loadSystem(itemPreviewWindowWindowSkin);
         this._padding = itemPreviewWindowPadding;
 
-        //console.log("this._contentsBackSprite: ", this._contentsBackSprite)
-        //itemPreviewWindowBackgroundImage
-        console.log("itemPreviewWindowBackgroundImage: ",itemPreviewWindowBackgroundImage)
         if (itemPreviewWindowBackgroundImage) {
           const bitmap = ImageManager.loadBitmap("img/", itemPreviewWindowBackgroundImage);
           bitmap.addLoadListener(() => {
@@ -2076,15 +2582,12 @@ const ASItemBarWindowNameSpace = (() => {
     const _Scene_Map_CreateDisplayObjects = Scene_Map.prototype.createDisplayObjects;
     Scene_Map.prototype.createDisplayObjects = function() {
         _Scene_Map_CreateDisplayObjects.apply(this, arguments);
-
         this.charm = new Charm(PIXI);
-
         this.itemPreviewWindow = new Window_ItemPreview(itemPreviewWindowRect);
         const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
-        console.log("createDisplayObjects----currentHoldingItemIdVariableValue: ", currentHoldingItemIdVariableValue)
+        //console.log("createDisplayObjects----currentHoldingItemIdVariableValue: ", currentHoldingItemIdVariableValue)
         this.itemPreviewWindow.refreshContent(currentHoldingItemIdVariableValue, false);
         this.addChild(this.itemPreviewWindow);
-    
         const itemBarCommandWindowWidth = itemBarWindowItemWidth + itemBarWindowColSpacing + 2 * itemBarWindowPadding;
         const itemBarCommandWindowHeight = (itemBarWindowItemHeight + itemBarWindowRowSpacing) * itemBarWindowVisibleItems + 2 * itemBarWindowPadding;
         const rect = new Rectangle(- (itemBarWindowFinalOffset.x + itemBarCommandWindowWidth), itemBarWindowFinalOffset.y, itemBarCommandWindowWidth, itemBarCommandWindowHeight);
@@ -2093,27 +2596,23 @@ const ASItemBarWindowNameSpace = (() => {
         this.itemBarCommandWindow.visible = false;
         this.itemBarCommandWindowPlaying = false;
         this.addChild(this.itemBarCommandWindow);
-
     };
 
     const _Scene_Map_Update = Scene_Map.prototype.update;
     Scene_Map.prototype.update = function() {
         _Scene_Map_Update.apply(this, arguments);
         this.charm.update();
-
         if (Input.isTriggered("itembarshow")) {
           if(this.itemBarCommandWindowPlaying !== true) {
             if (this.itemBarCommandWindow.visible === false) {
               this.itemBarCommandWindow.visible = true;
               this.itemBarCommandWindowPlaying = true;
-              
               playSoundEffectsObject(itemBarWindowShowSoundEffects);
               this.charm.slide(this.itemBarCommandWindow, itemBarWindowFinalOffset.x, itemBarWindowFinalOffset.y, 30).onComplete = () => {
                 this.itemBarCommandWindowPlaying = false;
               };
             } else {
               this.itemBarCommandWindowPlaying = true;
-              
               playSoundEffectsObject(itemBarWindowHideSoundEffects);
               this.charm.slide(this.itemBarCommandWindow, - (itemBarWindowFinalOffset.x + this.itemBarCommandWindow.width), itemBarWindowFinalOffset.y, 30).onComplete = () => {
                 this.itemBarCommandWindow.visible = false;
@@ -2122,12 +2621,10 @@ const ASItemBarWindowNameSpace = (() => {
             }
           }
         }
-
         if (Input.isTriggered("itembaremptyhanded")) {
           playSoundEffectsObject(itemBarWindowEmptyHandedSoundEffects);
           this.setItemBarEmptyHanded();
         }
-
     };
 
     Scene_Map.prototype.setItemBarEmptyHanded = function() {
@@ -2144,11 +2641,8 @@ const ASItemBarWindowNameSpace = (() => {
 
     const _Game_Party_GainItem = Game_Party.prototype.gainItem;
     Game_Party.prototype.gainItem = function (item, amount, includeEquip) {
-
       const isNewItem = !this._items[item.id];
-
       _Game_Party_GainItem.apply(this, arguments);
-
       if (this._orderItems) {
           if (!this._orderItems.includes(item.id)) {
             this._orderItems.push(item.id);
@@ -2161,29 +2655,22 @@ const ASItemBarWindowNameSpace = (() => {
           }
           $gameMap.requestRefresh();
       }
-
-      //
       const currentScene = SceneManager._scene;
       if (currentScene && currentScene instanceof Scene_Map && currentScene.itemBarCommandWindow && currentScene.itemPreviewWindow) {
-        console.log("在地图处理物品")
         if (DataManager.isItem(item) && amount >= 1) {
-          console.log("获得物品");
           currentScene.itemBarCommandWindow.drawGainItem(item, isNewItem);
         }
         if (DataManager.isItem(item) && amount <= -1) {
-          console.log("失去物品");
           currentScene.itemBarCommandWindow.drawLoseItem(item);
         }
       } else {
         if (DataManager.isItem(item) && amount <= -1) {
-          console.log("失去物品");
           const currentHoldingItemIdVariableValue = $gameVariables.value(itemBarWindowHoldingItemIdVariable);
           if(currentHoldingItemIdVariableValue !== 0 && currentHoldingItemIdVariableValue === item.id && $gameParty.numItems(item) === 0) {
             $gameVariables.setValue(itemBarWindowHoldingItemIdVariable, 0);
           }
         }
       }
-      
     };
 
     const _Game_Party_InitAllItems = Game_Party.prototype.initAllItems;
