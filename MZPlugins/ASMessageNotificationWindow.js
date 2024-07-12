@@ -35,6 +35,26 @@
  * @text Show Message Notification Window
  * @desc Show Message Notification Window
  * 
+ * @param messageNotificationWindowSkin
+ * @text Window Skin
+ * @desc WindowSkin
+ * @type file
+ * @dir img/system/
+ * @default Window
+ * 
+ * @arg messageNotificationIcon
+ * @text Icon
+ * @desc Icon
+ * @type file
+ * @dir img/
+ * @default
+ * 
+ * @arg messageNotificationText
+ * @text Text
+ * @desc Text
+ * @type note
+ * @default
+ * 
  * 
  */
 
@@ -47,8 +67,12 @@ const ASMessageNotificationWindowNameSpace = (() => {
     PluginManager.registerCommand(pluginName, "showMessageNotificationWindow", args => {
 
         console.log("Test");
+
         const currentScene = SceneManager._scene;
         const messageNotificationWindow = new Window_MessageNotification(new Rectangle(0, 0, 400, 100));
+        
+        messageNotificationWindow.setUpUI(args.messageNotificationIcon, args.messageNotificationText)
+
         currentScene.addChild(messageNotificationWindow);
 
     });
@@ -902,6 +926,26 @@ const ASMessageNotificationWindowNameSpace = (() => {
         }
     }
 
+    //***************************************************************************
+    // ---------------------------- Interpolation Animation Dependency Library End ----------------------------
+    //***************************************************************************
+
+    // Private Functions and System Class Extensions
+
+    // Bitmap.prototype.measureTextHeight = function(text) {
+    //     const context = this.context;
+    //     context.save();
+    //     context.font = this._makeFontNameText();
+    //     const height = context.measureText(text).height;
+    //     console.log("context.measureText(text): ", context.measureText(text))
+    //     context.restore();
+    //     return height;
+    // };
+
+    // Window_Base.prototype.textHeight = function(text) {
+    //     return this.contents.measureTextHeight(text);
+    // };
+    
     class Window_MessageNotification extends Window_Base {
 
         initialize(rect) {
@@ -909,6 +953,42 @@ const ASMessageNotificationWindowNameSpace = (() => {
             
         }
 
+        setUpUI(icon, text) {
+
+            if (icon) {
+                const bitmap = ImageManager.loadBitmap("img/", icon);
+                bitmap.addLoadListener(() => {
+                    this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, 0, 0, 96, 96);
+                });
+            }
+
+            if (text) {
+                console.log("text: ", text)
+                const realText = JSON.parse(text);
+                console.log("realText: ", realText)
+
+                const textSize = this.textSizeEx(realText);
+                console.log("textSize: ", textSize)
+
+                this.contents.fillRect(120, 7, textSize.width, textSize.height, `rgba(0, 0, 0, 1)`);
+                this.drawTextEx(realText, 120, 7, textSize.width);
+                
+            }
+
+        }
+
     }
+
+    const _Scene_Base_Initialize = Scene_Base.prototype.initialize;
+    Scene_Base.prototype.initialize = function() {
+        _Scene_Base_Initialize.apply(this, arguments);
+        this.messageNotificationCharm = new Charm(PIXI);
+    };
+
+    const _Scene_Base_Update = Scene_Base.prototype.update;
+    Scene_Base.prototype.update = function() {
+        _Scene_Base_Update.apply(this, arguments);
+        this.messageNotificationCharm.update();
+    };
 
 })();
