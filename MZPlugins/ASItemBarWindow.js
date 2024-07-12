@@ -1,6 +1,6 @@
 /*:
  * @target MZ
- * @plugindesc [V1.0.0] Item Bar Window Plugin
+ * @plugindesc [V1.0.1] Item Bar Window Plugin
  * @author Arrose
  * 
  * @url https://github.com/arrosev/RPGMakerMZPlugins
@@ -41,6 +41,10 @@
  *      5. You can attach an icon tag to the currently held item.
  *      6. You can display a preview image of the currently held items.
  * 
+ * [V1.0.1]
+ * Change:
+ *      1. Compatible with old archives that have acquired items before using the plugin.
+ * 
  * Note:
  *      1. Item note format: <ASItemBarThumbnail:items/bottles>, 
  *         "items/bottles" refers to the path of the item's thumbnail 
@@ -70,6 +74,10 @@
  *                                   RS(empty handed)
  *      7. Items mentioned in this plugin do not include weapons, armor, etc, items
  *         here are only those that appear in the database item categorization.
+ *      8. (v1.0.0)Incompatible with old archives that have acquired items before using
+ *         this plugin, because this plugin records the order in which items are first 
+ *         acquired, the order in which items were acquired before this plugin was 
+ *         used is not recorded.
  * 
  * 
  * @noteParam ASItemBarThumbnail
@@ -530,7 +538,7 @@
 
 /*:zh
  * @target MZ
- * @plugindesc [V1.0.0] 物品工具栏窗口插件
+ * @plugindesc [V1.0.1] 物品工具栏窗口插件
  * @author Arrose
  * 
  * @url https://github.com/arrosev/RPGMakerMZPlugins
@@ -571,6 +579,10 @@
  *      5. 您可以为当前持有的物品附加图标标签
  *      6. 您可以显示当前持有物品的预览图像
  * 
+ * [V1.0.1]
+ * 修改:
+ *      1. 兼容在使用插件之前已经获取过物品的老存档
+ * 
  * 注意:
  *      1. 物品备注格式：<ASItemBarThumbnail:items/bottles>，“items/bottles” 指
  *         img文件夹下的物品缩略图路径，不需要文件扩展名，标签中间不能有空格，具体请
@@ -593,6 +605,8 @@
  *                      RS(空手)             
  *      7. 本插件中提到的物品不包括武器、盔甲等，这里的物品仅指出现在数据库
  *         物品分类中的物品
+ *      8. (v1.0.0)无法兼容在没有使用此插件之前已经获取物品的旧存档，因为此插件会记录
+ *         物品首次获取的顺序，在没有使用此插件之前获取物品的顺序没有被记录
  * 
  * @noteParam ASItemBarThumbnail
  * @noteRequire 1
@@ -2685,11 +2699,27 @@ const ASItemBarWindowNameSpace = (() => {
 
     const _Game_Party_InitAllItems = Game_Party.prototype.initAllItems;
     Game_Party.prototype.initAllItems = function () {
+      // console.log("initAllItems")
       _Game_Party_InitAllItems.apply(this, arguments);
       this._orderItems = [];
+      // console.log("this._items: ", this._items)
+      // console.log("this._orderItems: ", this._orderItems)
     };
 
     Game_Party.prototype.orderItems = function () {
+      if (!this._orderItems) {
+        //console.log("Old archive of the first use of this plugin")
+        this._orderItems = [];
+        //console.log("this._items: ", this._items)
+        const oldArchivesItemIds = Object.keys(this._items);
+        if (oldArchivesItemIds.length !== 0) {
+          //console.log("Items have been acquired before using this plugin")
+          for (const id of oldArchivesItemIds) {
+            this._orderItems.push(Number(id));
+          }
+        }
+      }
+      //console.log("this._orderItems: ", this._orderItems)
       return this._orderItems.map(id => $dataItems[id]);
     };
 
