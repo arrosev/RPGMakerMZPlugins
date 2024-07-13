@@ -35,26 +35,104 @@
  * @text Show Message Notification Window
  * @desc Show Message Notification Window
  * 
- * @param messageNotificationWindowSkin
+ * @arg messageNotificationWindowSkin
  * @text Window Skin
  * @desc WindowSkin
  * @type file
  * @dir img/system/
  * @default Window
  * 
- * @arg messageNotificationIcon
+ * @arg messageNotificationWindowFinalOffset
+ * @text Final Offset
+ * @desc Final Offset
+ * @type struct<Point>
+ * @default {"x":"0","y":"0"}
+ * 
+ * @arg messageNotificationWindowSizeMode
+ * @text Window Size Mode
+ * @desc Window Size Mode
+ * @type select
+ * @option auto
+ * @option manual
+ * @default auto
+ * 
+ * @arg messageNotificationWindowSize
+ * @text Window Manual Size
+ * @desc Window Manual Size
+ * @parent messageNotificationWindowSizeMode
+ * @type struct<Size>
+ * @default {"width":"0","height":"0"}
+ * 
+ * @arg messageNotificationWindowPadding
+ * @text Padding
+ * @desc Padding
+ * @type number
+ * @default 12
+ * 
+ * @arg messageNotificationWindowIconTextPadding
+ * @text Icon Text Padding
+ * @desc Icon Text Padding
+ * @type number
+ * @default 20
+ * 
+ * @arg messageNotificationWindowIcon
  * @text Icon
  * @desc Icon
  * @type file
  * @dir img/
  * @default
  * 
- * @arg messageNotificationText
+ * @arg messageNotificationWindowIconSize
+ * @text Icon Size
+ * @desc Icon Size
+ * @type struct<Size>
+ * @default {"width":"0","height":"0"}
+ * 
+ * @arg messageNotificationWindowText
  * @text Text
  * @desc Text
  * @type note
  * @default
  * 
+ * @arg messageNotificationWindowTextLineHeight
+ * @text Text LineHeight
+ * @desc Text LineHeight
+ * @type number
+ * @default 36
+ * 
+ */
+
+/*~struct~Point:
+ * 
+ * @param x
+ * @text X
+ * @desc X
+ * @type number
+ * @default 0
+ * 
+ * @param y
+ * @text Y
+ * @desc Y
+ * @type number
+ * @default 0
+ * 
+ */
+
+/*~struct~Size:
+ * 
+ * @param width
+ * @text Width
+ * @desc Width
+ * @type number
+ * @min 0
+ * @default 0
+ * 
+ * @param height
+ * @text Height
+ * @desc Height
+ * @type number
+ * @min 0
+ * @default 0
  * 
  */
 
@@ -62,33 +140,65 @@ const ASMessageNotificationWindowNameSpace = (() => {
     "use strict";
 
     const pluginName = "ASMessageNotificationWindow";
-    const parameters = PluginManager.parameters(pluginName);
+    //const parameters = PluginManager.parameters(pluginName);
 
     PluginManager.registerCommand(pluginName, "showMessageNotificationWindow", args => {
 
-        console.log("Test");
+        const windowSkin = args.messageNotificationWindowSkin;
+        const finalOffsetJsonObject = JSON.parse(args.messageNotificationWindowFinalOffset);
+        const finalOffset = new Point(Number(finalOffsetJsonObject.x) || 0, Number(finalOffsetJsonObject.y) || 0);
+        const windowSizeMode = args.messageNotificationWindowSizeMode;
+        const windowManualSizeJsonObject = JSON.parse(args.messageNotificationWindowSize);
+        const windowManualSize = {
+            width: Number(windowManualSizeJsonObject.width) || 0,
+            height: Number(windowManualSizeJsonObject.height) || 0,
+        };
+        const padding = Number(args.messageNotificationWindowPadding);
+        const iconTextPadding = Number(args.messageNotificationWindowIconTextPadding);
 
-        const iconPath = args.messageNotificationIcon;
-        const realText = JSON.parse(args.messageNotificationText);
+        const iconPath = args.messageNotificationWindowIcon;
+        const iconSizeJsonObject = JSON.parse(args.messageNotificationWindowIconSize);
+        const iconSize = {
+            width: Number(iconSizeJsonObject.width) || 0,
+            height: Number(iconSizeJsonObject.height) || 0,
+        };
 
-        console.log("text: ", args.messageNotificationText)
+        const realText = args.messageNotificationWindowText ? JSON.parse(args.messageNotificationWindowText) : "";
         console.log("realText: ", realText)
-
+        const textLineHeight = Number(args.messageNotificationWindowTextLineHeight);
+        
         const currentScene = SceneManager._scene;
         //设置一个auto参数，自动计算通知窗口宽高或者手动指定
-        const messageNotificationWindow = new Window_MessageNotification(new Rectangle(0, 0, 400, 100));
-
+        const messageNotificationWindowManualRect = new Rectangle(finalOffset.x, finalOffset.y, windowManualSize.width, windowManualSize.height);
+        
+        console.log("messageNotificationWindowManualRect: ", messageNotificationWindowManualRect)
+        const messageNotificationWindow = new Window_MessageNotification(messageNotificationWindowManualRect, textLineHeight);
         const textSize = messageNotificationWindow.textSizeEx(realText);
-        messageNotificationWindow._padding = 4;
         console.log("textSize: ", textSize)
-        console.log("messageNotificationWindow: ", messageNotificationWindow)
-        console.log("messageNotificationWindow_container: ", messageNotificationWindow._container)
-        console.log("messageNotificationWindow_clientArea: ", messageNotificationWindow._clientArea)
-        console.log("messageNotificationWindow_contentsBackSprite: ", messageNotificationWindow._contentsBackSprite)
-        //设置完padding重新设置_contentsSprite size
-        console.log("messageNotificationWindow_contentsSprite: ", messageNotificationWindow._contentsSprite)
 
-        messageNotificationWindow.setUpUI(iconPath, realText, textSize);
+        if (windowSizeMode === "auto") {
+            messageNotificationWindow.width = padding * 2 + iconSize.width + iconTextPadding + textSize.width;
+            const maxHeight = Math.max(iconSize.height, textSize.height);
+            messageNotificationWindow.height = padding * 2 + maxHeight;
+        }
+
+        // console.log("messageNotificationWindow.width: ", messageNotificationWindow.width)
+        // console.log("messageNotificationWindow.height: ", messageNotificationWindow.height)
+
+        messageNotificationWindow.windowskin = ImageManager.loadSystem(windowSkin);
+        messageNotificationWindow._padding = padding;
+        
+        messageNotificationWindow.contents.resize(messageNotificationWindow.contentsWidth(), messageNotificationWindow.contentsHeight());
+        messageNotificationWindow.contentsBack.resize(messageNotificationWindow.contentsWidth(), messageNotificationWindow.contentsHeight());
+        // console.log("messageNotificationWindow.contents: ", messageNotificationWindow.contents)
+        // console.log("messageNotificationWindow.contentsBack: ", messageNotificationWindow.contentsBack)
+        
+        // console.log("messageNotificationWindow_clientArea: ", messageNotificationWindow._clientArea)
+        // console.log("messageNotificationWindow_contentsBackSprite: ", messageNotificationWindow._contentsBackSprite)
+        // //设置完padding重新设置_contentsSprite size
+        // console.log("messageNotificationWindow_contentsSprite: ", messageNotificationWindow._contentsSprite)
+
+        messageNotificationWindow.setUpUI(iconSize, iconPath, iconTextPadding, realText, textSize);
 
         currentScene.addChild(messageNotificationWindow);
 
@@ -951,27 +1061,77 @@ const ASMessageNotificationWindowNameSpace = (() => {
 
     class Window_MessageNotification extends Window_Base {
 
-        initialize(rect) {
+        initialize(rect, textLineHeight) {
             Window_Base.prototype.initialize.call(this, rect);
-
+            this.textLineHeight = textLineHeight;
+            this.inlineIconWidth = ImageManager.iconWidth;
         }
 
-        setUpUI(iconPath, realText, textSize) {
+        setUpUI(iconSize, iconPath, iconTextPadding, realText, textSize) {
 
-            if (iconPath) {
+            if (iconPath && iconSize) {
                 const bitmap = ImageManager.loadBitmap("img/", iconPath);
                 bitmap.addLoadListener(() => {
-                    this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, 0, 0, 96, 96);
+                    this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, 0, (this.contents.height - iconSize.height) / 2, iconSize.width, iconSize.height);
                 });
             }
 
             if (realText && textSize) {
 
-                this.contents.fillRect(120, 7, textSize.width, textSize.height, `rgba(0, 0, 0, 1)`);
-                this.drawTextEx(realText, 120, 7, textSize.width);
+                this.contents.fillRect(iconSize.width + iconTextPadding, (this.contents.height - textSize.height) / 2, textSize.width, textSize.height, `rgba(255, 255, 255, 1)`);
+                this.drawTextEx(realText, iconSize.width + iconTextPadding, (this.contents.height - textSize.height) / 2, textSize.width);
 
             }
 
+        }
+
+        lineHeight() {
+            return this.textLineHeight;
+        }
+
+        processEscapeCharacter(code, textState) {
+            switch (code) {
+                case "C":
+                    this.processColorChange(this.obtainEscapeParam(textState));
+                    break;
+                case "I":
+                    this.processDrawIcon(this.obtainEscapeParam(textState), textState);
+                    break;
+                case "IS":
+                    this.inlineIconWidth = this.obtainEscapeParam(textState);
+                    break;
+                case "PX":
+                    textState.x = this.obtainEscapeParam(textState);
+                    break;
+                case "PY":
+                    textState.y = this.obtainEscapeParam(textState);
+                    break;
+                case "FS":
+                    this.contents.fontSize = this.obtainEscapeParam(textState);
+                    break;
+                case "{":
+                    this.makeFontBigger();
+                    break;
+                case "}":
+                    this.makeFontSmaller();
+                    break;
+            }
+        }
+
+        processDrawIcon(iconIndex, textState) {
+            if (textState.drawing) {
+                this.drawIcon(iconIndex, textState.x + 2, textState.y);
+            }
+            textState.x += this.inlineIconWidth + 4;
+        }
+
+        drawIcon(iconIndex, x, y) {
+            const bitmap = ImageManager.loadSystem("IconSet");
+            const pw = ImageManager.iconWidth;
+            const ph = ImageManager.iconHeight;
+            const sx = (iconIndex % 16) * pw;
+            const sy = Math.floor(iconIndex / 16) * ph;
+            this.contents.blt(bitmap, sx, sy, pw, ph, x, y + (this.textLineHeight - this.inlineIconWidth) / 2, this.inlineIconWidth, this.inlineIconWidth);
         }
 
     }
