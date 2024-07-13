@@ -198,9 +198,34 @@ const ASMessageNotificationWindowNameSpace = (() => {
         // //设置完padding重新设置_contentsSprite size
         // console.log("messageNotificationWindow_contentsSprite: ", messageNotificationWindow._contentsSprite)
 
+        messageNotificationWindow.y = - messageNotificationWindow.height;
+
         messageNotificationWindow.setUpUI(iconSize, iconPath, iconTextPadding, realText, textSize);
 
         currentScene.addChild(messageNotificationWindow);
+
+        // let wayPoints = [
+        //     [finalOffset.x, - messageNotificationWindow.height],
+        //     [finalOffset.x, finalOffset.y],
+        //     [- messageNotificationWindow.width, finalOffset.y]
+        // ];
+        // currentScene.messageNotificationCharm.walkPath(messageNotificationWindow, wayPoints, 60, "smoothstep", false, false, 500).onComplete = () => {
+        //     console.log("移动完成");
+        //     currentScene.removeChild(messageNotificationWindow);
+        // };
+        currentScene.messageNotificationCharm.slide(messageNotificationWindow, finalOffset.x, finalOffset.y, 20).onComplete = () => {
+            currentScene.messageNotificationCharm.wait(1000).then(() => {
+                currentScene.messageNotificationCharm.fadeOut(messageNotificationWindow, 30);
+                currentScene.messageNotificationCharm.slide(messageNotificationWindow, - messageNotificationWindow.width, finalOffset.y, 40).onComplete = () => {
+                    currentScene.removeChild(messageNotificationWindow);
+                }
+            });
+        };
+        // currentScene.messageNotificationCharm.wait(1000).then(() => {
+        //     currentScene.messageNotificationCharm.slide(messageNotificationWindow, finalOffset.x, finalOffset.y, 20);
+        //     currentScene.messageNotificationCharm.fadeOut(messageNotificationWindow);
+        // });
+
 
     });
 
@@ -1068,21 +1093,16 @@ const ASMessageNotificationWindowNameSpace = (() => {
         }
 
         setUpUI(iconSize, iconPath, iconTextPadding, realText, textSize) {
-
             if (iconPath && iconSize) {
                 const bitmap = ImageManager.loadBitmap("img/", iconPath);
                 bitmap.addLoadListener(() => {
                     this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, 0, (this.contents.height - iconSize.height) / 2, iconSize.width, iconSize.height);
                 });
             }
-
             if (realText && textSize) {
-
-                this.contents.fillRect(iconSize.width + iconTextPadding, (this.contents.height - textSize.height) / 2, textSize.width, textSize.height, `rgba(255, 255, 255, 1)`);
+                //this.contents.fillRect(iconSize.width + iconTextPadding, (this.contents.height - textSize.height) / 2, textSize.width, textSize.height, `rgba(255, 255, 255, 1)`);
                 this.drawTextEx(realText, iconSize.width + iconTextPadding, (this.contents.height - textSize.height) / 2, textSize.width);
-
             }
-
         }
 
         lineHeight() {
