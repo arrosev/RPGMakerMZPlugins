@@ -46,7 +46,7 @@
  * @text Final Offset
  * @desc Final Offset
  * @type struct<Point>
- * @default {"x":"0","y":"0"}
+ * @default {"x":"20","y":"20"}
  * 
  * @arg messageNotificationWindowSizeMode
  * @text Window Size Mode
@@ -74,6 +74,22 @@
  * @desc Icon Text Padding
  * @type number
  * @default 20
+ * 
+ * @arg messageNotificationWindowDisplayDirection
+ * @text Display Direction
+ * @desc Display Direction
+ * @type select
+ * @option down
+ * @option up
+ * @default down
+ * 
+ * @arg messageNotificationWindowDismissDirection
+ * @text Dismiss Direction
+ * @desc Dismiss Direction
+ * @type select
+ * @option left
+ * @option right
+ * @default left
  * 
  * @arg messageNotificationWindowIcon
  * @text Icon
@@ -155,6 +171,8 @@ const ASMessageNotificationWindowNameSpace = (() => {
         };
         const padding = Number(args.messageNotificationWindowPadding);
         const iconTextPadding = Number(args.messageNotificationWindowIconTextPadding);
+        const displayDirection = args.messageNotificationWindowDisplayDirection;
+        const dismissDirection = args.messageNotificationWindowDismissDirection;
 
         const iconPath = args.messageNotificationWindowIcon;
         const iconSizeJsonObject = JSON.parse(args.messageNotificationWindowIconSize);
@@ -182,9 +200,6 @@ const ASMessageNotificationWindowNameSpace = (() => {
             messageNotificationWindow.height = padding * 2 + maxHeight;
         }
 
-        // console.log("messageNotificationWindow.width: ", messageNotificationWindow.width)
-        // console.log("messageNotificationWindow.height: ", messageNotificationWindow.height)
-
         messageNotificationWindow.windowskin = ImageManager.loadSystem(windowSkin);
         messageNotificationWindow._padding = padding;
         
@@ -198,34 +213,21 @@ const ASMessageNotificationWindowNameSpace = (() => {
         // //设置完padding重新设置_contentsSprite size
         // console.log("messageNotificationWindow_contentsSprite: ", messageNotificationWindow._contentsSprite)
 
-        messageNotificationWindow.y = - messageNotificationWindow.height;
+        messageNotificationWindow.y = displayDirection === "down" ? - messageNotificationWindow.height : Graphics.height;
 
         messageNotificationWindow.setUpUI(iconSize, iconPath, iconTextPadding, realText, textSize);
 
         currentScene.addChild(messageNotificationWindow);
 
-        // let wayPoints = [
-        //     [finalOffset.x, - messageNotificationWindow.height],
-        //     [finalOffset.x, finalOffset.y],
-        //     [- messageNotificationWindow.width, finalOffset.y]
-        // ];
-        // currentScene.messageNotificationCharm.walkPath(messageNotificationWindow, wayPoints, 60, "smoothstep", false, false, 500).onComplete = () => {
-        //     console.log("移动完成");
-        //     currentScene.removeChild(messageNotificationWindow);
-        // };
         currentScene.messageNotificationCharm.slide(messageNotificationWindow, finalOffset.x, finalOffset.y, 20).onComplete = () => {
             currentScene.messageNotificationCharm.wait(1000).then(() => {
                 currentScene.messageNotificationCharm.fadeOut(messageNotificationWindow, 30);
-                currentScene.messageNotificationCharm.slide(messageNotificationWindow, - messageNotificationWindow.width, finalOffset.y, 40).onComplete = () => {
+                const dismissX = dismissDirection === "left" ? - messageNotificationWindow.width : Graphics.width;
+                currentScene.messageNotificationCharm.slide(messageNotificationWindow, dismissX, finalOffset.y, 40).onComplete = () => {
                     currentScene.removeChild(messageNotificationWindow);
                 }
             });
         };
-        // currentScene.messageNotificationCharm.wait(1000).then(() => {
-        //     currentScene.messageNotificationCharm.slide(messageNotificationWindow, finalOffset.x, finalOffset.y, 20);
-        //     currentScene.messageNotificationCharm.fadeOut(messageNotificationWindow);
-        // });
-
 
     });
 
