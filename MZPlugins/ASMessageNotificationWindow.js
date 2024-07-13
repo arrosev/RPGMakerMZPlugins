@@ -68,10 +68,27 @@ const ASMessageNotificationWindowNameSpace = (() => {
 
         console.log("Test");
 
+        const iconPath = args.messageNotificationIcon;
+        const realText = JSON.parse(args.messageNotificationText);
+
+        console.log("text: ", args.messageNotificationText)
+        console.log("realText: ", realText)
+
         const currentScene = SceneManager._scene;
+        //设置一个auto参数，自动计算通知窗口宽高或者手动指定
         const messageNotificationWindow = new Window_MessageNotification(new Rectangle(0, 0, 400, 100));
-        
-        messageNotificationWindow.setUpUI(args.messageNotificationIcon, args.messageNotificationText)
+
+        const textSize = messageNotificationWindow.textSizeEx(realText);
+        messageNotificationWindow._padding = 4;
+        console.log("textSize: ", textSize)
+        console.log("messageNotificationWindow: ", messageNotificationWindow)
+        console.log("messageNotificationWindow_container: ", messageNotificationWindow._container)
+        console.log("messageNotificationWindow_clientArea: ", messageNotificationWindow._clientArea)
+        console.log("messageNotificationWindow_contentsBackSprite: ", messageNotificationWindow._contentsBackSprite)
+        //设置完padding重新设置_contentsSprite size
+        console.log("messageNotificationWindow_contentsSprite: ", messageNotificationWindow._contentsSprite)
+
+        messageNotificationWindow.setUpUI(iconPath, realText, textSize);
 
         currentScene.addChild(messageNotificationWindow);
 
@@ -932,47 +949,27 @@ const ASMessageNotificationWindowNameSpace = (() => {
 
     // Private Functions and System Class Extensions
 
-    // Bitmap.prototype.measureTextHeight = function(text) {
-    //     const context = this.context;
-    //     context.save();
-    //     context.font = this._makeFontNameText();
-    //     const height = context.measureText(text).height;
-    //     console.log("context.measureText(text): ", context.measureText(text))
-    //     context.restore();
-    //     return height;
-    // };
-
-    // Window_Base.prototype.textHeight = function(text) {
-    //     return this.contents.measureTextHeight(text);
-    // };
-    
     class Window_MessageNotification extends Window_Base {
 
         initialize(rect) {
             Window_Base.prototype.initialize.call(this, rect);
-            
+
         }
 
-        setUpUI(icon, text) {
+        setUpUI(iconPath, realText, textSize) {
 
-            if (icon) {
-                const bitmap = ImageManager.loadBitmap("img/", icon);
+            if (iconPath) {
+                const bitmap = ImageManager.loadBitmap("img/", iconPath);
                 bitmap.addLoadListener(() => {
                     this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, 0, 0, 96, 96);
                 });
             }
 
-            if (text) {
-                console.log("text: ", text)
-                const realText = JSON.parse(text);
-                console.log("realText: ", realText)
-
-                const textSize = this.textSizeEx(realText);
-                console.log("textSize: ", textSize)
+            if (realText && textSize) {
 
                 this.contents.fillRect(120, 7, textSize.width, textSize.height, `rgba(0, 0, 0, 1)`);
                 this.drawTextEx(realText, 120, 7, textSize.width);
-                
+
             }
 
         }
@@ -980,13 +977,13 @@ const ASMessageNotificationWindowNameSpace = (() => {
     }
 
     const _Scene_Base_Initialize = Scene_Base.prototype.initialize;
-    Scene_Base.prototype.initialize = function() {
+    Scene_Base.prototype.initialize = function () {
         _Scene_Base_Initialize.apply(this, arguments);
         this.messageNotificationCharm = new Charm(PIXI);
     };
 
     const _Scene_Base_Update = Scene_Base.prototype.update;
-    Scene_Base.prototype.update = function() {
+    Scene_Base.prototype.update = function () {
         _Scene_Base_Update.apply(this, arguments);
         this.messageNotificationCharm.update();
     };
