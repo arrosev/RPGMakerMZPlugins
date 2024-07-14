@@ -31,6 +31,31 @@
  * 
  * This plugin is mainly used to make message notification window.
  * 
+ * [V1.0.0]
+ * Features:
+ *      1. Display a message notification window in any scene via a plugin command or a script.
+ *      2. Modification of the window display by plugin command parameters or script parameters.
+ *      3. The text of the window can be changed by adding signs such as "\C[x]" "\I[x]", etc., 
+ *         the same as the editor's own Show Text command.
+ *      4. A new "\IS[x]" signs has been added to the text of the window to resize the inline 
+ *         icons in the text.
+ * 
+ * Note:
+ *      1. To modify the text style by text signs, please refer to the signs of the "Show Text" 
+ *         command in the editor.
+ *      2. When calling a plugin function through a script, you need to fill in the function 
+ *         parameters of the correct type in sequence.
+ *      3. Example of script usage: ASMessageNotificationWindowNameSpace.showMessageNotificationWindow("Window", 20, 20, "auto", 0, 0, 12, 0, "right", "Miss", 0, 100, 90, "left", 2, true, "system/exclamation", 50, 50, "\\C[0]卧室的钥匙\\IS[26]\\I[324]\\C[20]找到了", 36)
+ *      4. Argument type reference for plugin functions: const showMessageNotificationWindow = function(windowSkinString,
+ *         finalOffsetXNumber, finalOffsetYNumber, windowSizeModeString, windowManualWidthNumber, 
+ *         windowManualHeightNumber, paddingNumber, iconTextPaddingNumber, displayDirectionString,
+ *         displaySoundEffectsNameString, displaySoundEffectsPanNumber, displaySoundEffectsPitchNumber,
+ *         displaySoundEffectsVolumeNumber, dismissDirectionString, dismissDelayTimeNumber, dismissNeedPanningBool,
+ *         iconPathString, iconWidthNumber, iconHeightNumber, textString, textLineHeightNumber)
+ *         String with String suffix, Number with Number for numeric, Bool with Boolean.
+ *      5. The debug in the plugin parameters can be used to view the size of the window for easy 
+ *         positioning of the layout.
+ * 
  * @param messageNotificationWindowDebug
  * @text Debug
  * @desc Debug(Display window final rect, position before disappearance)
@@ -44,14 +69,14 @@
  * @desc Show Message Notification Window
  * 
  * @arg messageNotificationWindowSet
- * @text Window Set
- * @desc Window Set
+ * @text Window Settings
+ * @desc Window Settings
  * @type string
  * @default
  * 
  * @arg messageNotificationWindowSkin
  * @text Window Skin
- * @desc WindowSkin
+ * @desc Window Skin
  * @parent messageNotificationWindowSet
  * @type file
  * @dir img/system/
@@ -66,7 +91,7 @@
  * 
  * @arg messageNotificationWindowSizeMode
  * @text Window Size Mode
- * @desc Window Size Mode
+ * @desc Window Size Mode (auto: automatic size calculation | manual: manual size specification)
  * @parent messageNotificationWindowSet
  * @type select
  * @option auto
@@ -141,8 +166,8 @@
  * @default true
  * 
  * @arg messageNotificationWindowIconSet
- * @text Icon Set
- * @desc Icon Set
+ * @text Icon Settings
+ * @desc Icon Settings
  * @type string
  * @default
  * 
@@ -162,8 +187,8 @@
  * @default {"width":"0","height":"0"}
  * 
  * @arg messageNotificationWindowTextSet
- * @text Text Set
- * @desc Text Set
+ * @text Text Settings
+ * @desc Text Settings
  * @type string
  * @default
  * 
@@ -177,6 +202,211 @@
  * @arg messageNotificationWindowTextLineHeight
  * @text Text LineHeight
  * @desc Text LineHeight
+ * @parent messageNotificationWindowTextSet
+ * @type number
+ * @default 36
+ * 
+ */
+
+/*:zh
+ * @target MZ
+ * @plugindesc [V1.0.0] 消息通知窗口插件
+ * @author Arrose
+ * 
+ * @url https://github.com/arrosev/RPGMakerMZPlugins
+ * 
+ * @help
+ * 
+ * 这个插件在MIT许可下发布
+ * 
+ * Copyright (c) 2024 Arrose
+
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ * 
+ * 这个插件主要用于制作消息通知窗口
+ * 
+ * [V1.0.0]
+ * 功能:
+ *      1. 通过插件指令或脚本在任意场景中显示一个消息通知窗口
+ *      2. 通过插件指令参数或脚本参数来修改窗口显示的方式
+ *      3. 窗口的文本可以通过添加 “\C[x]” “\I[x]” 等标识来改变样式，同编辑器自带的显示文字指令
+ *      4. 窗口的文本新增了一个 “\IS[x]” 标识用来调整文本内嵌图标的大小
+ * 
+ * 注意:
+ *      1. 通过文本标识修改文本样式时，请自行参考编辑器 “显示文字” 指令的标识
+ *      2. 通过脚本调用插件函数时，需要按顺序填入正确类型的函数参数
+ *      3. 脚本使用举例：ASMessageNotificationWindowNameSpace.showMessageNotificationWindow("Window", 20, 20, "auto", 0, 0, 12, 0, "right", "Miss", 0, 100, 90, "left", 2, true, "system/exclamation", 50, 50, "\\C[0]卧室的钥匙\\IS[26]\\I[324]\\C[20]找到了", 36)
+ *      4. 插件函数的参数类型参考：const showMessageNotificationWindow = function(windowSkinString,
+ *         finalOffsetXNumber, finalOffsetYNumber, windowSizeModeString, windowManualWidthNumber, 
+ *         windowManualHeightNumber, paddingNumber, iconTextPaddingNumber, displayDirectionString,
+ *         displaySoundEffectsNameString, displaySoundEffectsPanNumber, displaySoundEffectsPitchNumber,
+ *         displaySoundEffectsVolumeNumber, dismissDirectionString, dismissDelayTimeNumber, dismissNeedPanningBool,
+ *         iconPathString, iconWidthNumber, iconHeightNumber, textString, textLineHeightNumber)
+ *         后缀带String的为字符串型，带Number为数值型，带Bool的为布尔型
+ *      5. 插件参数中的调试模式可以用于查看窗口的大小，方便定位布局
+ * 
+ * @param messageNotificationWindowDebug
+ * @text 调试模式
+ * @desc 调试模式(显示窗口最终布局，消失前停下的位置)
+ * @type boolean
+ * @on 开
+ * @off 关
+ * @default false
+ * 
+ * @command showMessageNotificationWindow
+ * @text 显示消息通知窗口
+ * @desc 显示消息通知窗口
+ * 
+ * @arg messageNotificationWindowSet
+ * @text 窗口设置
+ * @desc 窗口设置
+ * @type string
+ * @default
+ * 
+ * @arg messageNotificationWindowSkin
+ * @text 窗口皮肤
+ * @desc 窗口皮肤
+ * @parent messageNotificationWindowSet
+ * @type file
+ * @dir img/system/
+ * @default Window
+ * 
+ * @arg messageNotificationWindowFinalOffset
+ * @text 最终偏移
+ * @desc 最终偏移 (消失前停下的位置)
+ * @parent messageNotificationWindowSet
+ * @type struct<Point>
+ * @default {"x":"20","y":"20"}
+ * 
+ * @arg messageNotificationWindowSizeMode
+ * @text 窗口尺寸模式
+ * @desc 窗口尺寸模式 (auto: 自动计算尺寸 | manual: 手动指定尺寸(必须指定窗口手动尺寸的值))
+ * @parent messageNotificationWindowSet
+ * @type select
+ * @option auto
+ * @option manual
+ * @default auto
+ * 
+ * @arg messageNotificationWindowSize
+ * @text 窗口手动尺寸
+ * @desc 窗口手动尺寸
+ * @parent messageNotificationWindowSet
+ * @parent messageNotificationWindowSizeMode
+ * @type struct<Size>
+ * @default {"width":"0","height":"0"}
+ * 
+ * @arg messageNotificationWindowPadding
+ * @text 内边距
+ * @desc 内边距
+ * @parent messageNotificationWindowSet
+ * @type number
+ * @default 12
+ * 
+ * @arg messageNotificationWindowIconTextPadding
+ * @text 图标文本间距离
+ * @desc 图标文本间距离
+ * @parent messageNotificationWindowSet
+ * @type number
+ * @default 0
+ * 
+ * @arg messageNotificationWindowDisplayDirection
+ * @text 显示方向
+ * @desc 显示方向
+ * @parent messageNotificationWindowSet
+ * @type select
+ * @option down
+ * @option up
+ * @option right
+ * @option left
+ * @default down
+ * 
+ * @arg messageNotificationWindowDisplaySoundEffects
+ * @text 显示音效
+ * @desc 显示音效
+ * @parent messageNotificationWindowSet
+ * @type struct<SoundEffects>
+ * @default {"name":"","pan":"0","pitch":"100","volume":"90"}
+ * 
+ * @arg messageNotificationWindowDismissDirection
+ * @text 消失方向
+ * @desc 消失方向
+ * @parent messageNotificationWindowSet
+ * @type select
+ * @option down
+ * @option up
+ * @option right
+ * @option left
+ * @default left
+ * 
+ * @arg messageNotificationWindowDismissDelayTime
+ * @text 消失延迟时间
+ * @desc 消失延迟时间 (单位为秒)
+ * @parent messageNotificationWindowSet
+ * @type number
+ * @default 1
+ * 
+ * @arg messageNotificationWindowDismissNeedPanning
+ * @text 消失时是否需要平移
+ * @desc 消失时是否需要平移
+ * @parent messageNotificationWindowSet
+ * @type boolean
+ * @on 是
+ * @off 否
+ * @default true
+ * 
+ * @arg messageNotificationWindowIconSet
+ * @text 图标设置
+ * @desc 图标设置
+ * @type string
+ * @default
+ * 
+ * @arg messageNotificationWindowIcon
+ * @text 图标路径
+ * @desc 图标路径
+ * @parent messageNotificationWindowIconSet
+ * @type file
+ * @dir img/
+ * @default
+ * 
+ * @arg messageNotificationWindowIconSize
+ * @text 图标尺寸
+ * @desc 图标尺寸
+ * @parent messageNotificationWindowIconSet
+ * @type struct<Size>
+ * @default {"width":"0","height":"0"}
+ * 
+ * @arg messageNotificationWindowTextSet
+ * @text 文本设置
+ * @desc 文本设置
+ * @type string
+ * @default
+ * 
+ * @arg messageNotificationWindowText
+ * @text 文本
+ * @desc 文本
+ * @parent messageNotificationWindowTextSet
+ * @type note
+ * @default
+ * 
+ * @arg messageNotificationWindowTextLineHeight
+ * @text 文本行高
+ * @desc 文本行高
  * @parent messageNotificationWindowTextSet
  * @type number
  * @default 36
@@ -283,19 +513,19 @@ const ASMessageNotificationWindowNameSpace = (() => {
             width: iconWidthNumber || 0,
             height: iconHeightNumber || 0,
         };
-        
+        //console.log("js - textString: ", textString)
         const realText = textString ? textString : "";
-        console.log("realText: ", realText)
+        //console.log("realText: ", realText)
         const textLineHeight = textLineHeightNumber;
 
         const currentScene = SceneManager._scene;
         
         const messageNotificationWindowManualRect = new Rectangle(finalOffset.x, finalOffset.y, windowManualSize.width, windowManualSize.height);
         
-        console.log("messageNotificationWindowManualRect: ", messageNotificationWindowManualRect)
+        //console.log("messageNotificationWindowManualRect: ", messageNotificationWindowManualRect)
         const messageNotificationWindow = new Window_MessageNotification(messageNotificationWindowManualRect, textLineHeight);
         const textSize = messageNotificationWindow.textSizeEx(realText);
-        console.log("textSize: ", textSize)
+        //console.log("textSize: ", textSize)
 
         if (windowSizeMode === "auto") {
             messageNotificationWindow.width = padding * 2 + iconSize.width + iconTextPadding + textSize.width;
@@ -391,17 +621,17 @@ const ASMessageNotificationWindowNameSpace = (() => {
         };
         //console.log("args.messageNotificationWindowText: ", args.messageNotificationWindowText)
         const realText = args.messageNotificationWindowText ? JSON.parse(args.messageNotificationWindowText) : "";
-        console.log("realText: ", realText)
+        //console.log("realText: ", realText)
         const textLineHeight = Number(args.messageNotificationWindowTextLineHeight);
         
         const currentScene = SceneManager._scene;
         
         const messageNotificationWindowManualRect = new Rectangle(finalOffset.x, finalOffset.y, windowManualSize.width, windowManualSize.height);
         
-        console.log("messageNotificationWindowManualRect: ", messageNotificationWindowManualRect)
+        //console.log("messageNotificationWindowManualRect: ", messageNotificationWindowManualRect)
         const messageNotificationWindow = new Window_MessageNotification(messageNotificationWindowManualRect, textLineHeight);
         const textSize = messageNotificationWindow.textSizeEx(realText);
-        console.log("textSize: ", textSize)
+        //console.log("textSize: ", textSize)
 
         if (windowSizeMode === "auto") {
             messageNotificationWindow.width = padding * 2 + iconSize.width + iconTextPadding + textSize.width;
