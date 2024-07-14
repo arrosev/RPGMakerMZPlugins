@@ -45,7 +45,7 @@
  *         command in the editor.
  *      2. When calling a plugin function through a script, you need to fill in the function 
  *         parameters of the correct type in sequence.
- *      3. Example of script usage: ASMessageNotificationWindowNameSpace.showMessageNotificationWindow("Window", 20, 20, "auto", 0, 0, 12, 0, "right", "Miss", 0, 100, 90, "left", 2, true, "system/exclamation", 50, 50, "\\C[0]卧室的钥匙\\IS[26]\\I[324]\\C[20]找到了", 36)
+ *      3. Example of script usage: ASMessageNotificationWindowNameSpace.showMessageNotificationWindow("Window", 20, 20, "auto", 0, 0, 12, 0, "right", "Miss", 0, 100, 90, "left", 2, true, "system/exclamation", 50, 50, "\\C[0]Bedroom key\\IS[26]\\I[324]\\C[20]Got it.", 36)
  *      4. Argument type reference for plugin functions: const showMessageNotificationWindow = function(windowSkinString,
  *         finalOffsetXNumber, finalOffsetYNumber, windowSizeModeString, windowManualWidthNumber, 
  *         windowManualHeightNumber, paddingNumber, iconTextPaddingNumber, displayDirectionString,
@@ -565,7 +565,11 @@ const ASMessageNotificationWindowNameSpace = (() => {
         playSoundEffectsObject(displaySoundEffects);
         currentScene.messageNotificationCharm.slide(messageNotificationWindow, finalOffset.x, finalOffset.y, 20).onComplete = () => {
             currentScene.messageNotificationCharm.wait(dismissDelayTime * 1000).then(() => {
-                currentScene.messageNotificationCharm.fadeOut(messageNotificationWindow, 30);
+                currentScene.messageNotificationCharm.fadeOut(messageNotificationWindow, 30).onComplete = () => {
+                    if (dismissNeedPanning === false) {
+                        currentScene.removeChild(messageNotificationWindow);
+                    }
+                };
                 if (dismissNeedPanning === true) {
                     let dismissX = finalOffset.x;
                     let dismissY = finalOffset.y;
@@ -671,7 +675,11 @@ const ASMessageNotificationWindowNameSpace = (() => {
         playSoundEffectsObject(displaySoundEffects);
         currentScene.messageNotificationCharm.slide(messageNotificationWindow, finalOffset.x, finalOffset.y, 20).onComplete = () => {
             currentScene.messageNotificationCharm.wait(dismissDelayTime * 1000).then(() => {
-                currentScene.messageNotificationCharm.fadeOut(messageNotificationWindow, 30);
+                currentScene.messageNotificationCharm.fadeOut(messageNotificationWindow, 30).onComplete = () => {
+                    if (dismissNeedPanning === false) {
+                        currentScene.removeChild(messageNotificationWindow);
+                    }
+                };
                 if (dismissNeedPanning === true) {
                     let dismissX = finalOffset.x;
                     let dismissY = finalOffset.y;
