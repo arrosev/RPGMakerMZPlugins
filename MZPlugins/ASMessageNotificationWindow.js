@@ -33,7 +33,7 @@
  * 
  * @param messageNotificationWindowDebug
  * @text Debug
- * @desc Debug(Display window final rect)
+ * @desc Debug(Display window final rect, position before disappearance)
  * @type boolean
  * @on ON
  * @off OFF
@@ -43,22 +43,31 @@
  * @text Show Message Notification Window
  * @desc Show Message Notification Window
  * 
+ * @arg messageNotificationWindowSet
+ * @text Window Set
+ * @desc Window Set
+ * @type string
+ * @default
+ * 
  * @arg messageNotificationWindowSkin
  * @text Window Skin
  * @desc WindowSkin
+ * @parent messageNotificationWindowSet
  * @type file
  * @dir img/system/
  * @default Window
  * 
  * @arg messageNotificationWindowFinalOffset
  * @text Final Offset
- * @desc Final Offset
+ * @desc Final Offset (Position before disappearance)
+ * @parent messageNotificationWindowSet
  * @type struct<Point>
  * @default {"x":"20","y":"20"}
  * 
  * @arg messageNotificationWindowSizeMode
  * @text Window Size Mode
  * @desc Window Size Mode
+ * @parent messageNotificationWindowSet
  * @type select
  * @option auto
  * @option manual
@@ -67,6 +76,7 @@
  * @arg messageNotificationWindowSize
  * @text Window Manual Size
  * @desc Window Manual Size
+ * @parent messageNotificationWindowSet
  * @parent messageNotificationWindowSizeMode
  * @type struct<Size>
  * @default {"width":"0","height":"0"}
@@ -74,18 +84,21 @@
  * @arg messageNotificationWindowPadding
  * @text Padding
  * @desc Padding
+ * @parent messageNotificationWindowSet
  * @type number
  * @default 12
  * 
  * @arg messageNotificationWindowIconTextPadding
  * @text Icon Text Padding
  * @desc Icon Text Padding
+ * @parent messageNotificationWindowSet
  * @type number
  * @default 0
  * 
  * @arg messageNotificationWindowDisplayDirection
  * @text Display Direction
  * @desc Display Direction
+ * @parent messageNotificationWindowSet
  * @type select
  * @option down
  * @option up
@@ -93,9 +106,17 @@
  * @option left
  * @default down
  * 
+ * @arg messageNotificationWindowDisplaySoundEffects
+ * @text Display Sound Effects
+ * @desc Display Sound Effects
+ * @parent messageNotificationWindowSet
+ * @type struct<SoundEffects>
+ * @default {"name":"","pan":"0","pitch":"100","volume":"90"}
+ * 
  * @arg messageNotificationWindowDismissDirection
  * @text Dismiss Direction
  * @desc Dismiss Direction
+ * @parent messageNotificationWindowSet
  * @type select
  * @option down
  * @option up
@@ -106,12 +127,29 @@
  * @arg messageNotificationWindowDismissDelayTime
  * @text Dismiss Delay Time
  * @desc Dismiss Delay Time (Units are in seconds)
+ * @parent messageNotificationWindowSet
  * @type number
  * @default 1
+ * 
+ * @arg messageNotificationWindowDismissNeedPanning
+ * @text Dismiss Need Panning
+ * @desc Dismiss Need Panning
+ * @parent messageNotificationWindowSet
+ * @type boolean
+ * @on YES
+ * @off NO
+ * @default true
+ * 
+ * @arg messageNotificationWindowIconSet
+ * @text Icon Set
+ * @desc Icon Set
+ * @type string
+ * @default
  * 
  * @arg messageNotificationWindowIcon
  * @text Icon
  * @desc Icon
+ * @parent messageNotificationWindowIconSet
  * @type file
  * @dir img/
  * @default
@@ -119,18 +157,27 @@
  * @arg messageNotificationWindowIconSize
  * @text Icon Size
  * @desc Icon Size
+ * @parent messageNotificationWindowIconSet
  * @type struct<Size>
  * @default {"width":"0","height":"0"}
+ * 
+ * @arg messageNotificationWindowTextSet
+ * @text Text Set
+ * @desc Text Set
+ * @type string
+ * @default
  * 
  * @arg messageNotificationWindowText
  * @text Text
  * @desc Text
+ * @parent messageNotificationWindowTextSet
  * @type note
  * @default
  * 
  * @arg messageNotificationWindowTextLineHeight
  * @text Text LineHeight
  * @desc Text LineHeight
+ * @parent messageNotificationWindowTextSet
  * @type number
  * @default 36
  * 
@@ -170,6 +217,39 @@
  * 
  */
 
+/*~struct~SoundEffects:
+ * 
+ * @param name
+ * @text Name[名称]
+ * @desc Name[名称]
+ * @type file
+ * @dir audio/se
+ * @default
+ * 
+ * @param pan
+ * @text Pan[声像]
+ * @desc Pan[声像](-100 ~ 100)
+ * @type string
+ * @default 0
+ * 
+ * @param pitch
+ * @text Pitch[音调]
+ * @desc Pitch[音调](50 ~ 150)
+ * @type number
+ * @min 50
+ * @max 150
+ * @default 100
+ * 
+ * @param volume
+ * @text Volume[音量]
+ * @desc Volume[音量](0 ~ 100)
+ * @type number
+ * @min 0
+ * @max 100
+ * @default 90
+ * 
+ */
+
 const ASMessageNotificationWindowNameSpace = (() => {
     "use strict";
 
@@ -177,36 +257,39 @@ const ASMessageNotificationWindowNameSpace = (() => {
     const parameters = PluginManager.parameters(pluginName);
     const messageNotificationWindowDebug = parameters.messageNotificationWindowDebug !== "false";
 
-    PluginManager.registerCommand(pluginName, "showMessageNotificationWindow", args => {
+    // Calling the notification window using a script
+    const showMessageNotificationWindow = function(windowSkinString, finalOffsetXNumber, finalOffsetYNumber, windowSizeModeString, windowManualWidthNumber,
+         windowManualHeightNumber, paddingNumber, iconTextPaddingNumber, displayDirectionString, displaySoundEffectsNameString, displaySoundEffectsPanNumber,
+        displaySoundEffectsPitchNumber, displaySoundEffectsVolumeNumber, dismissDirectionString, dismissDelayTimeNumber, dismissNeedPanningBool, iconPathString, 
+        iconWidthNumber, iconHeightNumber, textString, textLineHeightNumber) {
 
-        const windowSkin = args.messageNotificationWindowSkin;
-        const finalOffsetJsonObject = JSON.parse(args.messageNotificationWindowFinalOffset);
-        const finalOffset = new Point(Number(finalOffsetJsonObject.x) || 0, Number(finalOffsetJsonObject.y) || 0);
-        const windowSizeMode = args.messageNotificationWindowSizeMode;
-        const windowManualSizeJsonObject = JSON.parse(args.messageNotificationWindowSize);
+        const windowSkin = windowSkinString;
+        const finalOffset = new Point(finalOffsetXNumber || 0, finalOffsetYNumber || 0);
+        const windowSizeMode = windowSizeModeString;
         const windowManualSize = {
-            width: Number(windowManualSizeJsonObject.width) || 0,
-            height: Number(windowManualSizeJsonObject.height) || 0,
+            width: windowManualWidthNumber || 0,
+            height: windowManualHeightNumber || 0,
         };
-        const padding = Number(args.messageNotificationWindowPadding);
-        const iconTextPadding = Number(args.messageNotificationWindowIconTextPadding);
-        const displayDirection = args.messageNotificationWindowDisplayDirection;
-        const dismissDirection = args.messageNotificationWindowDismissDirection;
-        const messageNotificationWindowDismissDelayTime = Number(args.messageNotificationWindowDismissDelayTime);
+        const padding = paddingNumber;
+        const iconTextPadding = iconTextPaddingNumber;
+        const displayDirection = displayDirectionString;
+        const displaySoundEffects = `{\"name\":\"${displaySoundEffectsNameString}\",\"pan\":\"${displaySoundEffectsPanNumber}\",\"pitch\":\"${displaySoundEffectsPitchNumber}\",\"volume\":\"${displaySoundEffectsVolumeNumber}\"}`;
+        const dismissDirection = dismissDirectionString;
+        const dismissDelayTime = dismissDelayTimeNumber;
+        const dismissNeedPanning = dismissNeedPanningBool;
 
-        const iconPath = args.messageNotificationWindowIcon;
-        const iconSizeJsonObject = JSON.parse(args.messageNotificationWindowIconSize);
+        const iconPath = iconPathString;
         const iconSize = {
-            width: Number(iconSizeJsonObject.width) || 0,
-            height: Number(iconSizeJsonObject.height) || 0,
+            width: iconWidthNumber || 0,
+            height: iconHeightNumber || 0,
         };
-
-        const realText = args.messageNotificationWindowText ? JSON.parse(args.messageNotificationWindowText) : "";
-        console.log("realText: ", realText)
-        const textLineHeight = Number(args.messageNotificationWindowTextLineHeight);
         
+        const realText = textString ? textString : "";
+        console.log("realText: ", realText)
+        const textLineHeight = textLineHeightNumber;
+
         const currentScene = SceneManager._scene;
-        //设置一个auto参数，自动计算通知窗口宽高或者手动指定
+        
         const messageNotificationWindowManualRect = new Rectangle(finalOffset.x, finalOffset.y, windowManualSize.width, windowManualSize.height);
         
         console.log("messageNotificationWindowManualRect: ", messageNotificationWindowManualRect)
@@ -225,15 +308,8 @@ const ASMessageNotificationWindowNameSpace = (() => {
         
         messageNotificationWindow.contents.resize(messageNotificationWindow.contentsWidth(), messageNotificationWindow.contentsHeight());
         messageNotificationWindow.contentsBack.resize(messageNotificationWindow.contentsWidth(), messageNotificationWindow.contentsHeight());
-        // console.log("messageNotificationWindow.contents: ", messageNotificationWindow.contents)
-        // console.log("messageNotificationWindow.contentsBack: ", messageNotificationWindow.contentsBack)
         
-        // console.log("messageNotificationWindow_clientArea: ", messageNotificationWindow._clientArea)
-        // console.log("messageNotificationWindow_contentsBackSprite: ", messageNotificationWindow._contentsBackSprite)
-        // //设置完padding重新设置_contentsSprite size
-        // console.log("messageNotificationWindow_contentsSprite: ", messageNotificationWindow._contentsSprite)
-
-        // messageNotificationWindow.y = displayDirection === "down" ? - messageNotificationWindow.height : Graphics.height;
+        messageNotificationWindow.setDebug(messageNotificationWindowDebug, new Rectangle(messageNotificationWindow.x, messageNotificationWindow.y, messageNotificationWindow.width, messageNotificationWindow.height));
 
         switch (displayDirection) {
             case "down":
@@ -253,38 +329,142 @@ const ASMessageNotificationWindowNameSpace = (() => {
         }
 
         messageNotificationWindow.setUpUI(iconSize, iconPath, iconTextPadding, realText, textSize);
-        messageNotificationWindow.setDebug(messageNotificationWindowDebug, new Rectangle(messageNotificationWindow.x, messageNotificationWindow.y, messageNotificationWindow.width, messageNotificationWindow.height));
 
         currentScene.addChild(messageNotificationWindow);
 
+        playSoundEffectsObject(displaySoundEffects);
         currentScene.messageNotificationCharm.slide(messageNotificationWindow, finalOffset.x, finalOffset.y, 20).onComplete = () => {
-            currentScene.messageNotificationCharm.wait(messageNotificationWindowDismissDelayTime * 1000).then(() => {
+            currentScene.messageNotificationCharm.wait(dismissDelayTime * 1000).then(() => {
                 currentScene.messageNotificationCharm.fadeOut(messageNotificationWindow, 30);
-                let dismissX = finalOffset.x;
-                let dismissY = finalOffset.y;
-                switch (dismissDirection) {
-                    case "down":
-                        dismissY = finalOffset.y + messageNotificationWindow.height;
-                        break;
-                    case "up":
-                        dismissY = finalOffset.y - messageNotificationWindow.height;
-                        break;
-                    case "right":
-                        dismissX = finalOffset.x + messageNotificationWindow.width;
-                        break;
-                    case "left":
-                        dismissX = finalOffset.x - messageNotificationWindow.width;
-                        break;
-                    default:
-                        break;
+                if (dismissNeedPanning === true) {
+                    let dismissX = finalOffset.x;
+                    let dismissY = finalOffset.y;
+                    switch (dismissDirection) {
+                        case "down":
+                            dismissY = finalOffset.y + messageNotificationWindow.height;
+                            break;
+                        case "up":
+                            dismissY = finalOffset.y - messageNotificationWindow.height;
+                            break;
+                        case "right":
+                            dismissX = finalOffset.x + messageNotificationWindow.width;
+                            break;
+                        case "left":
+                            dismissX = finalOffset.x - messageNotificationWindow.width;
+                            break;
+                        default:
+                            break;
+                    }
+                    currentScene.messageNotificationCharm.slide(messageNotificationWindow, dismissX, dismissY, 40).onComplete = () => {
+                        currentScene.removeChild(messageNotificationWindow);
+                    }
                 }
-                currentScene.messageNotificationCharm.slide(messageNotificationWindow, dismissX, dismissY, 40).onComplete = () => {
-                    currentScene.removeChild(messageNotificationWindow);
+            });
+        };
+
+    }
+
+    PluginManager.registerCommand(pluginName, "showMessageNotificationWindow", args => {
+
+        const windowSkin = args.messageNotificationWindowSkin;
+        const finalOffsetJsonObject = JSON.parse(args.messageNotificationWindowFinalOffset);
+        const finalOffset = new Point(Number(finalOffsetJsonObject.x) || 0, Number(finalOffsetJsonObject.y) || 0);
+        const windowSizeMode = args.messageNotificationWindowSizeMode;
+        const windowManualSizeJsonObject = JSON.parse(args.messageNotificationWindowSize);
+        const windowManualSize = {
+            width: Number(windowManualSizeJsonObject.width) || 0,
+            height: Number(windowManualSizeJsonObject.height) || 0,
+        };
+        const padding = Number(args.messageNotificationWindowPadding);
+        const iconTextPadding = Number(args.messageNotificationWindowIconTextPadding);
+        const displayDirection = args.messageNotificationWindowDisplayDirection;
+        const displaySoundEffects = args.messageNotificationWindowDisplaySoundEffects;
+        const dismissDirection = args.messageNotificationWindowDismissDirection;
+        const dismissDelayTime = Number(args.messageNotificationWindowDismissDelayTime);
+        const dismissNeedPanning = args.messageNotificationWindowDismissNeedPanning !== "false";
+
+        const iconPath = args.messageNotificationWindowIcon;
+        const iconSizeJsonObject = JSON.parse(args.messageNotificationWindowIconSize);
+        const iconSize = {
+            width: Number(iconSizeJsonObject.width) || 0,
+            height: Number(iconSizeJsonObject.height) || 0,
+        };
+        //console.log("args.messageNotificationWindowText: ", args.messageNotificationWindowText)
+        const realText = args.messageNotificationWindowText ? JSON.parse(args.messageNotificationWindowText) : "";
+        console.log("realText: ", realText)
+        const textLineHeight = Number(args.messageNotificationWindowTextLineHeight);
+        
+        const currentScene = SceneManager._scene;
+        
+        const messageNotificationWindowManualRect = new Rectangle(finalOffset.x, finalOffset.y, windowManualSize.width, windowManualSize.height);
+        
+        console.log("messageNotificationWindowManualRect: ", messageNotificationWindowManualRect)
+        const messageNotificationWindow = new Window_MessageNotification(messageNotificationWindowManualRect, textLineHeight);
+        const textSize = messageNotificationWindow.textSizeEx(realText);
+        console.log("textSize: ", textSize)
+
+        if (windowSizeMode === "auto") {
+            messageNotificationWindow.width = padding * 2 + iconSize.width + iconTextPadding + textSize.width;
+            const maxHeight = Math.max(iconSize.height, textSize.height);
+            messageNotificationWindow.height = padding * 2 + maxHeight;
+        }
+
+        messageNotificationWindow.windowskin = ImageManager.loadSystem(windowSkin);
+        messageNotificationWindow._padding = padding;
+        
+        messageNotificationWindow.contents.resize(messageNotificationWindow.contentsWidth(), messageNotificationWindow.contentsHeight());
+        messageNotificationWindow.contentsBack.resize(messageNotificationWindow.contentsWidth(), messageNotificationWindow.contentsHeight());
+        
+        messageNotificationWindow.setDebug(messageNotificationWindowDebug, new Rectangle(messageNotificationWindow.x, messageNotificationWindow.y, messageNotificationWindow.width, messageNotificationWindow.height));
+
+        switch (displayDirection) {
+            case "down":
+                messageNotificationWindow.y = - messageNotificationWindow.height;
+                break;
+            case "up":
+                messageNotificationWindow.y = Graphics.height;
+                break;
+            case "right":
+                messageNotificationWindow.x = - messageNotificationWindow.width;
+                break;
+            case "left":
+                messageNotificationWindow.x = Graphics.width;
+                break;
+            default:
+                break;
+        }
+
+        messageNotificationWindow.setUpUI(iconSize, iconPath, iconTextPadding, realText, textSize);
+
+        currentScene.addChild(messageNotificationWindow);
+
+        playSoundEffectsObject(displaySoundEffects);
+        currentScene.messageNotificationCharm.slide(messageNotificationWindow, finalOffset.x, finalOffset.y, 20).onComplete = () => {
+            currentScene.messageNotificationCharm.wait(dismissDelayTime * 1000).then(() => {
+                currentScene.messageNotificationCharm.fadeOut(messageNotificationWindow, 30);
+                if (dismissNeedPanning === true) {
+                    let dismissX = finalOffset.x;
+                    let dismissY = finalOffset.y;
+                    switch (dismissDirection) {
+                        case "down":
+                            dismissY = finalOffset.y + messageNotificationWindow.height;
+                            break;
+                        case "up":
+                            dismissY = finalOffset.y - messageNotificationWindow.height;
+                            break;
+                        case "right":
+                            dismissX = finalOffset.x + messageNotificationWindow.width;
+                            break;
+                        case "left":
+                            dismissX = finalOffset.x - messageNotificationWindow.width;
+                            break;
+                        default:
+                            break;
+                    }
+                    currentScene.messageNotificationCharm.slide(messageNotificationWindow, dismissX, dismissY, 40).onComplete = () => {
+                        currentScene.removeChild(messageNotificationWindow);
+                    }
                 }
-                // const dismissX = dismissDirection === "left" ? - messageNotificationWindow.width : Graphics.width;
-                // currentScene.messageNotificationCharm.slide(messageNotificationWindow, dismissX, finalOffset.y, 40).onComplete = () => {
-                //     currentScene.removeChild(messageNotificationWindow);
-                // }
             });
         };
 
@@ -1145,6 +1325,15 @@ const ASMessageNotificationWindowNameSpace = (() => {
 
     // Private Functions and System Class Extensions
 
+    const playSoundEffectsObject = function (soundEffects) {
+        if (soundEffects) {
+            const soundEffectsObject = JSON.parse(soundEffects);
+            if (soundEffectsObject.name.length !== 0) {
+                AudioManager.playStaticSe(soundEffectsObject);
+            }
+        }
+    }
+
     class Window_MessageNotification extends Window_Base {
 
         initialize(rect, textLineHeight) {
@@ -1172,6 +1361,7 @@ const ASMessageNotificationWindowNameSpace = (() => {
                 this.contents.fontSize = 12;
                 this.contents.textColor = "red";
                 this.drawText(rectString, 0, this.contents.height / 2 + 2, this.contents.width, "center");
+                this.resetFontSettings();
             }
         }
 
@@ -1237,5 +1427,9 @@ const ASMessageNotificationWindowNameSpace = (() => {
         _Scene_Base_Update.apply(this, arguments);
         this.messageNotificationCharm.update();
     };
+
+    return {
+        showMessageNotificationWindow
+    }
 
 })();
