@@ -31,6 +31,14 @@
  * 
  * This plugin is mainly used to make message notification window.
  * 
+ * @param messageNotificationWindowDebug
+ * @text Debug
+ * @desc Debug(Display window final rect)
+ * @type boolean
+ * @on ON
+ * @off OFF
+ * @default false
+ * 
  * @command showMessageNotificationWindow
  * @text Show Message Notification Window
  * @desc Show Message Notification Window
@@ -73,7 +81,7 @@
  * @text Icon Text Padding
  * @desc Icon Text Padding
  * @type number
- * @default 20
+ * @default 0
  * 
  * @arg messageNotificationWindowDisplayDirection
  * @text Display Direction
@@ -81,15 +89,25 @@
  * @type select
  * @option down
  * @option up
+ * @option right
+ * @option left
  * @default down
  * 
  * @arg messageNotificationWindowDismissDirection
  * @text Dismiss Direction
  * @desc Dismiss Direction
  * @type select
- * @option left
+ * @option down
+ * @option up
  * @option right
+ * @option left
  * @default left
+ * 
+ * @arg messageNotificationWindowDismissDelayTime
+ * @text Dismiss Delay Time
+ * @desc Dismiss Delay Time (Units are in seconds)
+ * @type number
+ * @default 1
  * 
  * @arg messageNotificationWindowIcon
  * @text Icon
@@ -156,7 +174,8 @@ const ASMessageNotificationWindowNameSpace = (() => {
     "use strict";
 
     const pluginName = "ASMessageNotificationWindow";
-    //const parameters = PluginManager.parameters(pluginName);
+    const parameters = PluginManager.parameters(pluginName);
+    const messageNotificationWindowDebug = parameters.messageNotificationWindowDebug !== "false";
 
     PluginManager.registerCommand(pluginName, "showMessageNotificationWindow", args => {
 
@@ -173,6 +192,7 @@ const ASMessageNotificationWindowNameSpace = (() => {
         const iconTextPadding = Number(args.messageNotificationWindowIconTextPadding);
         const displayDirection = args.messageNotificationWindowDisplayDirection;
         const dismissDirection = args.messageNotificationWindowDismissDirection;
+        const messageNotificationWindowDismissDelayTime = Number(args.messageNotificationWindowDismissDelayTime);
 
         const iconPath = args.messageNotificationWindowIcon;
         const iconSizeJsonObject = JSON.parse(args.messageNotificationWindowIconSize);
@@ -213,19 +233,58 @@ const ASMessageNotificationWindowNameSpace = (() => {
         // //设置完padding重新设置_contentsSprite size
         // console.log("messageNotificationWindow_contentsSprite: ", messageNotificationWindow._contentsSprite)
 
-        messageNotificationWindow.y = displayDirection === "down" ? - messageNotificationWindow.height : Graphics.height;
+        // messageNotificationWindow.y = displayDirection === "down" ? - messageNotificationWindow.height : Graphics.height;
+
+        switch (displayDirection) {
+            case "down":
+                messageNotificationWindow.y = - messageNotificationWindow.height;
+                break;
+            case "up":
+                messageNotificationWindow.y = Graphics.height;
+                break;
+            case "right":
+                messageNotificationWindow.x = - messageNotificationWindow.width;
+                break;
+            case "left":
+                messageNotificationWindow.x = Graphics.width;
+                break;
+            default:
+                break;
+        }
 
         messageNotificationWindow.setUpUI(iconSize, iconPath, iconTextPadding, realText, textSize);
+        messageNotificationWindow.setDebug(messageNotificationWindowDebug, new Rectangle(messageNotificationWindow.x, messageNotificationWindow.y, messageNotificationWindow.width, messageNotificationWindow.height));
 
         currentScene.addChild(messageNotificationWindow);
 
         currentScene.messageNotificationCharm.slide(messageNotificationWindow, finalOffset.x, finalOffset.y, 20).onComplete = () => {
-            currentScene.messageNotificationCharm.wait(1000).then(() => {
+            currentScene.messageNotificationCharm.wait(messageNotificationWindowDismissDelayTime * 1000).then(() => {
                 currentScene.messageNotificationCharm.fadeOut(messageNotificationWindow, 30);
-                const dismissX = dismissDirection === "left" ? - messageNotificationWindow.width : Graphics.width;
-                currentScene.messageNotificationCharm.slide(messageNotificationWindow, dismissX, finalOffset.y, 40).onComplete = () => {
+                let dismissX = finalOffset.x;
+                let dismissY = finalOffset.y;
+                switch (dismissDirection) {
+                    case "down":
+                        dismissY = finalOffset.y + messageNotificationWindow.height;
+                        break;
+                    case "up":
+                        dismissY = finalOffset.y - messageNotificationWindow.height;
+                        break;
+                    case "right":
+                        dismissX = finalOffset.x + messageNotificationWindow.width;
+                        break;
+                    case "left":
+                        dismissX = finalOffset.x - messageNotificationWindow.width;
+                        break;
+                    default:
+                        break;
+                }
+                currentScene.messageNotificationCharm.slide(messageNotificationWindow, dismissX, dismissY, 40).onComplete = () => {
                     currentScene.removeChild(messageNotificationWindow);
                 }
+                // const dismissX = dismissDirection === "left" ? - messageNotificationWindow.width : Graphics.width;
+                // currentScene.messageNotificationCharm.slide(messageNotificationWindow, dismissX, finalOffset.y, 40).onComplete = () => {
+                //     currentScene.removeChild(messageNotificationWindow);
+                // }
             });
         };
 
@@ -1104,6 +1163,15 @@ const ASMessageNotificationWindowNameSpace = (() => {
             if (realText && textSize) {
                 //this.contents.fillRect(iconSize.width + iconTextPadding, (this.contents.height - textSize.height) / 2, textSize.width, textSize.height, `rgba(255, 255, 255, 1)`);
                 this.drawTextEx(realText, iconSize.width + iconTextPadding, (this.contents.height - textSize.height) / 2, textSize.width);
+            }
+        }
+
+        setDebug(open, rect) {
+            if (open === true) {
+                const rectString = `(${rect.x}, ${rect.y}, ${rect.width}, ${rect.height})`
+                this.contents.fontSize = 12;
+                this.contents.textColor = "red";
+                this.drawText(rectString, 0, this.contents.height / 2 + 2, this.contents.width, "center");
             }
         }
 
