@@ -1,6 +1,6 @@
 /*:
  * @target MZ
- * @plugindesc [V1.0.0] Message Notification Window Plugin
+ * @plugindesc [V1.0.1] Message Notification Window Plugin
  * @author Arrose
  * 
  * @url https://github.com/arrosev/RPGMakerMZPlugins
@@ -39,6 +39,9 @@
  *         the same as the editor's own Show Text command.
  *      4. A new "\IS[x]" signs has been added to the text of the window to resize the inline 
  *         icons in the text.
+ * 
+ * [V1.0.1]
+ *      1. Fix the error after switching scenes when the notification window appears.
  * 
  * Note:
  *      1. To modify the text style by text signs, please refer to the signs of the "Show Text" 
@@ -210,7 +213,7 @@
 
 /*:zh
  * @target MZ
- * @plugindesc [V1.0.0] 消息通知窗口插件
+ * @plugindesc [V1.0.1] 消息通知窗口插件
  * @author Arrose
  * 
  * @url https://github.com/arrosev/RPGMakerMZPlugins
@@ -241,12 +244,15 @@
  * 
  * 这个插件主要用于制作消息通知窗口
  * 
- * [V1.0.0]
+ * [V1.0.1]
  * 功能:
  *      1. 通过插件指令或脚本在任意场景中显示一个消息通知窗口
  *      2. 通过插件指令参数或脚本参数来修改窗口显示的方式
  *      3. 窗口的文本可以通过添加 “\C[x]” “\I[x]” 等标识来改变样式，同编辑器自带的显示文字指令
  *      4. 窗口的文本新增了一个 “\IS[x]” 标识用来调整文本内嵌图标的大小
+ * 
+ * [V1.0.1]
+ *      1. 修复通知窗口出现时，切换场景后报错
  * 
  * 注意:
  *      1. 通过文本标识修改文本样式时，请自行参考编辑器 “显示文字” 指令的标识
@@ -563,38 +569,45 @@ const ASMessageNotificationWindowNameSpace = (() => {
         currentScene.addChild(messageNotificationWindow);
 
         playSoundEffectsObject(displaySoundEffects);
-        currentScene.messageNotificationCharm.slide(messageNotificationWindow, finalOffset.x, finalOffset.y, 20).onComplete = () => {
-            currentScene.messageNotificationCharm.wait(dismissDelayTime * 1000).then(() => {
-                currentScene.messageNotificationCharm.fadeOut(messageNotificationWindow, 30).onComplete = () => {
-                    if (dismissNeedPanning === false) {
-                        currentScene.removeChild(messageNotificationWindow);
+
+        if(!messageNotificationWindow._destroyed) {
+            currentScene.messageNotificationCharm.slide(messageNotificationWindow, finalOffset.x, finalOffset.y, 20).onComplete = () => {
+                currentScene.messageNotificationCharm.wait(dismissDelayTime * 1000).then(() => {
+                    if(!messageNotificationWindow._destroyed) {
+                        currentScene.messageNotificationCharm.fadeOut(messageNotificationWindow, 30).onComplete = () => {
+                            if (dismissNeedPanning === false) {
+                                currentScene.removeChild(messageNotificationWindow);
+                            }
+                        };
+                    } 
+                    if (dismissNeedPanning === true) {
+                        let dismissX = finalOffset.x;
+                        let dismissY = finalOffset.y;
+                        switch (dismissDirection) {
+                            case "down":
+                                dismissY = finalOffset.y + messageNotificationWindow.height;
+                                break;
+                            case "up":
+                                dismissY = finalOffset.y - messageNotificationWindow.height;
+                                break;
+                            case "right":
+                                dismissX = finalOffset.x + messageNotificationWindow.width;
+                                break;
+                            case "left":
+                                dismissX = finalOffset.x - messageNotificationWindow.width;
+                                break;
+                            default:
+                                break;
+                        }
+                        if (!messageNotificationWindow._destroyed) {
+                            currentScene.messageNotificationCharm.slide(messageNotificationWindow, dismissX, dismissY, 40).onComplete = () => {
+                                currentScene.removeChild(messageNotificationWindow);
+                            };
+                        }
                     }
-                };
-                if (dismissNeedPanning === true) {
-                    let dismissX = finalOffset.x;
-                    let dismissY = finalOffset.y;
-                    switch (dismissDirection) {
-                        case "down":
-                            dismissY = finalOffset.y + messageNotificationWindow.height;
-                            break;
-                        case "up":
-                            dismissY = finalOffset.y - messageNotificationWindow.height;
-                            break;
-                        case "right":
-                            dismissX = finalOffset.x + messageNotificationWindow.width;
-                            break;
-                        case "left":
-                            dismissX = finalOffset.x - messageNotificationWindow.width;
-                            break;
-                        default:
-                            break;
-                    }
-                    currentScene.messageNotificationCharm.slide(messageNotificationWindow, dismissX, dismissY, 40).onComplete = () => {
-                        currentScene.removeChild(messageNotificationWindow);
-                    }
-                }
-            });
-        };
+                });
+            };
+        }
 
     }
 
@@ -673,38 +686,45 @@ const ASMessageNotificationWindowNameSpace = (() => {
         currentScene.addChild(messageNotificationWindow);
 
         playSoundEffectsObject(displaySoundEffects);
-        currentScene.messageNotificationCharm.slide(messageNotificationWindow, finalOffset.x, finalOffset.y, 20).onComplete = () => {
-            currentScene.messageNotificationCharm.wait(dismissDelayTime * 1000).then(() => {
-                currentScene.messageNotificationCharm.fadeOut(messageNotificationWindow, 30).onComplete = () => {
-                    if (dismissNeedPanning === false) {
-                        currentScene.removeChild(messageNotificationWindow);
+
+        if(!messageNotificationWindow._destroyed) {
+            currentScene.messageNotificationCharm.slide(messageNotificationWindow, finalOffset.x, finalOffset.y, 20).onComplete = () => {
+                currentScene.messageNotificationCharm.wait(dismissDelayTime * 1000).then(() => {
+                    if(!messageNotificationWindow._destroyed) {
+                        currentScene.messageNotificationCharm.fadeOut(messageNotificationWindow, 30).onComplete = () => {
+                            if (dismissNeedPanning === false) {
+                                currentScene.removeChild(messageNotificationWindow);
+                            }
+                        };
+                    } 
+                    if (dismissNeedPanning === true) {
+                        let dismissX = finalOffset.x;
+                        let dismissY = finalOffset.y;
+                        switch (dismissDirection) {
+                            case "down":
+                                dismissY = finalOffset.y + messageNotificationWindow.height;
+                                break;
+                            case "up":
+                                dismissY = finalOffset.y - messageNotificationWindow.height;
+                                break;
+                            case "right":
+                                dismissX = finalOffset.x + messageNotificationWindow.width;
+                                break;
+                            case "left":
+                                dismissX = finalOffset.x - messageNotificationWindow.width;
+                                break;
+                            default:
+                                break;
+                        }
+                        if (!messageNotificationWindow._destroyed) {
+                            currentScene.messageNotificationCharm.slide(messageNotificationWindow, dismissX, dismissY, 40).onComplete = () => {
+                                currentScene.removeChild(messageNotificationWindow);
+                            };
+                        }
                     }
-                };
-                if (dismissNeedPanning === true) {
-                    let dismissX = finalOffset.x;
-                    let dismissY = finalOffset.y;
-                    switch (dismissDirection) {
-                        case "down":
-                            dismissY = finalOffset.y + messageNotificationWindow.height;
-                            break;
-                        case "up":
-                            dismissY = finalOffset.y - messageNotificationWindow.height;
-                            break;
-                        case "right":
-                            dismissX = finalOffset.x + messageNotificationWindow.width;
-                            break;
-                        case "left":
-                            dismissX = finalOffset.x - messageNotificationWindow.width;
-                            break;
-                        default:
-                            break;
-                    }
-                    currentScene.messageNotificationCharm.slide(messageNotificationWindow, dismissX, dismissY, 40).onComplete = () => {
-                        currentScene.removeChild(messageNotificationWindow);
-                    }
-                }
-            });
-        };
+                });
+            };
+        }
 
     });
 
@@ -1579,6 +1599,10 @@ const ASMessageNotificationWindowNameSpace = (() => {
             this.textLineHeight = textLineHeight;
             this.inlineIconWidth = ImageManager.iconWidth;
         }
+
+        // destroy(options) {
+        //     console.log("Window_MessageNotification ------ destroy")
+        // }
 
         setUpUI(iconSize, iconPath, iconTextPadding, realText, textSize) {
             if (iconPath && iconSize) {
