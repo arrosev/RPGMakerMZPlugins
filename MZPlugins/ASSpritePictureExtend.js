@@ -1,7 +1,7 @@
 /*:
  * @target MZ
  * @plugindesc [V1.0.0] 显示图片功能扩展插件
- * @author Author
+ * @author Arrose
  * 
  * @url https://github.com/arrosev/RPGMakerMZPlugins
  * 
