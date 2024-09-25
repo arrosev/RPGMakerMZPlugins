@@ -77,7 +77,8 @@ const ASSimulatedPostingSceneNameSpace = (() => {
             this._postingCode = "ASGIGJML";
             this._defaultPostingCode = "";
             this._index = 0;
-            this._leftPadding = (rect.width - maxLength * this.charWidth()) / 2;
+            this._leftPadding = (rect.width - maxLength * this.charWidth()) / 2 - this._padding;
+            this.drawTips();
             this.deactivate();
         }
 
@@ -114,7 +115,8 @@ const ASSimulatedPostingSceneNameSpace = (() => {
         }
 
         charWidth() {
-            return this.textWidth("M");
+            // return this.textWidth("A");
+            return 50;
         }
 
         itemRect(index) {
@@ -141,6 +143,12 @@ const ASSimulatedPostingSceneNameSpace = (() => {
             return ColorManager.normalColor();
         }
 
+        drawTips() {
+            this.contentsBack.fontSize = 20;
+            //this.contentsBack.textColor = this.bitmapLabelTextColor;
+            this.contentsBack.drawText("请输入配信码：", 20, 8, this.width, this.lineHeight(), "left");
+        }
+
         drawUnderline(index) {
             const rect = this.underlineRect(index);
             const color = this.underlineColor();
@@ -152,7 +160,8 @@ const ASSimulatedPostingSceneNameSpace = (() => {
         drawChar(index) {
             const rect = this.itemRect(index);
             this.resetTextColor();
-            this.drawText(this._postingCode[index] || "", rect.x, rect.y);
+            this.drawText(this._postingCode[index] || "", rect.x + (this.charWidth() - this.textWidth("A")) / 2, rect.y);
+            //this.drawText(this._postingCode[index] || "", rect.x + this.charWidth() / 4, rect.y, this.charWidth(), this.lineHeight(), "center");
         }
 
         refresh() {
