@@ -51,7 +51,20 @@ const ASSimulatedPostingSceneNameSpace = (() => {
 
         create() {
             Scene_MenuBase.prototype.create.call(this);
-            
+            this.createPostingCodeWindow();
+        }
+
+        createPostingCodeWindow() {
+            const inputWindowHeight = this.calcWindowHeight(9, true);
+            const padding = $gameSystem.windowPadding();
+            const ww = 600;
+            const wh = 144 + padding * 2;
+            const wx = (Graphics.boxWidth - ww) / 2;
+            const wy = (Graphics.boxHeight - (wh + inputWindowHeight + 8)) / 2;
+            const rect = new Rectangle(wx, wy, ww, wh);;
+            this._postingCodeWindow = new Window_PostingCode(rect, 8);
+            this.addWindow(this._postingCodeWindow);
+            this._postingCodeWindow.refresh();
         }
 
     }
@@ -61,9 +74,10 @@ const ASSimulatedPostingSceneNameSpace = (() => {
         initialize(rect, maxLength) {
             Window_Base.prototype.initialize.call(this, rect);
             this._maxLength = maxLength;
-            this._postingCode = "";
+            this._postingCode = "ASGIGJML";
             this._defaultPostingCode = "";
             this._index = 0;
+            this._leftPadding = (rect.width - maxLength * this.charWidth()) / 2;
             this.deactivate();
         }
 
@@ -100,12 +114,63 @@ const ASSimulatedPostingSceneNameSpace = (() => {
         }
 
         charWidth() {
-            return this.textWidth("A");
+            return this.textWidth("M");
         }
 
-        
+        itemRect(index) {
+            console.log("index: ", index);
+            //const x = (this.width - index * this.charWidth()) / 2;
+            const x = this._leftPadding + index * this.charWidth();
+            const y = 54;
+            const width = this.charWidth();
+            const height = this.lineHeight();
+            console.log("Rect: ", x, y, width, height);
+            return new Rectangle(x, y, width, height);
+        }
+
+        underlineRect(index) {
+            const rect = this.itemRect(index);
+            rect.x++;
+            rect.y += rect.height - 4;
+            rect.width -= 2;
+            rect.height = 2;
+            return rect;
+        }
+
+        underlineColor() {
+            return ColorManager.normalColor();
+        }
+
+        drawUnderline(index) {
+            const rect = this.underlineRect(index);
+            const color = this.underlineColor();
+            this.contents.paintOpacity = 48;
+            this.contents.fillRect(rect.x, rect.y, rect.width, rect.height, color);
+            this.contents.paintOpacity = 255;
+        }
+
+        drawChar(index) {
+            const rect = this.itemRect(index);
+            this.resetTextColor();
+            this.drawText(this._postingCode[index] || "", rect.x, rect.y);
+        }
+
+        refresh() {
+            this.contents.clear();
+            for (let i = 0; i < this._maxLength; i++) {
+                this.drawUnderline(i);
+            }
+            for (let j = 0; j < this._postingCode.length; j++) {
+                this.drawChar(j);
+            }
+            const rect = this.itemRect(this._index);
+            this.setCursorRect(rect.x, rect.y, rect.width, rect.height);
+        }
 
     }
-    
+
+    return {
+        Scene_SimulatedPosting
+    }    
 
 })();
