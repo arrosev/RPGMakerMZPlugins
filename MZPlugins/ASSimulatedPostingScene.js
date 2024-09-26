@@ -16,26 +16,26 @@ const ASSimulatedPostingSceneNameSpace = (() => {
     const pluginName = "ASSimulatedPostingScene";
     const parameters = PluginManager.parameters(pluginName);
 
-    const fetchJson = async function () {
-    	let response = await fetch('https://raw.githubusercontent.com/arrosev/RMMZPluginTestFile/refs/heads/main/SimulatedPostingPluginTest.json');
-    	if (response.status >= 200 && response.status < 300) {
-    		return await response.json();
-    	} else {
-    		throw new Error(response.statusText);
-    	}
-    }
+    // const fetchJson = async function () {
+    // 	let response = await fetch('https://raw.githubusercontent.com/arrosev/RMMZPluginTestFile/refs/heads/main/SimulatedPostingPluginTest.json');
+    // 	if (response.status >= 200 && response.status < 300) {
+    // 		return await response.json();
+    // 	} else {
+    // 		throw new Error(response.statusText);
+    // 	}
+    // }
 
-    // const fetchAPI = async () => {
+    // const fetchGifts = async () => {
     //     try {
-    //       const response = await fetch(url)
-    //       if (response.status === 200) {
-    //         const data = await response.json()
-    //         console.log(data)
-    //       } else {
-    //         console.log('请求异常')
-    //       }
+    //         const response = await fetch('https://raw.githubusercontent.com/arrosev/RMMZPluginTestFile/refs/heads/main/SimulatedPostingPluginTest.json');
+    //         if (response.ok === true) {
+    //             const data = await response.json();
+    //             console.log(data);
+    //         } else {
+    //             console.log('请求异常');
+    //         }
     //     } catch (err) {
-    //         console.log(err)
+    //         console.log(err);
     //     }
     // }
 
@@ -80,8 +80,23 @@ const ASSimulatedPostingSceneNameSpace = (() => {
             this.addWindow(this._inputWindow);
         }
 
+        async fetchGifts() {
+            try {
+                const response = await fetch('https://raw.githubusercontent.com/arrosev/RMMZPluginTestFile/refs/heads/main/SimulatedPostingPluginTest.json');
+                if (response.ok === true) {
+                    const data = await response.json();
+                    console.log(data);
+                } else {
+                    console.log('请求异常');
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
         onInputOk() {
             console.log("PostingCode: ", this._postingCodeWindow.postingCode());
+            this.fetchGifts();
         }
 
     }
