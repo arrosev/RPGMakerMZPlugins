@@ -210,7 +210,7 @@ const ASSimulatedPostingSceneNameSpace = (() => {
                           "Z","[","]","^","_",  "z","{","}","|","~",
                           "0","1","2","3","4",  "!","#","$","%","&",
                           "5","6","7","8","9",  "(",")","*","+","-",
-                          "/","=","@","<",">",  ":",";"," ","Page","OK"];
+                          "/","=","@","<",">",  ":",";"," ","Del","OK"];
         }
 
         setEditWindow(editWindow) {
@@ -244,7 +244,7 @@ const ASSimulatedPostingSceneNameSpace = (() => {
             return this._index < 88 ? this.table()[this._page][this._index] : "";
         }
 
-        isPageChange() {
+        isDeleteCode() {
             return this._index === 88;
         }
 
@@ -311,23 +311,23 @@ const ASSimulatedPostingSceneNameSpace = (() => {
             }
         }
 
-        cursorPagedown() {
-            this._page = (this._page + 1) % this.table().length;
-            this.refresh();
-        }
+        // cursorPagedown() {
+        //     this._page = (this._page + 1) % this.table().length;
+        //     this.refresh();
+        // }
 
-        cursorPageup() {
-            this._page = (this._page + this.table().length - 1) % this.table().length;
-            this.refresh();
-        }
+        // cursorPageup() {
+        //     this._page = (this._page + this.table().length - 1) % this.table().length;
+        //     this.refresh();
+        // }
 
         processCursorMove() {
-            const lastPage = this._page;
+            //const lastPage = this._page;
             Window_Selectable.prototype.processCursorMove.call(this);
             this.updateCursor();
-            if (this._page !== lastPage) {
-                this.playCursorSound();
-            }
+            // if (this._page !== lastPage) {
+            //     this.playCursorSound();
+            // }
         }
 
         processHandling() {
@@ -335,9 +335,12 @@ const ASSimulatedPostingSceneNameSpace = (() => {
                 if (Input.isTriggered("shift")) {
                     this.processJump();
                 }
-                if (Input.isRepeated("cancel")) {
-                    this.processBack();
-                }
+                // if (Input.isRepeated("cancel")) {
+                //     console.log("Input.isRepeated(cancel)");
+                //     SceneManager.pop();
+                //     SoundManager.playCancel();
+                //     //this.processBack();
+                // }
                 if (Input.isRepeated("ok")) {
                     this.processOk();
                 }
@@ -368,9 +371,8 @@ const ASSimulatedPostingSceneNameSpace = (() => {
         processOk() {
             if (this.character()) {
                 this.onCodeAdd();
-            } else if (this.isPageChange()) {
-                this.playOkSound();
-                this.cursorPagedown();
+            } else if (this.isDeleteCode()) {
+                this.processBack();
             } else if (this.isOk()) {
                 this.onCodeOk();
             }
