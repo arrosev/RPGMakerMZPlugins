@@ -47,6 +47,11 @@ const ASSimulatedPostingSceneNameSpace = (() => {
     	this.createCommandWindow();
     };
 
+    // const _Game_Party_Initialize = Game_Party.prototype.initialize;
+    // Game_Party.prototype.initialize = function() {
+    //     _Game_Party_Initialize.apply(this, arguments);
+    // };
+
     class Scene_SimulatedPosting extends Scene_MenuBase {
 
         create() {
@@ -86,8 +91,14 @@ const ASSimulatedPostingSceneNameSpace = (() => {
                 if (response.ok === true) {
                     const data = await response.json();
                     console.log(data);
+                    if (data[this._postingCodeWindow.postingCode()]) {
+                        console.log("匹配")
+                        //判断是否过期
+                    } else {
+                        console.log("无效的配信码")
+                    }
                 } else {
-                    console.log('请求异常');
+                    console.log(response.statusText);
                 }
             } catch (err) {
                 console.log(err);
@@ -96,7 +107,20 @@ const ASSimulatedPostingSceneNameSpace = (() => {
 
         onInputOk() {
             console.log("PostingCode: ", this._postingCodeWindow.postingCode());
-            this.fetchGifts();
+            // console.log("earliestSavefileId: ", DataManager.earliestSavefileId());
+            //this.fetchGifts();
+            const latestSavefileId = DataManager.latestSavefileId();
+            console.log("latestSavefileId: ", latestSavefileId);
+            if($gameParty._usedPostingCodes) {
+                console.log("已经存在配信码");
+                //判断是否已经兑换过配信码
+
+            } else {
+                $gameParty._usedPostingCodes = [];
+                console.log("第一次使用配信码");
+                
+            }
+
         }
 
     }
