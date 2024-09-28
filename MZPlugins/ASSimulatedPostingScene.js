@@ -107,7 +107,7 @@ const ASSimulatedPostingSceneNameSpace = (() => {
             if (Input.isTriggered("cancel") && this._postingStatus === PostingStatus.Init) {
                 this.clickOnCancelButton();
             }
-            if (TouchInput.isTriggered() && this._postingStatus === PostingStatus.Completed) {
+            if ((TouchInput.isTriggered() || Input.isTriggered("ok")) && this._postingStatus === PostingStatus.Completed) {
                 //console.log("点击以返回");
                 this.setPostingStatus(PostingStatus.Init);
             }
@@ -197,30 +197,30 @@ const ASSimulatedPostingSceneNameSpace = (() => {
         }
 
         onInputOk() {
-            this.setPostingStatus(PostingStatus.Processing);
-            // console.log("earliestSavefileId: ", DataManager.earliestSavefileId());
-            const latestSavefileId = DataManager.latestSavefileId();
-            console.log("latestSavefileId: ", latestSavefileId);
-            const postingCode = this._postingCodeWindow.postingCode();
-            console.log("PostingCode: ", postingCode);
-            if ($gameParty._usedPostingCodes) {
-                console.log("再次使用配信码");
+            if (this._postingStatus === PostingStatus.Init) {
+                this.setPostingStatus(PostingStatus.Processing);
+                const latestSavefileId = DataManager.latestSavefileId();
+                console.log("latestSavefileId: ", latestSavefileId);
+                const postingCode = this._postingCodeWindow.postingCode();
+                console.log("PostingCode: ", postingCode);
+                if ($gameParty._usedPostingCodes) {
+                    console.log("再次使用配信码");
                 //判断是否已经兑换过配信码
-                if (!$gameParty._usedPostingCodes.includes(postingCode)) {
-                    console.log("未使用过的配信码");
+                    if (!$gameParty._usedPostingCodes.includes(postingCode)) {
+                        console.log("未使用过的配信码");
+                        this._infoWindow.setText("正在处理配信请求");
+                        this.fetchGifts(postingCode);
+                    } else {
+                        this._infoWindow.setText("本存档已使用过此配信码");
+                        this.setPostingStatus(PostingStatus.Completed);
+                    }
+                } else {
+                    $gameParty._usedPostingCodes = [];
+                    console.log("第一次使用配信码");
                     this._infoWindow.setText("正在处理配信请求");
                     this.fetchGifts(postingCode);
-                } else {
-                    this._infoWindow.setText("本存档已使用过此配信码");
-                    this.setPostingStatus(PostingStatus.Completed);
                 }
-            } else {
-                $gameParty._usedPostingCodes = [];
-                console.log("第一次使用配信码");
-                this._infoWindow.setText("正在处理配信请求");
-                this.fetchGifts(postingCode);
             }
-
         }
 
         clickOnCancelButton() {
