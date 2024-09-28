@@ -52,12 +52,29 @@ const ASSimulatedPostingSceneNameSpace = (() => {
     //     _Game_Party_Initialize.apply(this, arguments);
     // };
 
+    const PostingStatus = {
+        Init: 0,
+        Processing:1,
+        Completed: 2
+    }
+
     class Scene_SimulatedPosting extends Scene_MenuBase {
 
         create() {
             Scene_MenuBase.prototype.create.call(this);
+            this._postingStatus = PostingStatus.Init;
+            this.createInfoWindow();
             this.createPostingCodeWindow();
             this.createInputWindow();
+            this._cancelButton.setClickHandler(this.clickOnCancelButton.bind(this));
+            this.setPostingStatus(PostingStatus.Init);
+        }
+
+        createInfoWindow() {
+            const rect = new Rectangle(0, 0, 0, 0);
+            this._infoWindow = new Window_Info(rect);
+            this._infoWindow.setText("");
+            this.addWindow(this._infoWindow);
         }
 
         createPostingCodeWindow() {
@@ -67,7 +84,7 @@ const ASSimulatedPostingSceneNameSpace = (() => {
             const wh = 144 + padding * 2;
             const wx = (Graphics.boxWidth - ww) / 2;
             const wy = (Graphics.boxHeight - (wh + inputWindowHeight + 8)) / 2 + 10;
-            const rect = new Rectangle(wx, wy, ww, wh);;
+            const rect = new Rectangle(wx, wy, ww, wh);
             this._postingCodeWindow = new Window_PostingCode(rect, 8);
             this.addWindow(this._postingCodeWindow);
             this._postingCodeWindow.refresh();
@@ -85,8 +102,58 @@ const ASSimulatedPostingSceneNameSpace = (() => {
             this.addWindow(this._inputWindow);
         }
 
+        update() {
+            Scene_MenuBase.prototype.update.call(this);
+            if (Input.isTriggered("cancel") && this._postingStatus === PostingStatus.Init) {
+                this.clickOnCancelButton();
+            }
+            if (TouchInput.isTriggered() && this._postingStatus === PostingStatus.Completed) {
+                //console.log("点击以返回");
+                this.setPostingStatus(PostingStatus.Init);
+            }
+        }
+
+        setPostingStatus(status) {
+            this._postingStatus = status;
+            switch (this._postingStatus) {
+                case PostingStatus.Init:
+                    this._cancelButton.visible = true;
+                    this._infoWindow.hide();
+                    this._postingCodeWindow.restoreDefault();
+                    this._postingCodeWindow.show();
+                    this._inputWindow.show();
+                    break;
+                case PostingStatus.Processing:
+                    this._cancelButton.visible = false;
+                    this._infoWindow.show();
+                    this._postingCodeWindow.hide();
+                    this._inputWindow.hide();
+                    break;
+                case PostingStatus.Completed:
+                    this._cancelButton.visible = false;
+                    this._infoWindow.show();
+                    this._postingCodeWindow.hide();
+                    this._inputWindow.hide();
+                    break;
+                default:
+                    break;
+            }
+        }
+
         gainGift(gift) {
             console.log(gift);
+            if (gift.type === "gold") {
+                $gameParty.gainGold(gift.number);
+            }
+            if (gift.type === "item") {
+                $gameParty.gainItem($dataItems[gift.id], gift.number);
+            }
+            if (gift.type === "weapon") {
+                $gameParty.gainItem($dataWeapons[gift.id], gift.number, false);
+            }
+            if (gift.type === "armor") {
+                $gameParty.gainItem($dataArmors[gift.id], gift.number, false);
+            }
         }
 
         async fetchGifts(postingCode) {
@@ -102,25 +169,35 @@ const ASSimulatedPostingSceneNameSpace = (() => {
                         //判断是否过期
                         if (!detailData.expire) {
                             console.log("正在搜索礼物");
+                            this._infoWindow.setText("正在搜索礼物");
                             for (const gift of detailData.gifts) {
                                 this.gainGift(gift);
                             }
                             console.log("info: ", detailData.info);
+                            //写入存档
+
+                            this._infoWindow.setText(detailData.info);
+                            this.setPostingStatus(PostingStatus.Completed);
                         } else {
-                            console.log("配信码已过期");
+                            this._infoWindow.setText("配信码已过期");
+                            this.setPostingStatus(PostingStatus.Completed);
                         }
                     } else {
-                        console.log("无效的配信码");
+                        this._infoWindow.setText("无效的配信码");
+                        this.setPostingStatus(PostingStatus.Completed);
                     }
                 } else {
-                    console.log(response.statusText);
+                    this._infoWindow.setText(response.statusText);
+                    this.setPostingStatus(PostingStatus.Completed);
                 }
             } catch (err) {
-                console.log(err);
+                this._infoWindow.setText(err);
+                this.setPostingStatus(PostingStatus.Completed);
             }
         }
 
         onInputOk() {
+            this.setPostingStatus(PostingStatus.Processing);
             // console.log("earliestSavefileId: ", DataManager.earliestSavefileId());
             const latestSavefileId = DataManager.latestSavefileId();
             console.log("latestSavefileId: ", latestSavefileId);
@@ -131,16 +208,24 @@ const ASSimulatedPostingSceneNameSpace = (() => {
                 //判断是否已经兑换过配信码
                 if (!$gameParty._usedPostingCodes.includes(postingCode)) {
                     console.log("未使用过的配信码");
+                    this._infoWindow.setText("正在处理配信请求");
                     this.fetchGifts(postingCode);
                 } else {
-                    console.log("本存档已使用过此配信码");
+                    this._infoWindow.setText("本存档已使用过此配信码");
+                    this.setPostingStatus(PostingStatus.Completed);
                 }
             } else {
                 $gameParty._usedPostingCodes = [];
                 console.log("第一次使用配信码");
+                this._infoWindow.setText("正在处理配信请求");
                 this.fetchGifts(postingCode);
             }
 
+        }
+
+        clickOnCancelButton() {
+            SoundManager.playCancel();
+            this.popScene();
         }
 
     }
@@ -150,6 +235,64 @@ const ASSimulatedPostingSceneNameSpace = (() => {
         initialize(rect) {
             Window_Base.prototype.initialize.call(this, rect);
             this.inlineIconWidth = ImageManager.iconWidth;
+        }
+
+        setText(text) {
+            if (text) {
+                const textSize = this.textSizeEx(text);
+                this.width = this._padding * 2 + textSize.width;
+                this.height = this._padding * 2 + textSize.height;
+                this.x = (Graphics.boxWidth - this.width) / 2;
+                this.y = (Graphics.boxHeight - this.height) / 2;
+                this.contents.resize(this.contentsWidth(), this.contentsHeight());
+                this.contentsBack.resize(this.contentsWidth(), this.contentsHeight());
+                this.drawTextEx(text, 0, (this.contents.height - textSize.height) / 2, textSize.width);
+            }
+        }
+
+        processEscapeCharacter(code, textState) {
+            switch (code) {
+            case "C":
+                this.processColorChange(this.obtainEscapeParam(textState));
+                break;
+            case "I":
+                this.processDrawIcon(this.obtainEscapeParam(textState), textState);
+                break;
+            case "IS":
+                this.inlineIconWidth = this.obtainEscapeParam(textState);
+                break;
+            case "PX":
+                textState.x = this.obtainEscapeParam(textState);
+                break;
+            case "PY":
+                textState.y = this.obtainEscapeParam(textState);
+                break;
+            case "FS":
+                this.contents.fontSize = this.obtainEscapeParam(textState);
+                break;
+            case "{":
+                this.makeFontBigger();
+                break;
+            case "}":
+                this.makeFontSmaller();
+                break;
+            }
+        }
+
+        processDrawIcon(iconIndex, textState) {
+            if (textState.drawing) {
+                this.drawIcon(iconIndex, textState.x + 2, textState.y);
+            }
+            textState.x += this.inlineIconWidth + 4;
+        }
+
+        drawIcon(iconIndex, x, y) {
+            const bitmap = ImageManager.loadSystem("IconSet");
+            const pw = ImageManager.iconWidth;
+            const ph = ImageManager.iconHeight;
+            const sx = (iconIndex % 16) * pw;
+            const sy = Math.floor(iconIndex / 16) * ph;
+            this.contents.blt(bitmap, sx, sy, pw, ph, x, y + (this.lineHeight() - this.inlineIconWidth) / 2, this.inlineIconWidth, this.inlineIconWidth);
         }
 
     }
@@ -409,7 +552,7 @@ const ASSimulatedPostingSceneNameSpace = (() => {
                 //     SoundManager.playCancel();
                 //     //this.processBack();
                 // }
-                if (Input.isRepeated("ok")) {
+                if (Input.isTriggered("ok")) {
                     this.processOk();
                 }
             }
