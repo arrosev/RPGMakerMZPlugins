@@ -85,17 +85,32 @@ const ASSimulatedPostingSceneNameSpace = (() => {
             this.addWindow(this._inputWindow);
         }
 
-        async fetchGifts() {
+        gainGift(gift) {
+            console.log(gift);
+        }
+
+        async fetchGifts(postingCode) {
             try {
                 const response = await fetch('https://raw.githubusercontent.com/arrosev/RMMZPluginTestFile/refs/heads/main/SimulatedPostingPluginTest.json');
                 if (response.ok === true) {
                     const data = await response.json();
-                    console.log(data);
-                    if (data[this._postingCodeWindow.postingCode()]) {
+                    console.log("data: ", data);
+                    const detailData = data[postingCode];
+                    console.log("detailData: ", detailData);
+                    if (detailData) {
                         console.log("匹配")
                         //判断是否过期
+                        if (!detailData.expire) {
+                            console.log("正在搜索礼物");
+                            for (const gift of detailData.gifts) {
+                                this.gainGift(gift);
+                            }
+                            console.log("info: ", detailData.info);
+                        } else {
+                            console.log("配信码已过期");
+                        }
                     } else {
-                        console.log("无效的配信码")
+                        console.log("无效的配信码");
                     }
                 } else {
                     console.log(response.statusText);
@@ -106,21 +121,35 @@ const ASSimulatedPostingSceneNameSpace = (() => {
         }
 
         onInputOk() {
-            console.log("PostingCode: ", this._postingCodeWindow.postingCode());
             // console.log("earliestSavefileId: ", DataManager.earliestSavefileId());
-            //this.fetchGifts();
             const latestSavefileId = DataManager.latestSavefileId();
             console.log("latestSavefileId: ", latestSavefileId);
-            if($gameParty._usedPostingCodes) {
-                console.log("已经存在配信码");
+            const postingCode = this._postingCodeWindow.postingCode();
+            console.log("PostingCode: ", postingCode);
+            if ($gameParty._usedPostingCodes) {
+                console.log("再次使用配信码");
                 //判断是否已经兑换过配信码
-
+                if (!$gameParty._usedPostingCodes.includes(postingCode)) {
+                    console.log("未使用过的配信码");
+                    this.fetchGifts(postingCode);
+                } else {
+                    console.log("本存档已使用过此配信码");
+                }
             } else {
                 $gameParty._usedPostingCodes = [];
                 console.log("第一次使用配信码");
-                
+                this.fetchGifts(postingCode);
             }
 
+        }
+
+    }
+
+    class Window_Info extends Window_Base {
+
+        initialize(rect) {
+            Window_Base.prototype.initialize.call(this, rect);
+            this.inlineIconWidth = ImageManager.iconWidth;
         }
 
     }
