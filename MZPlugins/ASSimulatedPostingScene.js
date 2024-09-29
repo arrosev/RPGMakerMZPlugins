@@ -1,6 +1,6 @@
 /*:
  * @target MZ
- * @plugindesc [V1.0.0] 模拟配信场景插件
+ * @plugindesc [V1.0.0] 模拟配信插件
  * @author Arrose
  * 
  * @url https://github.com/arrosev/RPGMakerMZPlugins
@@ -30,6 +30,8 @@
  * SOFTWARE.
  *
  * 这个插件主要用于模拟配信功能
+ *
+ * 打开模拟配信场景脚本: ASSimulatedPostingSceneNameSpace.openSimulatedPostingScene();
  *
  * @param simulatedPostingSceneRequestAddress
  * @text 配信请求地址
@@ -105,6 +107,10 @@
  * @type string
  * @default 配信码已过期
  *
+ * @command openSimulatedPostingScene
+ * @text 打开模拟配信场景
+ * @desc 打开模拟配信场景
+ *
  */
 
 const ASSimulatedPostingSceneNameSpace = (() => {
@@ -125,13 +131,13 @@ const ASSimulatedPostingSceneNameSpace = (() => {
     const tipsText5 = parameters.tipsText5 || "";
     const tipsText6 = parameters.tipsText6 || "";
 
-    Scene_Title.prototype.create = function() {
-    	Scene_Base.prototype.create.call(this);
-    	this.createBackground();
-    	this.createForeground();
-    	this.createWindowLayer();
-    	this.createCommandWindow();
-    };
+    const openSimulatedPostingScene = function() {
+        SceneManager.push(Scene_SimulatedPosting);
+    }
+
+    PluginManager.registerCommand(pluginName, "openSimulatedPostingScene", args => {
+        SceneManager.push(Scene_SimulatedPosting);
+    });
 
     const PostingStatus = {
         Init: 0,
@@ -225,7 +231,7 @@ const ASSimulatedPostingSceneNameSpace = (() => {
         }
 
         gainGift(gift) {
-            console.log(gift);
+            //console.log(gift);
             if (gift.type === "gold") {
                 $gameParty.gainGold(gift.number);
             }
@@ -246,19 +252,18 @@ const ASSimulatedPostingSceneNameSpace = (() => {
                 const response = await fetch(simulatedPostingSceneRequestAddress);
                 if (response.ok === true) {
                     const data = await response.json();
-                    console.log("data: ", data);
+                    //console.log("data: ", data);
                     const detailData = data[postingCode];
-                    console.log("detailData: ", detailData);
+                    //console.log("detailData: ", detailData);
                     if (detailData) {
-                        console.log("匹配")
                         //判断是否过期
                         if (!detailData.expire) {
-                            console.log("正在搜索礼物");
+                            //console.log("正在搜索礼物");
                             this._infoWindow.setText(tipsText4);
                             for (const gift of detailData.gifts) {
                                 this.gainGift(gift);
                             }
-                            console.log("info: ", detailData.info);
+                            //console.log("info: ", detailData.info);
                             $gameParty._usedPostingCodes.push(postingCode);
                             this._infoWindow.setText(detailData.info);
                             this.setPostingStatus(PostingStatus.Completed);
@@ -294,7 +299,7 @@ const ASSimulatedPostingSceneNameSpace = (() => {
                     this.setPostingStatus(PostingStatus.Completed);
                 }
             } catch (err) {
-                this._infoWindow.setText(err);
+                this._infoWindow.setText(err.message);
                 this.setPostingStatus(PostingStatus.Completed);
             }
         }
@@ -303,9 +308,9 @@ const ASSimulatedPostingSceneNameSpace = (() => {
             if (this._postingStatus === PostingStatus.Init) {
                 this.setPostingStatus(PostingStatus.Processing);
                 const postingCode = this._postingCodeWindow.postingCode();
-                console.log("PostingCode: ", postingCode);
+                //console.log("PostingCode: ", postingCode);
                 if ($gameParty._usedPostingCodes) {
-                    console.log("再次使用配信码");
+                    //console.log("再次使用配信码");
                     //判断是否已经兑换过配信码
                     if (!$gameParty._usedPostingCodes.includes(postingCode)) {
                         console.log("未使用过的配信码");
@@ -317,7 +322,7 @@ const ASSimulatedPostingSceneNameSpace = (() => {
                     }
                 } else {
                     $gameParty._usedPostingCodes = [];
-                    console.log("第一次使用配信码");
+                    //console.log("第一次使用配信码");
                     this._infoWindow.setText(tipsText2);
                     this.fetchGifts(postingCode);
                 }
@@ -714,7 +719,7 @@ const ASSimulatedPostingSceneNameSpace = (() => {
     }
 
     return {
-        Scene_SimulatedPosting
+        openSimulatedPostingScene
     }    
 
 })();
