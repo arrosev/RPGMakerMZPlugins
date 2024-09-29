@@ -1,13 +1,110 @@
 /*:
  * @target MZ
- * @plugindesc 模拟配信场景插件
+ * @plugindesc [V1.0.0] 模拟配信场景插件
  * @author Arrose
  * 
  * @url https://github.com/arrosev/RPGMakerMZPlugins
  * 
  * @help
  * 
+ * 这个插件在MIT许可下发布
  * 
+ * Copyright (c) 2024 Arrose
+
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * 这个插件主要用于模拟配信功能
+ *
+ * @param simulatedPostingSceneRequestAddress
+ * @text 配信请求地址
+ * @desc 配信请求地址
+ * @type string
+ * @default
+ *
+ * @param simulatedPostingSceneStyleSet
+ * @text 样式设置
+ * @desc 样式设置
+ * @type string
+ * @default
+ *
+ * @param postingCodeMaxLength
+ * @text 配信码字符最大长度
+ * @desc 配信码字符最大长度
+ * @parent simulatedPostingSceneStyleSet
+ * @type number
+ * @default 8
+ *
+ * @param postingCodeCharWidth
+ * @text 配信码单格宽度
+ * @desc 配信码单格宽度
+ * @parent simulatedPostingSceneStyleSet
+ * @type number
+ * @default 50
+ * 
+ * @param simulatedPostingSceneTipsTextSet
+ * @text 提示文本设置
+ * @desc 提示文本设置
+ * @type string
+ * @default
+ *
+ * @param tipsText1
+ * @text 提示文本1
+ * @desc 提示文本1
+ * @parent simulatedPostingSceneTipsTextSet
+ * @type string
+ * @default 请输入配信码：
+ *
+ * @param tipsText2
+ * @text 提示文本2
+ * @desc 提示文本2
+ * @parent simulatedPostingSceneTipsTextSet
+ * @type string
+ * @default 正在处理配信请求
+ *
+ * @param tipsText3
+ * @text 提示文本3
+ * @desc 提示文本3
+ * @parent simulatedPostingSceneTipsTextSet
+ * @type string
+ * @default 本存档已使用过此配信码
+ *
+ * @param tipsText4
+ * @text 提示文本4
+ * @desc 提示文本4
+ * @parent simulatedPostingSceneTipsTextSet
+ * @type string
+ * @default 正在搜索礼物
+ *
+ * @param tipsText5
+ * @text 提示文本5
+ * @desc 提示文本5
+ * @parent simulatedPostingSceneTipsTextSet
+ * @type string
+ * @default 无效的配信码
+ *
+ * @param tipsText6
+ * @text 提示文本6
+ * @desc 提示文本6
+ * @parent simulatedPostingSceneTipsTextSet
+ * @type string
+ * @default 配信码已过期
+ *
  */
 
 const ASSimulatedPostingSceneNameSpace = (() => {
@@ -16,28 +113,17 @@ const ASSimulatedPostingSceneNameSpace = (() => {
     const pluginName = "ASSimulatedPostingScene";
     const parameters = PluginManager.parameters(pluginName);
 
-    // const fetchJson = async function () {
-    // 	let response = await fetch('https://raw.githubusercontent.com/arrosev/RMMZPluginTestFile/refs/heads/main/SimulatedPostingPluginTest.json');
-    // 	if (response.status >= 200 && response.status < 300) {
-    // 		return await response.json();
-    // 	} else {
-    // 		throw new Error(response.statusText);
-    // 	}
-    // }
+    const simulatedPostingSceneRequestAddress = parameters.simulatedPostingSceneRequestAddress || "";
 
-    // const fetchGifts = async () => {
-    //     try {
-    //         const response = await fetch('https://raw.githubusercontent.com/arrosev/RMMZPluginTestFile/refs/heads/main/SimulatedPostingPluginTest.json');
-    //         if (response.ok === true) {
-    //             const data = await response.json();
-    //             console.log(data);
-    //         } else {
-    //             console.log('请求异常');
-    //         }
-    //     } catch (err) {
-    //         console.log(err);
-    //     }
-    // }
+    const postingCodeMaxLength = Number(parameters.postingCodeMaxLength) || 0;
+    const postingCodeCharWidth = Number(parameters.postingCodeCharWidth) || 0;
+
+    const tipsText1 = parameters.tipsText1 || "";
+    const tipsText2 = parameters.tipsText2 || "";
+    const tipsText3 = parameters.tipsText3 || "";
+    const tipsText4 = parameters.tipsText4 || "";
+    const tipsText5 = parameters.tipsText5 || "";
+    const tipsText6 = parameters.tipsText6 || "";
 
     Scene_Title.prototype.create = function() {
     	Scene_Base.prototype.create.call(this);
@@ -47,14 +133,9 @@ const ASSimulatedPostingSceneNameSpace = (() => {
     	this.createCommandWindow();
     };
 
-    // const _Game_Party_Initialize = Game_Party.prototype.initialize;
-    // Game_Party.prototype.initialize = function() {
-    //     _Game_Party_Initialize.apply(this, arguments);
-    // };
-
     const PostingStatus = {
         Init: 0,
-        Processing:1,
+        Processing: 1,
         Completed: 2
     }
 
@@ -85,7 +166,7 @@ const ASSimulatedPostingSceneNameSpace = (() => {
             const wx = (Graphics.boxWidth - ww) / 2;
             const wy = (Graphics.boxHeight - (wh + inputWindowHeight + 8)) / 2 + 10;
             const rect = new Rectangle(wx, wy, ww, wh);
-            this._postingCodeWindow = new Window_PostingCode(rect, 8);
+            this._postingCodeWindow = new Window_PostingCode(rect, postingCodeMaxLength);
             this.addWindow(this._postingCodeWindow);
             this._postingCodeWindow.refresh();
         }
@@ -161,7 +242,8 @@ const ASSimulatedPostingSceneNameSpace = (() => {
 
         async fetchGifts(postingCode) {
             try {
-                const response = await fetch('https://raw.githubusercontent.com/arrosev/RMMZPluginTestFile/refs/heads/main/SimulatedPostingPluginTest.json');
+                //'https://raw.githubusercontent.com/arrosev/RMMZPluginTestFile/refs/heads/main/SimulatedPostingPluginTest.json'
+                const response = await fetch(simulatedPostingSceneRequestAddress);
                 if (response.ok === true) {
                     const data = await response.json();
                     console.log("data: ", data);
@@ -172,23 +254,39 @@ const ASSimulatedPostingSceneNameSpace = (() => {
                         //判断是否过期
                         if (!detailData.expire) {
                             console.log("正在搜索礼物");
-                            this._infoWindow.setText("正在搜索礼物");
+                            this._infoWindow.setText(tipsText4);
                             for (const gift of detailData.gifts) {
                                 this.gainGift(gift);
                             }
                             console.log("info: ", detailData.info);
-                            //写入存档
-                            const latestSavefileId = DataManager.latestSavefileId();
-                            console.log("latestSavefileId: ", latestSavefileId);
-                            
+                            $gameParty._usedPostingCodes.push(postingCode);
                             this._infoWindow.setText(detailData.info);
                             this.setPostingStatus(PostingStatus.Completed);
+                            //写入存档
+                            // const latestSavefileId = DataManager.latestSavefileId();
+                            // const savefileId = latestSavefileId === 0 ? 1 : latestSavefileId;
+                            // console.log("savefileId: ", savefileId);
+                            // $gameParty._usedPostingCodes.push(postingCode);
+                            // $gameSystem.setSavefileId(savefileId);
+                            // $gameSystem.onBeforeSave();
+                            // DataManager.saveGame(savefileId);
+                            // .then(() => {
+                            //     console.log("配信完成，保存成功");
+                            //     this._infoWindow.setText(detailData.info);
+                            //     this.setPostingStatus(PostingStatus.Completed);
+                            // })
+                            // .catch((error) => {
+                            //     console.log("catch error:", error);
+                            //     $gameParty._usedPostingCodes.pop(postingCode);
+                            //     this._infoWindow.setText(error);
+                            //     this.setPostingStatus(PostingStatus.Completed);
+                            // });
                         } else {
-                            this._infoWindow.setText("配信码已过期");
+                            this._infoWindow.setText(tipsText6);
                             this.setPostingStatus(PostingStatus.Completed);
                         }
                     } else {
-                        this._infoWindow.setText("无效的配信码");
+                        this._infoWindow.setText(tipsText5);
                         this.setPostingStatus(PostingStatus.Completed);
                     }
                 } else {
@@ -204,25 +302,23 @@ const ASSimulatedPostingSceneNameSpace = (() => {
         onInputOk() {
             if (this._postingStatus === PostingStatus.Init) {
                 this.setPostingStatus(PostingStatus.Processing);
-                // const latestSavefileId = DataManager.latestSavefileId();
-                // console.log("latestSavefileId: ", latestSavefileId);
                 const postingCode = this._postingCodeWindow.postingCode();
                 console.log("PostingCode: ", postingCode);
                 if ($gameParty._usedPostingCodes) {
                     console.log("再次使用配信码");
-                //判断是否已经兑换过配信码
+                    //判断是否已经兑换过配信码
                     if (!$gameParty._usedPostingCodes.includes(postingCode)) {
                         console.log("未使用过的配信码");
-                        this._infoWindow.setText("正在处理配信请求");
+                        this._infoWindow.setText(tipsText2);
                         this.fetchGifts(postingCode);
                     } else {
-                        this._infoWindow.setText("本存档已使用过此配信码");
+                        this._infoWindow.setText(tipsText3);
                         this.setPostingStatus(PostingStatus.Completed);
                     }
                 } else {
                     $gameParty._usedPostingCodes = [];
                     console.log("第一次使用配信码");
-                    this._infoWindow.setText("正在处理配信请求");
+                    this._infoWindow.setText(tipsText2);
                     this.fetchGifts(postingCode);
                 }
             }
@@ -350,7 +446,7 @@ const ASSimulatedPostingSceneNameSpace = (() => {
 
         charWidth() {
             // return this.textWidth("A");
-            return 50;
+            return postingCodeCharWidth;
         }
 
         itemRect(index) {
@@ -378,7 +474,7 @@ const ASSimulatedPostingSceneNameSpace = (() => {
         drawTips() {
             this.contentsBack.fontSize = 26;
             //this.contentsBack.textColor = this.bitmapLabelTextColor;
-            this.contentsBack.drawText("请输入配信码：", 20, 8, this.width, this.lineHeight(), "left");
+            this.contentsBack.drawText(tipsText1, 20, 8, this.width, this.lineHeight(), "left");
         }
 
         drawUnderline(index) {
