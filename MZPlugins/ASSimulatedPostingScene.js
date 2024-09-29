@@ -122,18 +122,21 @@ const ASSimulatedPostingSceneNameSpace = (() => {
                     this._postingCodeWindow.restoreDefault();
                     this._postingCodeWindow.show();
                     this._inputWindow.show();
+                    this._inputWindow.activate();
                     break;
                 case PostingStatus.Processing:
                     this._cancelButton.visible = false;
                     this._infoWindow.show();
                     this._postingCodeWindow.hide();
                     this._inputWindow.hide();
+                    this._inputWindow.deactivate();
                     break;
                 case PostingStatus.Completed:
                     this._cancelButton.visible = false;
                     this._infoWindow.show();
                     this._postingCodeWindow.hide();
                     this._inputWindow.hide();
+                    this._inputWindow.deactivate();
                     break;
                 default:
                     break;
@@ -175,7 +178,9 @@ const ASSimulatedPostingSceneNameSpace = (() => {
                             }
                             console.log("info: ", detailData.info);
                             //写入存档
-
+                            const latestSavefileId = DataManager.latestSavefileId();
+                            console.log("latestSavefileId: ", latestSavefileId);
+                            
                             this._infoWindow.setText(detailData.info);
                             this.setPostingStatus(PostingStatus.Completed);
                         } else {
@@ -199,8 +204,8 @@ const ASSimulatedPostingSceneNameSpace = (() => {
         onInputOk() {
             if (this._postingStatus === PostingStatus.Init) {
                 this.setPostingStatus(PostingStatus.Processing);
-                const latestSavefileId = DataManager.latestSavefileId();
-                console.log("latestSavefileId: ", latestSavefileId);
+                // const latestSavefileId = DataManager.latestSavefileId();
+                // console.log("latestSavefileId: ", latestSavefileId);
                 const postingCode = this._postingCodeWindow.postingCode();
                 console.log("PostingCode: ", postingCode);
                 if ($gameParty._usedPostingCodes) {
